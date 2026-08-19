@@ -1,0 +1,189 @@
+---
+import ChaiIcon from "../assets/images/logos/Icon-Hand-drawn-White.png";
+import { Image } from "astro:assets";
+
+const socials = [
+  { label: "Facebook", href: "https://www.facebook.com/chaiwallahs" },
+  { label: "Instagram", href: "https://www.instagram.com/chaiwallahs/" },
+  { label: "YouTube", href: "https://www.youtube.com/@ChaiWallahs" },
+  { label: "TikTok", href: "https://www.tiktok.com/@chaiwallahs_" },
+];
+
+const explore = [
+  { href: "/about/", label: "About" },
+  { href: "/events/", label: "Events" },
+  { href: "/where-it-all-began/", label: "Where It All Began" },
+  { href: "/shop/", label: "Shop" },
+];
+
+const involved = [
+  { href: "/contact/#artists", label: "Apply to Play" },
+  { href: "/contact/#crew", label: "Join the Crew" },
+  { href: "/contact/#production", label: "Book Us" },
+];
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-top">
+    <div class="footer-brand">
+      <Image src={ChaiIcon} alt="" width={128} height={128} class="footer-icon" />
+      <p class="footer-tagline">Where all good things come together.<br />Independent since '99.</p>
+    </div>
+
+    <nav class="footer-col">
+      <p class="eyebrow">Explore</p>
+      <ul>
+        {explore.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <nav class="footer-col">
+      <p class="eyebrow">Get Involved</p>
+      <ul>
+        {involved.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="footer-col">
+      <p class="eyebrow">Follow</p>
+      <ul>
+        {socials.map((s) => (
+          <li><a href={s.href} target="_blank" rel="noopener noreferrer">{s.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="wrap footer-bottom">
+    <p>2026 Chai Wallahs. Where All Good Things Come Together.</p>
+    <p><a href="mailto:sichai@chaiwallahs.co.uk">sichai@chaiwallahs.co.uk</a></p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-3) var(--space-4);
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .footer-icon {
+    display: block;
+    height: 96px;
+    width: 96px;
+    flex-shrink: 0;
+    opacity: 0.9;
+  }
+
+  .footer-tagline {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    line-height: 1.15;
+    max-width: 20ch;
+    margin-top: 0.2rem;
+    color: var(--off-white);
+  }
+
+  .footer-col .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-2);
+  }
+
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .footer-col a {
+    text-decoration: none;
+    color: var(--off-white);
+    opacity: 0.8;
+    font-size: 0.95rem;
+    transition: opacity 0.15s ease, color 0.15s ease;
+  }
+
+  .footer-col a:hover {
+    opacity: 1;
+    color: var(--chai-gold);
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    padding: var(--space-3);
+    border-top: 1px solid rgba(239, 239, 239, 0.12);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    color: rgba(239, 239, 239, 0.6);
+  }
+
+  .footer-bottom a {
+    text-decoration: none;
+    color: rgba(239, 239, 239, 0.6);
+  }
+
+  .footer-bottom a:hover {
+    color: var(--chai-gold);
+  }
+
+  @media (max-width: 860px) {
+    .footer-top {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 499px) {
+    .footer-top {
+      grid-template-columns: 1fr 1fr;
+      row-gap: var(--space-4);
+    }
+
+    .footer-brand {
+      grid-column: auto;
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    /* Explore/Get Involved/Follow sit on the same row as the brand block,
+       overriding the 860px breakpoint's 2-col/2-row layout for this range. */
+    .footer-top {
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      gap: var(--space-3);
+    }
+
+    .footer-brand {
+      grid-column: auto;
+    }
+
+    .footer-tagline {
+      max-width: 16ch;
+      font-size: 0.95rem;
+    }
+  }
+</style>

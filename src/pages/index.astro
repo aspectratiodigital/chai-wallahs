@@ -1,0 +1,922 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import EventCard from "../components/EventCard.astro";
+import Highlight from "../components/Highlight.astro";
+import { Image } from "astro:assets";
+import { upcomingEvents } from "../data/events.js";
+
+import HeroBg from "../assets/images/backgrounds/orange-2.png";
+import StampWhite from "../assets/images/logos/Icon-Hand-drawn-White.png";
+import RootsIcon from "../assets/images/symbols/white/Roots1.png";
+import CrewIcon from "../assets/images/symbols/white/Crew.png";
+import CommunityIcon from "../assets/images/symbols/white/Community.png";
+import SoundIcon from "../assets/images/symbols/white/Sound1.png";
+import DancingIcon from "../assets/images/symbols/white/Dancing1.png";
+import MissionBg from "../assets/images/backgrounds/green-1.png";
+import WiabBg from "../assets/images/backgrounds/green-4.png";
+import WiabSticker from "../assets/images/logos/wiab-sticker.svg";
+import GrassrootsHoodieGrey from "../assets/images/shop/grassroots-hoodie-grey.jpg";
+import ChaiTeeBlack from "../assets/images/shop/chai-tee-black.jpg";
+import ChaiHoodieBlack from "../assets/images/shop/chai-hoodie-black.jpg";
+import CtaBg from "../assets/images/gallery/chai-stage.jpg";
+import GreenmanLogo from "../assets/images/festivals/greenman.svg";
+import SgpLogo from "../assets/images/festivals/secret-garden-party.svg";
+import BoomerangLogo from "../assets/images/festivals/boomerang.svg";
+import ShambalaLogo from "../assets/images/festivals/shambala.svg";
+import KendalCallingRaw from "../assets/images/festivals/kendal-calling.svg?raw";
+
+const merch = [
+  { name: "Grassroots Supporter Hoodie", price: "£50.00", image: GrassrootsHoodieGrey },
+  { name: "Chai Wallah's Organic T-Shirt", price: "£25.00", image: ChaiTeeBlack },
+  { name: "Chai Wallah's Heavyweight Hoodie", price: "£50.00", image: ChaiHoodieBlack },
+];
+
+const festivals = [
+  { name: "Greenman", logo: GreenmanLogo },
+  { name: "Kendal Calling", inlineSvg: KendalCallingRaw, big: true },
+  { name: "Secret Garden Party", logo: SgpLogo, big: true },
+  { name: "Boomerang", logo: BoomerangLogo },
+  { name: "Shambala", logo: ShambalaLogo },
+];
+
+const missionPoints = [
+  { icon: RootsIcon, text: "A platform where non-commercial music is not a compromise — it's the entire point." },
+  { icon: CrewIcon, text: "First stages for voices that deserve to be heard." },
+  { icon: SoundIcon, text: "Fair pay for artists isn't a radical idea. Just the right one." },
+  { icon: DancingIcon, text: "Festivals that feel alive again — made for you, not sold to you." },
+  { icon: CommunityIcon, text: "So the music sounds, as the artists intended." },
+];
+
+const stats = [
+  { target: 27, prefix: "", suffix: "", label: "Years of Stages" },
+  { target: 3000, prefix: "", suffix: "+", label: "Bands & Artists" },
+  { target: 2000000, prefix: "", suffix: "+", label: "Spectators", fast: true },
+  { target: 50, prefix: "", suffix: "%", label: "Shop Profits to Grassroots" },
+];
+---
+
+<BaseLayout title="Home" description="Independent, artist-first festival venue and sound system. Grassroots since '99.">
+  <!-- HERO -->
+  <section class="hero">
+    <Image src={HeroBg} alt="" class="hero-img" width={2200} height={1400} priority />
+    <div class="hero-scrim"></div>
+    <div class="wrap hero-content">
+      <Image src={StampWhite} alt="" width={70} height={70} class="hero-stamp" />
+      <h1 class="hero-headline">Where all<br /><Highlight rotate={-1.2}>good things</Highlight><br />come together</h1>
+      <p class="hero-tag">Independent since '99</p>
+      <div class="hero-ctas">
+        <a href="/events/" class="btn btn-solid">Upcoming Events</a>
+        <a href="/contact/#artists" class="btn btn-outline">Apply to Play</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- UPCOMING EVENTS -->
+  <section class="section events-strip">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow section-label">&gt; Upcoming</p>
+        <h2>Next up on the stage</h2>
+      </div>
+      <div class="events-grid">
+        {upcomingEvents.map((e) => <EventCard {...e} featured />)}
+      </div>
+      <a href="/events/" class="btn btn-outline see-all">See All Events</a>
+    </div>
+  </section>
+
+  <!-- WHY WE EXIST -->
+  <section class="mission">
+    <Image src={MissionBg} alt="" class="mission-img" width={2200} height={1400} />
+    <div class="mission-scrim"></div>
+    <div class="wrap mission-grid">
+      <div class="mission-copy">
+        <p class="eyebrow">&gt; Why We Exist</p>
+        <h2>We exist to support the <Highlight color="ember" rotate={1}>unsupported</Highlight></h2>
+        <p class="mission-founding">
+          In 1999, Richard Howard and Si Chai sat down with a cuppa and believed the music industry
+          could be a fairer place. 27 years later, we still do.
+        </p>
+      </div>
+      <ul class="mission-points">
+        {
+          missionPoints.map((point) => (
+            <li>
+              <Image src={point.icon} alt="" width={40} height={40} />
+              <p>{point.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="wrap stats-grid">
+      {
+        stats.map((s) => {
+          const finalText = s.prefix + s.target.toLocaleString("en-GB") + s.suffix;
+          return (
+            <div>
+              <span
+                class="stat-num"
+                data-target={s.target}
+                data-prefix={s.prefix}
+                data-suffix={s.suffix}
+                data-fast={s.fast ? "true" : undefined}
+                style={`min-width:${finalText.length}ch;`}
+              >
+                {s.prefix}0{s.suffix}
+              </span>
+              <span class="stat-label">{s.label}</span>
+            </div>
+          );
+        })
+      }
+    </div>
+    <div class="stats-marquee">
+      <div class="stats-track">
+        {
+          [0, 1].map((copy) => (
+            <div class="stats-set" aria-hidden={copy === 1 ? "true" : undefined}>
+              {
+                stats.map((s) => {
+                  const finalText = s.prefix + s.target.toLocaleString("en-GB") + s.suffix;
+                  return (
+                    <div class="stat-item">
+                      <span
+                        class="stat-num"
+                        data-target={s.target}
+                        data-prefix={s.prefix}
+                        data-suffix={s.suffix}
+                        data-fast={s.fast ? "true" : undefined}
+                        style={`min-width:${finalText.length}ch;`}
+                      >
+                        {s.prefix}0{s.suffix}
+                      </span>
+                      <span class="stat-label">{s.label}</span>
+                    </div>
+                  );
+                })
+              }
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- WIAB CROSS-PROMO -->
+  <section class="wiab-band">
+    <Image src={WiabBg} alt="" class="wiab-img" width={2200} height={1400} />
+    <div class="wiab-scrim"></div>
+    <div class="wrap wiab-grid">
+      <div class="wiab-media">
+        <img src="/images/wiab-lineup.gif" alt="Where It All Began line-up" width="900" height="900" />
+      </div>
+      <div class="wiab-content">
+        <Image src={WiabSticker} alt="Where It All Began" width={110} height={96} class="wiab-logo" />
+        <h2>We're the <Highlight color="ember" rotate={1.2}>people</Highlight> behind it.</h2>
+        <p class="wiab-sub">
+          Not "Chai Wallahs presents." Same people, same standards, new scale — a whole new festival,
+          brought to you by the people behind Chai Wallahs.
+        </p>
+        <a href="/where-it-all-began/" class="btn btn-outline wiab-btn">Find out more</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MERCH TEASER -->
+  <section class="section merch">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow section-label">&gt; We Got Merch</p>
+        <h2>Wear the stamp</h2>
+      </div>
+      <div class="merch-grid">
+        {
+          merch.map((item) => (
+            <a href="/shop/" class="merch-card">
+              <div class="merch-swatch">
+                <Image src={item.image} alt={item.name} width={480} height={480} />
+              </div>
+              <p class="merch-name">{item.name}</p>
+              <p class="merch-price eyebrow">{item.price}</p>
+            </a>
+          ))
+        }
+      </div>
+      <a href="/shop/" class="btn btn-solid see-all">Visit the Shop</a>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <Image src={CtaBg} alt="" class="final-cta-img" width={2048} height={1254} />
+    <div class="final-cta-scrim"></div>
+    <div class="wrap final-cta-content">
+      <h2>Apply to play Chai Wallahs 2027</h2>
+      <p>The Chai Wallahs family are welcoming submissions for new artists to join us for the 2027 season and our new festival, Where It All Began. Show us where you are now as performers.</p>
+      <a href="/contact/#artists" class="btn btn-solid">Apply to Play</a>
+    </div>
+  </section>
+
+  <!-- FESTIVALS WE'VE PLAYED -->
+  <section class="section festivals">
+    <div class="wrap">
+      <p class="eyebrow festivals-label">27 years of stages, at —</p>
+    </div>
+    <div class="festivals-marquee">
+      <div class="festivals-track">
+        {
+          [0, 1].map((copy) => (
+            <div class="festivals-set" aria-hidden={copy === 1 ? "true" : undefined}>
+              {
+                festivals.map((f) =>
+                  f.inlineSvg ? (
+                    <span
+                      class:list={["festival-logo", "festival-logo--inline", { "festival-logo--big": f.big }]}
+                      aria-label={f.name}
+                      set:html={f.inlineSvg}
+                    />
+                  ) : (
+                    <span
+                      class:list={["festival-logo", { "festival-logo--big": f.big }]}
+                      aria-label={f.name}
+                      style={`-webkit-mask-image:url("${f.logo.src}"); mask-image:url("${f.logo.src}");`}
+                    />
+                  ),
+                )
+              }
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const nums = Array.from(document.querySelectorAll<HTMLElement>(".stat-num[data-target]"));
+  const formatter = new Intl.NumberFormat("en-GB");
+  const statsSection = document.querySelector(".stats");
+
+  function animate(el: HTMLElement): Promise<void> {
+    return new Promise((resolve) => {
+      const target = Number(el.dataset.target ?? "0");
+      const prefix = el.dataset.prefix ?? "";
+      const suffix = el.dataset.suffix ?? "";
+      const duration = el.dataset.fast === "true" ? 490 : target > 100 ? 1200 : 700;
+      const start = performance.now();
+
+      function tick(now: number) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const value = Math.floor(eased * target);
+        el.textContent = prefix + formatter.format(value) + suffix;
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          el.textContent = prefix + formatter.format(target) + suffix;
+          resolve();
+        }
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
+  async function runSequence() {
+    const order: number[] = [];
+    for (const el of nums) {
+      const target = Number(el.dataset.target ?? "0");
+      if (!order.includes(target)) order.push(target);
+    }
+    for (const target of order) {
+      const group = nums.filter((el) => Number(el.dataset.target ?? "0") === target);
+      await Promise.all(group.map((el) => animate(el)));
+      if (target === order[0]) {
+        startMarquee();
+      }
+    }
+  }
+
+  // Mobile/tablet marquee: sits with the first stat centred while it counts up,
+  // then glides into the continuous scroll from that exact position — no jump.
+  const marqueeEl = document.querySelector<HTMLElement>(".stats-marquee");
+  const trackEl = document.querySelector<HTMLElement>(".stats-track");
+  const firstSetEl = trackEl?.querySelector<HTMLElement>(".stats-set:not([aria-hidden])") ?? null;
+  const firstItemEl = firstSetEl?.querySelector<HTMLElement>(".stat-item") ?? null;
+  let centeredOffset = 0;
+
+  function centerFirstItem() {
+    if (!marqueeEl || !trackEl || !firstItemEl) return;
+    trackEl.style.transform = "translateX(0px)";
+    const marqueeRect = marqueeEl.getBoundingClientRect();
+    const trackRect = trackEl.getBoundingClientRect();
+    const itemRect = firstItemEl.getBoundingClientRect();
+    const isTablet = window.matchMedia("(min-width: 500px) and (max-width: 850px)").matches;
+    if (isTablet) {
+      // Tablet: anchor the first stat 40px from the left edge instead of centring it.
+      const itemLeftInTrack = itemRect.left - trackRect.left;
+      centeredOffset = 40 - itemLeftInTrack;
+    } else {
+      const itemCenterInTrack = itemRect.left - trackRect.left + itemRect.width / 2;
+      centeredOffset = marqueeRect.width / 2 - itemCenterInTrack;
+    }
+    trackEl.style.transform = `translateX(${centeredOffset}px)`;
+  }
+
+  function startMarquee() {
+    if (!trackEl || !firstSetEl) return;
+    // The wrap distance is one set's width PLUS the track's own gap to the next
+    // set — not just the set's width — or the loop jumps by that gap each cycle.
+    const trackGap = parseFloat(getComputedStyle(trackEl).columnGap || "0");
+    const setWidth = firstSetEl.getBoundingClientRect().width + trackGap;
+    const speed = setWidth / 18000; // px/ms
+    let offset = centeredOffset;
+    let lastTime: number | null = null;
+
+    function tick(now: number) {
+      if (lastTime === null) lastTime = now;
+      offset -= speed * (now - lastTime);
+      lastTime = now;
+      if (offset <= centeredOffset - setWidth) offset += setWidth;
+      if (trackEl) trackEl.style.transform = `translateX(${offset}px)`;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  if (window.matchMedia("(max-width: 850px)").matches) {
+    centerFirstItem();
+    document.fonts?.ready.then(centerFirstItem);
+    window.addEventListener("resize", centerFirstItem);
+  }
+
+  if (statsSection) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            runSequence();
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(statsSection);
+  }
+</script>
+
+<style>
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .hero :global(.hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.92) 0%, rgba(27, 21, 17, 0.35) 55%, rgba(27, 21, 17, 0.15) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    padding-bottom: var(--space-6);
+    padding-top: var(--space-6);
+  }
+
+  .hero-stamp {
+    margin-bottom: var(--space-2);
+  }
+
+  .hero-headline {
+    color: var(--off-white);
+  }
+
+  .hero-tag {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--chai-gold);
+    margin-top: var(--space-3);
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  /* Section head */
+  .section-head {
+    margin-bottom: var(--space-4);
+  }
+
+  .section-head .section-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  /* EVENTS STRIP */
+  .events-strip {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .events-strip h2 {
+    color: var(--off-white);
+  }
+
+  .events-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .events-strip .see-all {
+    margin-top: var(--space-4);
+  }
+
+  /* MISSION */
+  .mission {
+    position: relative;
+    color: var(--off-white);
+    overflow: hidden;
+    padding: var(--space-6) 0;
+  }
+
+  .mission :global(.mission-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mission-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(27, 21, 17, 0.68);
+  }
+
+  .mission-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+    align-items: start;
+  }
+
+  .mission .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .mission h2 {
+    color: var(--off-white);
+  }
+
+  .mission h2 :global(.highlight-word) {
+    padding: 0.16em 0.5em 0.16em 0.45em;
+    margin-left: -0.45em;
+  }
+
+  .mission-founding {
+    margin-top: var(--space-3);
+    max-width: 42ch;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  .mission-points {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .mission-points li {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .mission-points :global(img) {
+    flex-shrink: 0;
+    opacity: 0.9;
+  }
+
+  .mission-points p {
+    margin: 0;
+  }
+
+  /* STATS */
+  .stats {
+    background: var(--stage-black);
+    color: var(--off-white);
+    padding: var(--space-4) 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  .stat-num {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--chai-gold);
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-top: 0.4rem;
+  }
+
+  .stats-marquee {
+    display: none;
+  }
+
+  /* MERCH */
+  .merch {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .merch h2 {
+    color: var(--off-white);
+  }
+
+  .merch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .merch-card {
+    text-decoration: none;
+    color: var(--off-white);
+    display: block;
+  }
+
+  .merch-swatch {
+    aspect-ratio: 1;
+    background: var(--off-white);
+    border: 1px solid rgba(27, 21, 17, 0.1);
+    margin-bottom: var(--space-2);
+    overflow: hidden;
+  }
+
+  .merch-swatch :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.25s ease;
+  }
+
+  .merch-card:hover .merch-swatch :global(img) {
+    transform: scale(1.04);
+  }
+
+  .merch-name {
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+    color: var(--off-white);
+  }
+
+  .merch-price {
+    color: var(--chai-gold);
+  }
+
+  .merch .see-all {
+    margin-top: var(--space-4);
+  }
+
+  /* WIAB BAND */
+  .wiab-band {
+    position: relative;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .wiab-band :global(.wiab-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .wiab-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(27, 21, 17, 0.62);
+  }
+
+  .wiab-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: var(--space-5);
+    align-items: center;
+    padding: var(--space-6) 0;
+  }
+
+  .wiab-media {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .wiab-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .wiab-logo {
+    margin-bottom: var(--space-2);
+  }
+
+  .wiab-content h2 {
+    color: var(--off-white);
+  }
+
+  .wiab-content .wiab-sub {
+    margin-top: var(--space-3);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  .wiab-btn {
+    margin-top: var(--space-3);
+  }
+
+  /* FESTIVALS */
+  .festivals {
+    background: var(--stage-black);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .festivals-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-4);
+  }
+
+  .festivals-marquee {
+    width: 100%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .festivals-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: festivals-scroll 32s linear infinite;
+  }
+
+  .festivals-set {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding-right: var(--space-6);
+  }
+
+  @keyframes festivals-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .festival-logo {
+    display: block;
+    width: 175px;
+    height: 87.5px;
+    flex-shrink: 0;
+    background-color: var(--off-white);
+    opacity: 0.85;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
+
+  .festival-logo--big {
+    width: 196px;
+    height: 98px;
+  }
+
+  .festival-logo--inline {
+    background-color: transparent;
+    opacity: 0.85;
+  }
+
+  .festival-logo--inline :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .festival-logo--inline :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* FINAL CTA */
+  .final-cta {
+    position: relative;
+    color: var(--off-white);
+    overflow: hidden;
+    padding: var(--space-6) 0;
+    text-align: center;
+  }
+
+  .final-cta :global(.final-cta-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 65%;
+    filter: grayscale(1) sepia(1) saturate(2.4) brightness(0.6) contrast(1.35);
+  }
+
+  .final-cta-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(27, 21, 17, 0.55);
+  }
+
+  .final-cta-content {
+    position: relative;
+  }
+
+  .final-cta h2 {
+    color: var(--off-white);
+  }
+
+  .final-cta p {
+    max-width: 78ch;
+    margin: var(--space-2) auto 0;
+    opacity: 0.9;
+  }
+
+  .final-cta .btn {
+    margin-top: var(--space-3);
+  }
+
+  @media (max-width: 860px) {
+    .events-grid,
+    .mission-grid,
+    .wiab-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+
+    .merch-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* .wiab-grid's own padding shorthand zeroes out .wrap's horizontal padding,
+       pulling the media/text flush to the screen edges below the 1240px wrap cap. */
+    .wiab-grid {
+      padding: var(--space-6) var(--space-3);
+    }
+  }
+
+  /* STATS + SHOP: shared mobile/tablet slider mechanics — JS drives the stats
+     track position (centred start, delayed scroll), so no CSS animation here. */
+  @media (max-width: 850px) {
+    .stats-grid {
+      display: none;
+    }
+
+    .stats-marquee {
+      display: block;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+
+    /* A single gap source (the track's own) keeps the seam between the two
+       duplicated sets exactly as wide as every other gap. */
+    .stats-track {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      width: max-content;
+    }
+
+    .stats-set {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    /* MERCH: swipeable slider — dominant card(s), next one peeking to hint scroll */
+    .merch-grid {
+      display: flex;
+      grid-template-columns: none;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-bottom: var(--space-2);
+    }
+
+    .merch-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .merch-card {
+      scroll-snap-align: start;
+    }
+  }
+
+  @media (max-width: 499px) {
+    .merch-card {
+      flex: 0 0 70%;
+    }
+
+    .merch .see-all {
+      margin-top: var(--space-1);
+    }
+
+    /* FESTIVALS: tighten the gap before the footer (same bg colour, so it should read as one block) */
+    .festivals {
+      padding-bottom: var(--space-2);
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    .merch-card {
+      flex: 0 0 46%;
+    }
+
+    /* General tablet shrink — pages were running too tall */
+    .hero {
+      min-height: 70vh;
+    }
+
+    .mission,
+    .final-cta {
+      padding: var(--space-4) 0;
+    }
+
+    .wiab-media {
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>

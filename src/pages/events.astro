@@ -1,0 +1,215 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import EventCard from "../components/EventCard.astro";
+import { Image } from "astro:assets";
+import { upcomingEvents, pastEvents } from "../data/events.js";
+
+import HeroImg from "../assets/images/backgrounds/orange-4.png";
+import PastBg from "../assets/images/gallery/crowd-night-hires.jpg";
+---
+
+<BaseLayout title="Events" description="Upcoming and past Chai Wallahs stages — from grassroots venues to the UK's biggest independent festivals.">
+  <section class="events-hero">
+    <Image src={HeroImg} alt="" class="events-hero-img" width={2000} height={900} priority />
+    <div class="events-hero-scrim"></div>
+    <div class="wrap events-hero-content">
+      <p class="eyebrow">&gt; The Stage</p>
+      <h1>Events</h1>
+      <p>All venue shows are 18+.</p>
+    </div>
+  </section>
+
+  <section class="section upcoming-section">
+    <div class="wrap">
+      <p class="eyebrow section-label">&gt; Upcoming</p>
+      <h2 class="section-title">Where to find us next</h2>
+      <div class="events-grid upcoming-grid">
+        {upcomingEvents.map((e) => <EventCard {...e} featured />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section past-section">
+    <Image src={PastBg} alt="" class="past-section-img" width={2200} height={1467} />
+    <div class="past-section-scrim"></div>
+    <div class="wrap past-section-content">
+      <p class="eyebrow section-label">&gt; Past Events</p>
+      <h2 class="section-title">Where we've been</h2>
+      <div class="events-grid past-grid">
+        {pastEvents.map((e) => <EventCard {...e} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .events-hero {
+    position: relative;
+    min-height: 48vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .events-hero :global(.events-hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .events-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.95) 15%, rgba(27, 21, 17, 0.4) 100%);
+  }
+
+  .events-hero-content {
+    position: relative;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .events-hero-content .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .events-hero-content h1 {
+    color: var(--off-white);
+  }
+
+  .events-hero-content p {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    opacity: 0.75;
+    margin-top: var(--space-1);
+  }
+
+  .upcoming-section .section-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .past-section .section-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .upcoming-section .section-title {
+    color: var(--off-white);
+    margin-bottom: var(--space-4);
+  }
+
+  .past-section .section-title {
+    color: var(--off-white);
+    margin-bottom: var(--space-4);
+  }
+
+  .events-grid {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .upcoming-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .upcoming-section {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .past-section {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .past-section :global(.past-section-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) sepia(1) hue-rotate(-20deg) saturate(2.4) brightness(0.38) contrast(1.6);
+  }
+
+  .past-section-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(27, 21, 17, 0.72);
+  }
+
+  .past-section-content {
+    position: relative;
+  }
+
+  .past-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .past-grid :global(.event-card) {
+    flex: 0 1 calc((100% - 2 * var(--space-3)) / 3);
+    max-width: calc((100% - 2 * var(--space-3)) / 3);
+  }
+
+  @media (max-width: 860px) {
+    .upcoming-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .past-grid :global(.event-card) {
+      flex-basis: calc((100% - var(--space-3)) / 2);
+      max-width: calc((100% - var(--space-3)) / 2);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .upcoming-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .past-grid :global(.event-card) {
+      flex-basis: 100%;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 499px) {
+    .events-hero {
+      min-height: 33.6vh;
+    }
+
+    /* UPCOMING: swipeable slider — same treatment as the homepage merch slider.
+       Past Events stays a wrapping grid. */
+    .upcoming-grid {
+      display: flex;
+      grid-template-columns: none;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .upcoming-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .upcoming-grid :global(.event-card) {
+      flex: 0 0 78%;
+      scroll-snap-align: start;
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    /* General tablet shrink — pages were running too tall */
+    .events-hero {
+      min-height: 38vh;
+    }
+  }
+</style>

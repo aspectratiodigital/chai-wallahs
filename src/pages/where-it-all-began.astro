@@ -1,0 +1,1101 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import Highlight from "../components/Highlight.astro";
+
+import HeroPhoto from "../assets/images/wiab/wiab-hero-crowd.jpg";
+import EthosPhoto from "../assets/images/wiab/wiab-crowd.jpg";
+import BlackboardBg from "../assets/images/backgrounds/plum-1.png";
+import WiabSticker from "../assets/images/logos/wiab-sticker.svg";
+import ChaiStageImg from "../assets/images/gallery/chai-stage.jpg";
+import SquiggleIcon from "../assets/images/symbols/white/Roots1.png";
+import WildThingsImg from "../assets/images/wiab/venue-wild-things.jpg";
+import GrandUnionImg from "../assets/images/wiab/venue-grand-union.jpg";
+import BohemianImg from "../assets/images/wiab/venue-bohemian.jpg";
+
+import AifLogo from "../assets/images/partners/aif.svg";
+import ArtsCouncilLogo from "../assets/images/partners/arts-council-england.svg";
+import BauLogo from "../assets/images/partners/bau-drinks.svg";
+import BplLogo from "../assets/images/partners/bpl.svg";
+import ChaiLogo from "../assets/images/partners/chai-wallahs.svg";
+import ClwbLogo from "../assets/images/partners/clwb-ifor-bach.svg";
+import DbsLogo from "../assets/images/partners/dbs-institute.svg";
+import DosLogo from "../assets/images/partners/diplomats-of-sound.svg";
+import FenderLogo from "../assets/images/partners/fender.svg";
+import GlobalLocalLogo from "../assets/images/partners/global-local.svg";
+import HpaLogo from "../assets/images/partners/hpa.svg";
+import JamJarLogo from "../assets/images/partners/jam-jar-bristol.svg";
+import MelancholyClownLogo from "../assets/images/partners/melancholy-clown.svg";
+import MesaLogo from "../assets/images/partners/mesa-engineering.svg";
+import MvtLogo from "../assets/images/partners/music-venue-trust.svg";
+import ProofLogo from "../assets/images/partners/proof-drinks.svg";
+import SaveOurSceneLogo from "../assets/images/partners/save-our-scene.svg";
+import SgpLogo from "../assets/images/partners/secret-garden-party.svg";
+import The100ClubLogo from "../assets/images/partners/the-100-club.svg";
+import BeatGoesOnLogo from "../assets/images/partners/the-beat-goes-on.svg";
+import TwAudioLogo from "../assets/images/partners/tw-audio.svg";
+import YamahaLogo from "../assets/images/partners/yamaha.svg";
+import LeedsConservatoireLogo from "../assets/images/partners/leeds-conservatoire.svg";
+import AspectRatioLogo from "../assets/images/partners/aspect-ratio.svg";
+import GreenmanLogo from "../assets/images/partners/greenman.svg";
+import NewBristolBreweryLogo from "../assets/images/partners/new-bristol-brewery.svg";
+
+// Trinity & Kendal Calling are multi-layer vectors — mask-image would flatten them to
+// one silhouette, so they're inlined raw with dark paths on currentColor (recolours with
+// hover like every other logo) and light paths fixed off-white.
+import TrinityLogoRaw from "../assets/images/partners/trinity-bristol.svg?raw";
+import KendalCallingLogoRaw from "../assets/images/partners/kendal-calling.svg?raw";
+
+const TICKETS_URL = "https://events.humanitix.com/where-it-all-began-festival?c=chai-wallahs";
+const SITE_URL = "https://www.whereitallbeganfestival.org";
+
+const doesMean = [
+  "Same people. Same standards. New scale.",
+  "Chai's history is the proof this way works.",
+  "When we talk about WIAB, we're the people behind it — not the brand behind it.",
+];
+
+const doesntMean = [
+  'WIAB isn\'t "Chai Wallahs presents."',
+  "We don't lend our name to take the credit.",
+  "This isn't a rebrand of Chai — it's something new, from people you already know.",
+];
+
+const venues = [
+  {
+    image: ChaiStageImg,
+    name: "Chai Wallahs",
+    text: "The UK's unrivalled, critically acclaimed, independent festival venue. The alternative to the mainstream.",
+  },
+  {
+    image: WildThingsImg,
+    name: "Where The Wild Things Are",
+    text: "The iconic open-air stage from our friends at Secret Garden Party.",
+  },
+  {
+    image: GrandUnionImg,
+    name: "The Grand Union",
+    text: "Could be a venue, could be a village. A collaborative programming project from the country's leading grassroots music venues.",
+  },
+  {
+    image: BohemianImg,
+    name: "The Bohemian Triangle",
+    text: "An ever-shifting dance experience. Follow your ears, chase the vibe, and move through eclectic spaces as the rhythm shifts, sun-up til sun-up.",
+  },
+];
+
+const stats = [
+  { target: 190000, prefix: "£", label: "Raised So Far" },
+  { target: 4, prefix: "", label: "Venues & Stages" },
+  { target: 3, prefix: "", label: "Days" },
+  { target: 0, prefix: "", label: "Shareholders" },
+];
+
+// Real partners + live links, scraped from whereitallbeganfestival.org/about-us
+const partners = [
+  { name: "Chai Wallahs", url: "https://www.chaiwallahs.co.uk", logo: ChaiLogo },
+  { name: "Diplomats of Sound", url: "https://diplomatsofsound.org", logo: DosLogo },
+  { name: "Arts Council England", url: "https://www.artscouncil.org.uk/", logo: ArtsCouncilLogo },
+  { name: "Secret Garden Party", url: "https://www.secretgardenparty.com", logo: SgpLogo },
+  { name: "The Beat Goes On", url: "https://thebeatgoesonfestival.com", logo: BeatGoesOnLogo, large: true },
+  { name: "Global Local", url: "https://www.globallocal.co.uk/festivalandcarnivallabbristol", logo: GlobalLocalLogo },
+  { name: "dBs Institute", url: "https://www.dbsinstitute.ac.uk", logo: DbsLogo },
+  { name: "Leeds Conservatoire", url: "https://www.leedsconservatoire.ac.uk", logo: LeedsConservatoireLogo, xsmall: true },
+  { name: "Music Venue Trust", url: "https://www.musicvenuetrust.com", logo: MvtLogo, large: true },
+  { name: "Association of Independent Festivals", url: "https://www.aiforg.com", logo: AifLogo },
+  { name: "Save Our Scene", url: "https://www.saveourscene.uk", logo: SaveOurSceneLogo },
+  { name: "Trinity Bristol", url: "https://www.trinitybristol.org.uk", inlineSvg: TrinityLogoRaw },
+  { name: "The Jam Jar Bristol", url: "https://www.thejamjarbristol.com", logo: JamJarLogo },
+  { name: "Clwb Ifor Bach", url: "https://clwb.net", logo: ClwbLogo, small: true },
+  { name: "The 100 Club", url: "https://the100club.co.uk", logo: The100ClubLogo },
+  { name: "HPA", url: "https://hpa.uk.com", logo: HpaLogo },
+  { name: "Melancholy Clown", url: "https://www.melancholyclown.com/", logo: MelancholyClownLogo },
+  { name: "New Bristol Brewery", url: "https://www.newbristolbrewery.co.uk/", logo: NewBristolBreweryLogo, invert: true },
+  { name: "Bau Drinks", url: "https://baudrinks.com/", logo: BauLogo },
+  { name: "Proof", url: "https://proofdrinks.com", logo: ProofLogo },
+  { name: "TW Audio", url: "https://twaudio.de/", logo: TwAudioLogo },
+  { name: "Fender", url: "https://uk.fender.com/", logo: FenderLogo },
+  { name: "BPL", url: "https://www.bplglobal.co.uk/", logo: BplLogo },
+  { name: "Mesa Engineering", url: "https://www.mesaboogie.com/en-US/", logo: MesaLogo },
+  { name: "Yamaha Audio", url: "https://uk.yamaha.com/en/audio/home-audio/", logo: YamahaLogo },
+  { name: "Aspect Ratio Digital", url: "http://aspectratiodigital.com", logo: AspectRatioLogo, small: true },
+  { name: "Green Man Festival", url: "https://www.greenman.net", logo: GreenmanLogo, small: true },
+  { name: "Kendal Calling", url: "https://www.kendalcalling.co.uk", inlineSvg: KendalCallingLogoRaw },
+];
+---
+
+<BaseLayout title="Where It All Began" description="A new festival from the people behind Chai Wallahs. Same standards, new scale.">
+  <section class="wiab-hero">
+    <Image src={HeroPhoto} alt="" class="wiab-hero-img" width={2200} height={1467} priority />
+    <div class="wiab-hero-scrim"></div>
+    <div class="wrap wiab-hero-content">
+      <Image src={WiabSticker} alt="Where It All Began" width={176} height={154} class="wiab-hero-logo" />
+      <h1>Where It All Began</h1>
+      <p class="wiab-hero-sub">Brought to you by the people behind Chai Wallahs.</p>
+      <div class="wiab-hero-ctas">
+        <a href={TICKETS_URL} target="_blank" rel="noopener noreferrer" class="btn btn-solid">Get Tickets</a>
+        <a href={SITE_URL} target="_blank" rel="noopener noreferrer" class="btn btn-outline wiab-hero-outline">Find Out More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT IS WIAB -->
+  <section class="section intro">
+    <div class="wrap intro-grid">
+      <div>
+        <p class="eyebrow">&gt; What Is WIAB</p>
+        <h2>We're the <Highlight rotate={-1}>people</Highlight><br />behind it.</h2>
+      </div>
+      <p class="intro-copy">
+        27 years of Chai Wallahs proved something — that you can run things fairly, pay people properly,
+        and build a real community, and it works. Not as a nice idea. As a model that lasts. Where It All
+        Began is what happens when the same people ask: what if we built a whole festival that way? It's
+        not our name on someone else's idea. It's the same hands, the same standards, the same belief —
+        applied to something bigger than one stage.
+      </p>
+    </div>
+  </section>
+
+  <!-- WHAT THIS MEANS — blackboard -->
+  <section class="means-band">
+    <Image src={BlackboardBg} alt="" class="means-bg" width={2200} height={1400} />
+    <div class="means-scrim"></div>
+    <div class="wrap means-grid">
+      <div class="means-col">
+        <h3 class="means-yes">What This <Highlight color="gold" rotate={-1}>Means</Highlight></h3>
+        <ul style={`--squiggle:url("${SquiggleIcon.src}");`}>
+          {doesMean.map((line) => <li>{line}</li>)}
+        </ul>
+      </div>
+      <div class="means-col">
+        <h3 class="means-no">What This <Highlight color="ember" rotate={1}>Doesn't Mean</Highlight></h3>
+        <ul style={`--squiggle:url("${SquiggleIcon.src}");`}>
+          {doesntMean.map((line) => <li>{line}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VENUES — accordion hover -->
+  <section class="section venues">
+    <div class="wrap">
+      <p class="eyebrow venues-label">&gt; The Site</p>
+      <h2>Four venues. One festival.</h2>
+      <p class="venues-intro">
+        Held at the iconic home of Secret Garden Party — Grange Farm, Abbots Ripton. Alongside sharing the
+        site, the SGP team programme their own stage, bringing their unmistakable spirit and creative
+        chaos into the heart of the festival. A familiar setting, reimagined for something new.
+      </p>
+      <div class="venues-accordion">
+        {
+          venues.map((v) => (
+            <div class="venue-tile">
+              <Image src={v.image} alt={v.name} width={900} height={700} class="venue-photo" />
+              <div class="venue-caption">
+                <h3>{v.name}</h3>
+                <p>{v.text}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="wiab-stats">
+    <div class="wrap wiab-stats-grid">
+      {
+        stats.map((s) => {
+          const finalText = s.prefix + s.target.toLocaleString("en-GB");
+          return (
+            <div>
+              <span
+                class="stat-num"
+                data-target={s.target}
+                data-prefix={s.prefix}
+                style={`min-width:${finalText.length}ch;`}
+              >
+                {s.prefix}0
+              </span>
+              <span class="stat-label">{s.label}</span>
+            </div>
+          );
+        })
+      }
+    </div>
+    <div class="wiab-stats-marquee">
+      <div class="wiab-stats-track">
+        {
+          [0, 1].map((copy) => (
+            <div class="wiab-stats-set" aria-hidden={copy === 1 ? "true" : undefined}>
+              {
+                stats.map((s) => {
+                  const finalText = s.prefix + s.target.toLocaleString("en-GB");
+                  return (
+                    <div class="stat-item">
+                      <span
+                        class="stat-num"
+                        data-target={s.target}
+                        data-prefix={s.prefix}
+                        style={`min-width:${finalText.length}ch;`}
+                      >
+                        {s.prefix}0
+                      </span>
+                      <span class="stat-label">{s.label}</span>
+                    </div>
+                  );
+                })
+              }
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ETHOS -->
+  <section class="section festival-info">
+    <div class="wrap festival-info-grid">
+      <Image src={EthosPhoto} alt="Crowd at a Chai Wallahs show" width={900} height={900} class="festival-photo" />
+      <div>
+        <p class="eyebrow">&gt; The Ethos</p>
+        <h2>A return to the roots</h2>
+        <p class="festival-copy">
+          A place where the creative spirit and the core values of festival culture are upheld. High
+          quality production is standard, musical diversity the foundation, and audiences feel valued,
+          respected, and part of a deep sense of community. No shareholders. Artists paid fairly. Every
+          partner benefits from the success.
+        </p>
+        <p class="festival-meta">Fri 18 &ndash; Sun 20 June 2027 &middot; Grange Farm, Abbots Ripton, Cambridgeshire</p>
+        <a href={TICKETS_URL} target="_blank" rel="noopener noreferrer" class="btn btn-outline">Get Tickets</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE COLLECTIVE -->
+  <section class="section partners">
+    <div class="wrap">
+      <div class="partners-heading">
+        <p class="eyebrow partners-label">&gt; The Collective</p>
+        <h2>Our Partners</h2>
+      </div>
+      <div class="partners-grid">
+        {
+          partners.map((p, i) =>
+            p.inlineSvg ? (
+              <a href={p.url} target="_blank" rel="noopener noreferrer" class="partner-tile" aria-label={p.name} style={`--i:${i};`}>
+                <span class="partner-logo partner-logo--inline" set:html={p.inlineSvg} />
+              </a>
+            ) : (
+              <a href={p.url} target="_blank" rel="noopener noreferrer" class="partner-tile" aria-label={p.name} style={`--i:${i};`}>
+                <span
+                  class:list={["partner-logo", { "partner-logo--small": p.small, "partner-logo--xsmall": p.xsmall, "partner-logo--large": p.large, "partner-logo--invert": p.invert }]}
+                  style={
+                    p.invert
+                      ? `--logo-url:url("${p.logo.src}");`
+                      : `-webkit-mask-image:url("${p.logo.src}"); mask-image:url("${p.logo.src}");`
+                  }
+                />
+              </a>
+            ),
+          )
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const nums = Array.from(document.querySelectorAll<HTMLElement>(".stat-num[data-target]"));
+  const formatter = new Intl.NumberFormat("en-GB");
+  const statsSection = document.querySelector(".wiab-stats");
+
+  function animate(el: HTMLElement): Promise<void> {
+    return new Promise((resolve) => {
+      const target = Number(el.dataset.target ?? "0");
+      const prefix = el.dataset.prefix ?? "";
+      const duration = target > 100 ? 1200 : 700;
+      const start = performance.now();
+
+      function tick(now: number) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const value = Math.floor(eased * target);
+        el.textContent = prefix + formatter.format(value);
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          el.textContent = prefix + formatter.format(target);
+          resolve();
+        }
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
+  async function runSequence() {
+    const order: number[] = [];
+    for (const el of nums) {
+      const target = Number(el.dataset.target ?? "0");
+      if (!order.includes(target)) order.push(target);
+    }
+    for (const target of order) {
+      const group = nums.filter((el) => Number(el.dataset.target ?? "0") === target);
+      await Promise.all(group.map((el) => animate(el)));
+      if (target === order[0]) {
+        startMarquee();
+      }
+    }
+  }
+
+  // Mobile marquee: sits with the first (£190,000) stat centred while it counts up,
+  // then glides into the continuous scroll from that exact position — no jump.
+  const marqueeEl = document.querySelector<HTMLElement>(".wiab-stats-marquee");
+  const trackEl = document.querySelector<HTMLElement>(".wiab-stats-track");
+  const firstSetEl = trackEl?.querySelector<HTMLElement>(".wiab-stats-set:not([aria-hidden])") ?? null;
+  const firstItemEl = firstSetEl?.querySelector<HTMLElement>(".stat-item") ?? null;
+  let centeredOffset = 0;
+
+  function centerFirstItem() {
+    if (!marqueeEl || !trackEl || !firstItemEl) return;
+    trackEl.style.transform = "translateX(0px)";
+    const marqueeRect = marqueeEl.getBoundingClientRect();
+    const trackRect = trackEl.getBoundingClientRect();
+    const itemRect = firstItemEl.getBoundingClientRect();
+    const isTablet = window.matchMedia("(min-width: 500px) and (max-width: 850px)").matches;
+    if (isTablet) {
+      // Tablet: anchor the first stat 40px from the left edge instead of centring it.
+      const itemLeftInTrack = itemRect.left - trackRect.left;
+      centeredOffset = 40 - itemLeftInTrack;
+    } else {
+      const itemCenterInTrack = itemRect.left - trackRect.left + itemRect.width / 2;
+      centeredOffset = marqueeRect.width / 2 - itemCenterInTrack;
+    }
+    trackEl.style.transform = `translateX(${centeredOffset}px)`;
+  }
+
+  function startMarquee() {
+    if (!trackEl || !firstSetEl) return;
+    // The wrap distance is one set's width PLUS the track's own gap to the next
+    // set — not just the set's width — or the loop jumps by that gap each cycle.
+    const trackGap = parseFloat(getComputedStyle(trackEl).columnGap || "0");
+    const setWidth = firstSetEl.getBoundingClientRect().width + trackGap;
+    const speed = setWidth / 18000; // px/ms — same pace as the old 18s-per-loop marquee
+    let offset = centeredOffset;
+    let lastTime: number | null = null;
+
+    function tick(now: number) {
+      if (lastTime === null) lastTime = now;
+      offset -= speed * (now - lastTime);
+      lastTime = now;
+      if (offset <= centeredOffset - setWidth) offset += setWidth;
+      if (trackEl) trackEl.style.transform = `translateX(${offset}px)`;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  if (window.matchMedia("(max-width: 850px)").matches) {
+    centerFirstItem();
+    // Re-measure once the custom font has actually swapped in — the eyebrow
+    // mono font's fallback metrics differ enough to throw the centring off.
+    document.fonts?.ready.then(centerFirstItem);
+    window.addEventListener("resize", centerFirstItem);
+  }
+
+  if (statsSection) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            runSequence();
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(statsSection);
+  }
+
+  function alignPartnersHeading() {
+    const grid = document.querySelector<HTMLElement>(".partners-grid");
+    const heading = document.querySelector<HTMLElement>(".partners-heading");
+    const wrap = grid?.closest<HTMLElement>(".wrap");
+    if (!grid || !heading || !wrap) return;
+    const offset = grid.getBoundingClientRect().left - wrap.getBoundingClientRect().left;
+    heading.style.paddingLeft = `${Math.max(offset, 0)}px`;
+  }
+
+  window.addEventListener("load", alignPartnersHeading);
+  window.addEventListener("resize", alignPartnersHeading);
+
+  const partnersGrid = document.querySelector<HTMLElement>(".partners-grid");
+  if (partnersGrid) {
+    const partnersObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            partnersGrid.classList.add("is-visible");
+            partnersObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 },
+    );
+    partnersObserver.observe(partnersGrid);
+  }
+</script>
+
+<style>
+  .wiab-hero {
+    position: relative;
+    min-height: 64vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .wiab-hero :global(.wiab-hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) sepia(1) hue-rotate(245deg) saturate(0.9) brightness(0.78) contrast(1.3);
+  }
+
+  .wiab-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.9) 5%, rgba(66, 36, 56, 0.35) 65%, rgba(66, 36, 56, 0.15) 100%);
+  }
+
+  .wiab-hero-content {
+    position: relative;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .wiab-hero-logo {
+    margin-bottom: var(--space-1);
+  }
+
+  .wiab-hero-content h1 {
+    color: var(--off-white);
+  }
+
+  .wiab-hero-sub {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin-top: var(--space-2);
+  }
+
+  .wiab-hero-ctas {
+    margin-top: var(--space-3);
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .wiab-hero-ctas .btn-solid {
+    --btn-accent: var(--off-white);
+    background: var(--btn-accent);
+    color: var(--crown);
+    border-color: var(--btn-accent);
+  }
+
+  /* INTRO — B (black) */
+  .intro {
+    background: var(--stage-black);
+    color: var(--off-white);
+    min-height: 46vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .intro .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .intro h2 {
+    color: var(--off-white);
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: var(--space-5);
+    align-items: center;
+    width: 100%;
+  }
+
+  .intro-copy {
+    font-size: 1.05rem;
+    opacity: 0.9;
+  }
+
+  /* MEANS — A (blackboard) */
+  .means-band {
+    position: relative;
+    color: var(--off-white);
+    overflow: hidden;
+    padding: var(--space-6) 0;
+  }
+
+  .means-band :global(.means-bg) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .means-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(30, 15, 26, 0.82);
+  }
+
+  .means-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 0.82fr 1.18fr;
+    gap: var(--space-5);
+  }
+
+  .means-col h3 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: clamp(1.92rem, 3.12vw, 2.64rem);
+    letter-spacing: 0.01em;
+    color: var(--off-white);
+    margin-bottom: var(--space-3);
+  }
+
+  /* Below 470px "WHAT THIS DOESN'T MEAN" won't fit on one line at the base clamp —
+     shrink both headings together (they share this rule) so they stay matched in
+     size, and force the single line now that it's guaranteed to fit. */
+  @media (max-width: 470px) {
+    .means-col h3 {
+      font-size: clamp(1.05rem, 7vw, 1.4rem);
+      white-space: nowrap;
+    }
+  }
+
+  .means-no :global(.highlight-word) {
+    padding-left: 0.6em;
+    padding-right: 0.6em;
+  }
+
+  .means-col ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .means-col li {
+    position: relative;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: clamp(0.92rem, 1.28vw, 1.2rem);
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    padding-left: 30px;
+  }
+
+  /* One squiggle isolated from the 3-up Recipe/Roots symbol via mask cropping —
+     the source PNG stacks 3 squiggles evenly, so a 300%-tall mask at 0% position
+     shows just the top one. */
+  .means-col li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 22px;
+    height: 8px;
+    background-color: currentColor;
+    -webkit-mask-image: var(--squiggle);
+    mask-image: var(--squiggle);
+    -webkit-mask-size: 100% 300%;
+    mask-size: 100% 300%;
+    -webkit-mask-position: 0 0%;
+    mask-position: 0 0%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    opacity: 0.8;
+  }
+
+  /* VENUES — B (black) */
+  .venues {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .venues-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .venues h2 {
+    color: var(--off-white);
+    margin-bottom: var(--space-3);
+  }
+
+  .venues-intro {
+    max-width: 70ch;
+    opacity: 0.75;
+    margin-bottom: var(--space-4);
+  }
+
+  .venues-accordion {
+    display: flex;
+    gap: 4px;
+    height: 460px;
+  }
+
+  .venue-tile {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    transition: flex 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+  }
+
+  .venues-accordion:hover .venue-tile {
+    flex: 1;
+  }
+
+  .venues-accordion .venue-tile:hover {
+    flex: 3.2;
+  }
+
+
+  .venue-tile :global(.venue-photo) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.9);
+  }
+
+  .venue-caption {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: var(--space-3) var(--space-2) var(--space-2);
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.95) 0%, rgba(27, 21, 17, 0.5) 60%, transparent 100%);
+  }
+
+  .venue-caption h3 {
+    font-size: 1.05rem;
+    white-space: nowrap;
+    color: var(--off-white);
+    margin-bottom: 0.5rem;
+  }
+
+  .venue-caption p {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--off-white);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease 0.1s;
+  }
+
+  .venue-tile:hover .venue-caption p {
+    opacity: 0.9;
+    max-height: 8em;
+  }
+
+  /* STATS — A (gold) */
+  .wiab-stats {
+    background: var(--chai-gold);
+    color: var(--stage-black);
+    padding: var(--space-5) 0;
+  }
+
+  .wiab-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  .wiab-stats .stat-num {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+    color: var(--stage-black);
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wiab-stats-grid > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .wiab-stats .stat-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+
+  .wiab-stats-marquee {
+    display: none;
+  }
+
+  /* ETHOS — B (black) */
+  .festival-info {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .festival-info-grid {
+    display: grid;
+    grid-template-columns: 0.9fr 1.3fr;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .festival-photo {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  .festival-info h2 {
+    color: var(--off-white);
+  }
+
+  .festival-info .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .festival-copy {
+    margin-top: var(--space-2);
+    font-size: 1.05rem;
+    opacity: 0.9;
+  }
+
+  .festival-meta {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--chai-gold);
+    margin: var(--space-3) 0 var(--space-3);
+  }
+
+  /* OUR PARTNERS — black bg, white logos, ember on hover */
+  .partners {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .partners-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .partners h2 {
+    color: var(--off-white);
+    margin-bottom: var(--space-4);
+  }
+
+  .partners-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4) var(--space-3);
+  }
+
+  .partner-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 160px;
+    max-width: 160px;
+    aspect-ratio: 3 / 2;
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition-delay: calc(min(var(--i, 0), 14) * 54ms);
+  }
+
+  .partners-grid.is-visible .partner-tile {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .partner-logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: var(--off-white);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    transition: background-color 0.2s ease;
+  }
+
+  .partner-tile:hover .partner-logo {
+    background-color: var(--ember);
+  }
+
+  .partner-logo--small {
+    -webkit-mask-size: 62%;
+    mask-size: 62%;
+  }
+
+  .partner-logo--xsmall {
+    -webkit-mask-size: 46%;
+    mask-size: 46%;
+  }
+
+  .partner-logo--large {
+    -webkit-mask-size: 92%;
+    mask-size: 92%;
+  }
+
+  /* This badge's source art is a solid filled disc with the monogram cut out as a
+     transparent hole — masking it straight would show a solid circle with the letters
+     missing. XOR it against a matching solid circle to flip which part reads as "on":
+     the monogram becomes the visible shape, the disc drops out to the section bg. */
+  .partner-logo--invert {
+    --circle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 810.78 810.78'%3E%3Ccircle cx='405.39' cy='405.39' r='405.39'/%3E%3C/svg%3E");
+    -webkit-mask-image: var(--circle), var(--logo-url);
+    mask-image: var(--circle), var(--logo-url);
+    -webkit-mask-size: contain, contain;
+    mask-size: contain, contain;
+    -webkit-mask-repeat: no-repeat, no-repeat;
+    mask-repeat: no-repeat, no-repeat;
+    -webkit-mask-position: center, center;
+    mask-position: center, center;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  /* Inline SVG variant (multi-colour logos) — dark paths use currentColor
+     (off-white by default, ember on hover), light/background paths are baked in as
+     fixed stage-black so they blend into the section and stay put on hover. */
+  .partner-logo--inline {
+    background-color: transparent;
+    -webkit-mask-image: none;
+    mask-image: none;
+    color: var(--off-white);
+    transition: color 0.2s ease;
+  }
+
+  .partner-tile:hover .partner-logo--inline {
+    background-color: transparent;
+    color: var(--ember);
+  }
+
+  .partner-logo--inline :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 980px) {
+    .means-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .intro-grid,
+    .festival-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .venues-accordion {
+      flex-direction: column;
+      height: auto;
+    }
+
+    .venue-tile {
+      height: 140px;
+      flex: none;
+    }
+
+    .venues-accordion .venue-tile:hover {
+      flex: none;
+      height: 260px;
+    }
+
+    .wiab-stats-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+
+    .partner-tile {
+      flex-basis: 150px;
+      max-width: 150px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .partner-tile {
+      flex-basis: 120px;
+      max-width: 120px;
+    }
+  }
+
+  /* STATS: continuous right-to-left marquee instead of a static grid — shared by
+     mobile and tablet, since the JS-driven centring/delay logic is width-agnostic. */
+  @media (max-width: 850px) {
+    .wiab-stats-grid {
+      display: none;
+    }
+
+    .wiab-stats-marquee {
+      display: block;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+
+    /* Position is driven by JS (translateX) so it can start centred on the first
+       stat and glide smoothly into the scroll once the count-up finishes. */
+    /* A single gap source (the track's own) keeps the seam between the two
+       duplicated sets exactly as wide as every other gap. */
+    .wiab-stats-track {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      width: max-content;
+    }
+
+    .wiab-stats-set {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .wiab-stats-set .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* VENUES: swipeable slider of square tiles, text always visible, no hover requirement */
+    .venues-accordion {
+      display: flex;
+      flex-direction: row;
+      height: auto;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: var(--space-2);
+    }
+
+    .venues-accordion::-webkit-scrollbar {
+      display: none;
+    }
+
+    .venue-tile {
+      aspect-ratio: 1 / 1;
+      height: auto;
+      scroll-snap-align: start;
+    }
+
+    .venues-accordion .venue-tile:hover {
+      height: auto;
+    }
+
+    .venue-caption h3 {
+      white-space: normal;
+    }
+
+    .venue-caption p,
+    .venue-tile:hover .venue-caption p {
+      opacity: 0.9;
+      max-height: none;
+    }
+  }
+
+  @media (max-width: 499px) {
+    /* Slightly tighten the space above/below each section */
+    .intro {
+      min-height: 0;
+      padding-top: var(--space-4);
+      padding-bottom: var(--space-4);
+    }
+
+    .means-band {
+      padding-top: var(--space-5);
+      padding-bottom: var(--space-5);
+    }
+
+    .venues,
+    .festival-info,
+    .partners {
+      padding-top: var(--space-4);
+      padding-bottom: var(--space-4);
+    }
+
+    .wiab-stats {
+      padding-top: var(--space-4);
+      padding-bottom: var(--space-4);
+    }
+
+    /* VENUES: one dominant card, next one peeking */
+    .venue-tile,
+    .venues-accordion .venue-tile:hover {
+      flex: 0 0 70%;
+    }
+
+    /* ETHOS: photo 25% shorter */
+    .festival-photo {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    /* VENUES: two cards visible, third peeking in */
+    .venue-tile,
+    .venues-accordion .venue-tile:hover {
+      flex: 0 0 46%;
+    }
+
+    /* General tablet shrink — pages were running too tall */
+    .wiab-hero {
+      min-height: 50vh;
+    }
+
+    .intro {
+      min-height: 0;
+      padding: var(--space-4) 0;
+    }
+
+    .festival-photo {
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>

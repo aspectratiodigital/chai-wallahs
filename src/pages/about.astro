@@ -1,0 +1,651 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import TornBox from "../components/TornBox.astro";
+import Highlight from "../components/Highlight.astro";
+
+import HeroImg from "../assets/images/backgrounds/green-2.png";
+import MissionBg from "../assets/images/backgrounds/green-3.png";
+import BookUsBg from "../assets/images/backgrounds/green-4.png";
+import BookUsPhoto from "../assets/images/gallery/hero-tent-golden.jpg";
+import StampWhite from "../assets/images/logos/Icon-Hand-drawn-White.png";
+
+import VenueIcon from "../assets/images/symbols/white/Venue.png";
+import StageIcon from "../assets/images/symbols/white/Stage.png";
+import ProgrammingIcon from "../assets/images/symbols/white/Programming.png";
+import SoundIcon from "../assets/images/symbols/white/Sound1.png";
+import CrewIcon from "../assets/images/symbols/white/Crew.png";
+import ArtistIcon from "../assets/images/symbols/white/Artist.png";
+import BarIcon from "../assets/images/symbols/white/Bar.png";
+import RootsIcon from "../assets/images/symbols/white/Roots1.png";
+
+const timeline = [
+  {
+    year: "1999",
+    text: "Founded by Richard Howard, Chai Wallahs began life as a chai stall — selling incense, tea, and housing drumming workshops.",
+  },
+  {
+    year: "2004",
+    text: "Si Blatchly's 'Creative Nature' joined forces with Chai Wallahs. Herbal shots, juices, smoothies, under-the-counter brandies and DJs — the landscape began to shift.",
+  },
+  {
+    year: "2007",
+    text: "A live stage was introduced. Since then the venue has hosted over 3,000 bands and artists, in front of more than 2 million spectators.",
+  },
+  {
+    year: "Now",
+    text: "From Jamie Woon, Polar Bear and Portico Quartet in the early days, to Gentleman's Dub Club, Dizraeli and this year's KOG, TC & the Groove Family and Afro Cluster — the journey continues.",
+  },
+];
+
+const symbols = [
+  {
+    icon: VenueIcon,
+    title: "The Venue",
+    text: "Meters of soft, undulating, freeform canvas create an intimate backdrop unlike any other festival venue. Immediately upon arrival, reality shifts — the senses prickle with the unmistakeable sounds and smells of Chai.",
+  },
+  {
+    icon: StageIcon,
+    title: "The Stage",
+    text: "From solo performers to 50-piece orchestras, our highly skilled, personable and focused stage crew are well versed for any eventuality — super-fast changeovers, calm and comfort on stage, a faultless production.",
+  },
+  {
+    icon: ProgrammingIcon,
+    title: "The Programming",
+    text: "Daily programming is deliberately designed with a sonic journey in mind — a clear emotional and spiritual arc, curated to suit energy levels and mood. Acoustic soul by day, new wave jazz after lunch, Afrobeat and world fusion by night.",
+  },
+  {
+    icon: SoundIcon,
+    title: "The Sound",
+    text: "Minimal processing so the music can breathe — tight and punchy with crystal clear definition. TW AUDiO loudspeakers, paired with Dynacord amplifiers and controlled with tour-grade Allen & Heath dLive mixers.",
+  },
+  {
+    icon: CrewIcon,
+    title: "The Crew",
+    text: "Absolute family. A tight-knit cluster of riggers, bar staff, logistics and stock, each member intrinsically linked to the next — all completely vital, and downright lush, the lot of 'em.",
+  },
+  {
+    icon: ArtistIcon,
+    title: "The Artists",
+    text: "Who without there would be no party. From brand new acts on their first tours to seasoned pros who've constantly absconded from corporate temptation to remain independent — we're fiercely proud of the relationships built over the years.",
+  },
+  {
+    icon: BarIcon,
+    title: "The Bar",
+    text: "Uniquely characterful, ethically sourced, specialist bar — bespoke cocktails, hot alcoholic brews, and delectable drinks. Seasonal, sustainable recipes that support small business and offer an alternative to the mainstream.",
+  },
+  {
+    icon: RootsIcon,
+    title: "The Recipe",
+    text: "Tasteful lighting and subtle projections create a comfortable, soothing, uplifting atmosphere. Every element considered — the smell, the taste, the sound, the movement, the connection. Not a festival stage. A full-body experience.",
+  },
+];
+---
+
+<BaseLayout title="About" description="27 years of stages, one stamp. The story, the mission, and everything that makes Chai Wallahs what it is.">
+  <!-- HERO -->
+  <section class="about-hero">
+    <Image src={HeroImg} alt="" class="about-hero-img" width={2000} height={1300} priority />
+    <div class="about-hero-scrim"></div>
+    <div class="wrap about-hero-content">
+      <Image src={StampWhite} alt="" width={56} height={56} />
+      <p class="eyebrow">&gt; This is who we are</p>
+      <h1>Where all <Highlight rotate={-1}>good things</Highlight><br />come together</h1>
+    </div>
+  </section>
+
+  <!-- CHAI STORY TIMELINE -->
+  <section class="section story">
+    <div class="wrap">
+      <p class="eyebrow story-label">&gt; Chai Story</p>
+      <h2>27 years of stages</h2>
+      <ol class="timeline">
+        {
+          timeline.map((t, i) => (
+            <li>
+              <TornBox color={i % 2 === 0 ? "gold" : "white"} rotate={i % 2 === 0 ? -2 : 2} tag="span" class="timeline-year">{t.year}</TornBox>
+              <p>{t.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- MISSION -->
+  <section class="mission-band">
+    <Image src={MissionBg} alt="" class="mission-band-img" width={2200} height={1400} />
+    <div class="mission-band-scrim"></div>
+    <div class="wrap mission-band-content">
+      <p class="eyebrow">&gt; The Chai Mission</p>
+      <h2>Our mission is simple</h2>
+      <p class="mission-lead">
+        To be the host with the most. To furnish the finest in beauteous brews. To fastidiously fuse an
+        eclectic, diverse and fiercely independent line-up of outstanding acts from the grassroots scene,
+        and declare their delectability through the most magnificent sound system on the festival circuit.
+      </p>
+      <div class="mission-cols">
+        <p>To support the un-supported. To provide a platform for non-commercial music and musicians. To
+        offer an alternative to the noise in the newsfeeds, and create a tangible territory for new paths
+        trodden, unforgettable experiences, and peerless party proceedings.</p>
+        <p>To bring warmth into the heart, and a twinkle to the eye. To advocate healing, compassion, and
+        creativity. To construct a community of open-minded, forward-thinking, caring individuals, who in
+        turn can affect the change we seek in our challenging world.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SYMBOLISM GRID -->
+  <section class="section symbolism">
+    <div class="wrap">
+      <p class="eyebrow symbolism-label">&gt; Our Symbols</p>
+      <h2>What Chai Wallahs<br class="symbolism-break" /> is made of</h2>
+      <div class="symbol-grid">
+        {
+          symbols.map((s, i) => (
+            <div class="symbol-card" style={`--i:${i};`}>
+              <span class="symbol-icon" style={`-webkit-mask-image:url("${s.icon.src}"); mask-image:url("${s.icon.src}");`} />
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOK US CTA -->
+  <section class="book-us">
+    <Image src={BookUsBg} alt="" class="book-us-bg" width={2200} height={1400} />
+    <div class="book-us-scrim"></div>
+    <div class="wrap book-us-grid">
+      <div class="book-us-media">
+        <Image src={BookUsPhoto} alt="The Chai Wallahs tent at golden hour" width={900} height={1100} class="book-us-photo" />
+      </div>
+      <div class="book-us-copy">
+        <p class="eyebrow">&gt; Book Us</p>
+        <h2>Bring Chai Wallahs<br />to your <Highlight rotate={-1}>event</Highlight></h2>
+        <p>
+          We offer bespoke production packages to suit your event's specific needs — bar, catering, and
+          curated stage programmes in various sized freeform tents. Sustainability, through long-term
+          relationships with event organisers, remains at the heart of what we do — it's how we keep our
+          crew in employment, and keep the platform standing for the artists we work with.
+        </p>
+        <a href="/contact/#production" class="btn btn-solid">Get In Touch</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  if (window.matchMedia("(max-width: 499px)").matches) {
+    const revealTargets = document.querySelectorAll(".symbolism-label, .symbolism h2, .symbol-card");
+    if (revealTargets.length) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.2 },
+      );
+      revealTargets.forEach((el) => observer.observe(el));
+    }
+  }
+</script>
+
+<style>
+  /* HERO */
+  .about-hero {
+    position: relative;
+    min-height: 48vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .about-hero :global(.about-hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .about-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.95) 10%, rgba(41, 79, 64, 0.55) 100%);
+  }
+
+  .about-hero-content {
+    position: relative;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .about-hero-content .eyebrow {
+    color: var(--chai-gold);
+    margin: var(--space-1) 0 var(--space-1);
+  }
+
+  .about-hero-content h1 {
+    color: var(--off-white);
+    text-transform: none;
+    font-size: clamp(2.3rem, 5vw + 1rem, 4.2rem);
+  }
+
+  /* STORY */
+  .story {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .story-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .story h2 {
+    color: var(--off-white);
+    margin-bottom: var(--space-4);
+  }
+
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+    border-top: 2px solid rgba(239, 239, 239, 0.2);
+  }
+
+  .timeline p {
+    opacity: 0.85;
+  }
+
+  .timeline li {
+    padding-top: var(--space-2);
+  }
+
+  .timeline :global(.timeline-year) {
+    display: inline-block;
+    margin-bottom: 0.6rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  /* MISSION BAND */
+  .mission-band {
+    position: relative;
+    color: var(--off-white);
+    overflow: hidden;
+    padding: var(--space-6) 0;
+  }
+
+  .mission-band :global(.mission-band-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mission-band-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(27, 21, 17, 0.7);
+  }
+
+  .mission-band-content {
+    position: relative;
+  }
+
+  .mission-band .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .mission-band h2 {
+    color: var(--off-white);
+    margin-bottom: var(--space-3);
+  }
+
+  .mission-band .mission-lead {
+    max-width: 60ch;
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin-bottom: var(--space-3);
+  }
+
+  .mission-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    opacity: 0.85;
+  }
+
+  /* SYMBOLISM */
+  .symbolism {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .symbolism-label {
+    color: var(--chai-gold);
+  }
+
+  .symbolism h2 {
+    color: var(--off-white);
+    margin: var(--space-1) 0 var(--space-4);
+  }
+
+  .symbolism-break {
+    display: none;
+  }
+
+  .symbol-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+
+  .symbol-card {
+    background: var(--stage-black);
+    padding: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    /* Interior-only divider lines — right + bottom on every card, then the
+       last column/row strip their outer-facing side so no line runs along the
+       grid's outer edge. Column count changes at the breakpoints below. */
+    box-shadow: 1px 0 0 rgba(239, 239, 239, 0.14), 0 1px 0 rgba(239, 239, 239, 0.14);
+  }
+
+  .symbol-card:nth-child(4n) {
+    box-shadow: 0 1px 0 rgba(239, 239, 239, 0.14);
+  }
+
+  .symbol-card:nth-child(n + 5) {
+    box-shadow: 1px 0 0 rgba(239, 239, 239, 0.14);
+  }
+
+  .symbol-card:nth-child(4n):nth-child(n + 5) {
+    box-shadow: none;
+  }
+
+  .symbol-icon {
+    display: block;
+    width: 88px;
+    height: 88px;
+    background-color: var(--off-white);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    opacity: 0.9;
+    transition: background-color 0.2s ease;
+  }
+
+  .symbol-card:hover .symbol-icon {
+    background-color: var(--chai-gold);
+    opacity: 1;
+  }
+
+  .symbol-card h3 {
+    color: var(--chai-gold);
+    font-size: 1.15rem;
+  }
+
+  .symbol-card p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    line-height: 1.55;
+  }
+
+  /* BOOK US */
+  .book-us {
+    position: relative;
+    color: var(--off-white);
+    overflow: hidden;
+    padding: var(--space-6) 0;
+  }
+
+  .book-us :global(.book-us-bg) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .book-us-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(27, 21, 17, 0.6);
+  }
+
+  .book-us-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .book-us-media {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .book-us-media :global(.book-us-photo) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .book-us .eyebrow {
+    color: var(--chai-gold);
+  }
+
+  .book-us h2 {
+    color: var(--off-white);
+    margin: var(--space-1) 0 var(--space-3);
+  }
+
+  .book-us-copy p {
+    max-width: 52ch;
+    margin-bottom: var(--space-3);
+    opacity: 0.9;
+  }
+
+  @media (max-width: 860px) {
+    .timeline {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .mission-cols {
+      grid-template-columns: 1fr;
+    }
+
+    .symbol-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Re-derive the interior-only divider lines for the 2-column layout.
+       :nth-child(n) matches every card but bumps specificity so this reset
+       actually overrides the unconditional 4-column nth-child rules above. */
+    .symbol-card:nth-child(n) {
+      box-shadow: 1px 0 0 rgba(239, 239, 239, 0.14), 0 1px 0 rgba(239, 239, 239, 0.14);
+    }
+
+    .symbol-card:nth-child(2n) {
+      box-shadow: 0 1px 0 rgba(239, 239, 239, 0.14);
+    }
+
+    .symbol-card:nth-child(n + 7) {
+      box-shadow: 1px 0 0 rgba(239, 239, 239, 0.14);
+    }
+
+    .symbol-card:nth-child(2n):nth-child(n + 7) {
+      box-shadow: none;
+    }
+
+    .book-us-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .book-us-media {
+      aspect-ratio: 1 / 1;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .timeline {
+      grid-template-columns: 1fr;
+    }
+
+    .symbol-grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* Single column: only a bottom divider is ever needed, and never on the last card.
+       :nth-child(n) is a no-op selector added purely to match the specificity of the
+       4-/2-column nth-child rules above, which would otherwise still win here. */
+    .symbol-card:nth-child(n) {
+      box-shadow: 0 1px 0 rgba(239, 239, 239, 0.14);
+    }
+
+    .symbol-card:last-child {
+      box-shadow: none;
+    }
+  }
+
+  @media (max-width: 499px) {
+    /* TIMELINE: a traditional centred spine with alternating branches — box and
+       text sit right-aligned against the line on the left side, left-aligned on
+       the right side. */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      border-top: none;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      transform: translateX(-1px);
+      background: linear-gradient(to bottom, var(--off-white), var(--chai-gold));
+    }
+
+    .timeline li {
+      position: relative;
+      z-index: 1;
+      width: calc(50% - 20px);
+      padding-top: 0;
+    }
+
+    .timeline li::after {
+      content: "";
+      position: absolute;
+      top: 18px;
+      width: 20px;
+      height: 2px;
+      background: var(--chai-gold);
+    }
+
+    .timeline li:nth-child(odd) {
+      margin-right: auto;
+      text-align: right;
+    }
+
+    .timeline li:nth-child(odd)::after {
+      right: -20px;
+    }
+
+    .timeline li:nth-child(even) {
+      margin-left: auto;
+      text-align: left;
+    }
+
+    .timeline li:nth-child(even)::after {
+      left: -20px;
+    }
+
+    /* MISSION: nudge body text down from the header, trim bottom space */
+    .mission-band {
+      padding-bottom: var(--space-4);
+    }
+
+    .mission-band .mission-lead {
+      margin-top: var(--space-1);
+    }
+
+    /* SYMBOLISM: each symbol (and the heading) rises up individually as it scrolls into view */
+    .symbolism-label,
+    .symbolism h2,
+    .symbol-card {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .symbolism-label.is-visible,
+    .symbolism h2.is-visible,
+    .symbol-card.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* BOOK US: text closer to the image, image 25% shorter */
+    .book-us-grid {
+      gap: var(--space-2);
+    }
+
+    .book-us-media {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    /* CHAI STORY: centre the divider line between the heading and the year boxes */
+    .story h2 {
+      margin-bottom: var(--space-3);
+    }
+
+    .timeline {
+      padding-top: var(--space-3);
+    }
+
+    .timeline li {
+      padding-top: 0;
+    }
+
+    /* General tablet shrink — pages were running too tall */
+    .about-hero {
+      min-height: 38vh;
+    }
+
+    .book-us-media {
+      aspect-ratio: 4 / 3;
+    }
+
+    /* SYMBOLISM: force "What Chai Wallahs" / "is made of" onto two even-ish lines */
+    .symbolism-break {
+      display: inline;
+    }
+  }
+</style>

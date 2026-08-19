@@ -1,0 +1,284 @@
+---
+import ChaiIcon from "../assets/images/logos/Icon-Hand-drawn-White.png";
+import ChaiWordmark from "../assets/images/logos/Hand-drawn-Wordmark-White.png";
+
+const links = [
+  { href: "/about/", label: "About" },
+  { href: "/events/", label: "Events" },
+  { href: "/where-it-all-began/", label: "WIAB" },
+  { href: "/shop/", label: "Shop" },
+  { href: "/contact/", label: "Contact" },
+];
+---
+
+<header class="site-header" id="site-header">
+  <div class="wrap bar">
+    <a href="/" class="logo" aria-label="Chai Wallahs — home">
+      <span class="logo-icon" style={`-webkit-mask-image:url("${ChaiIcon.src}"); mask-image:url("${ChaiIcon.src}");`} />
+      <span class="logo-wordmark" style={`-webkit-mask-image:url("${ChaiWordmark.src}"); mask-image:url("${ChaiWordmark.src}");`} />
+    </a>
+
+    <button type="button" class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="site-nav" id="nav-toggle">
+      <span></span>
+    </button>
+
+    <nav class="nav" id="site-nav">
+      <ul>
+        <li class="nav-home"><a href="/">Home</a></li>
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+      <a href="/contact/#artists" class="btn btn-solid apply-btn">Apply to Play</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById("nav-toggle");
+  const header = document.getElementById("site-header");
+
+  toggle?.addEventListener("click", () => {
+    const isOpen = header?.classList.toggle("nav-open");
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+
+  document.getElementById("site-nav")?.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).tagName === "A") {
+      header?.classList.remove("nav-open");
+      toggle?.setAttribute("aria-expanded", "false");
+    }
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--stage-black);
+    color: var(--off-white);
+    border-bottom: 1px solid rgba(239, 239, 239, 0.12);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1.1rem;
+    padding-bottom: 1.1rem;
+    position: relative;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .logo-icon,
+  .logo-wordmark {
+    display: block;
+    background-color: var(--off-white);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    transition: background-color 0.15s ease;
+  }
+
+  .logo-icon {
+    height: 64px;
+    width: 64px;
+  }
+
+  .logo-icon:hover {
+    background-color: var(--chai-gold);
+  }
+
+  .logo-wordmark {
+    height: 64px;
+    width: 290px;
+  }
+
+  .logo-wordmark:hover {
+    background-color: var(--chai-gold);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .nav ul {
+    list-style: none;
+    display: flex;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav a {
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--off-white);
+    opacity: 0.85;
+    transition: opacity 0.15s ease, color 0.15s ease;
+  }
+
+  .nav-home {
+    display: none;
+  }
+
+  .nav ul a:hover {
+    opacity: 1;
+    color: var(--chai-gold);
+  }
+
+  .nav a.apply-btn {
+    font-size: 0.82rem;
+    padding: 0.8em 1.5em;
+    color: var(--stage-black);
+    opacity: 1;
+  }
+
+  .nav a.apply-btn:hover {
+    background: transparent;
+    border-color: var(--chai-gold);
+    color: var(--chai-gold);
+  }
+
+  .nav-toggle {
+    display: none;
+    width: 32px;
+    height: 24px;
+    position: relative;
+    cursor: pointer;
+    z-index: 60;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .nav-toggle span,
+  .nav-toggle span::before,
+  .nav-toggle span::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--off-white);
+    transition: transform 0.2s ease, opacity 0.2s ease, top 0.2s ease;
+  }
+
+  .nav-toggle span {
+    top: 11px;
+  }
+
+  .nav-toggle span::before {
+    top: -9px;
+  }
+
+  .nav-toggle span::after {
+    top: 9px;
+  }
+
+  @media (max-width: 860px) {
+    .nav-home {
+      display: list-item;
+    }
+
+    .logo-icon {
+      height: 48px;
+      width: 48px;
+    }
+
+    .logo-wordmark {
+      height: 48px;
+      width: 217px;
+    }
+
+    .nav-toggle {
+      display: block;
+    }
+
+    .nav {
+      position: fixed;
+      inset: 0 0 0 30%;
+      background: var(--stage-black);
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      padding: var(--space-4);
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      gap: var(--space-4);
+      border-left: 1px solid rgba(239, 239, 239, 0.15);
+    }
+
+    .nav ul {
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .nav ul a {
+      font-size: 1.1rem;
+    }
+
+    .site-header.nav-open .nav {
+      transform: translateX(0);
+    }
+
+    .site-header.nav-open .nav-toggle span {
+      background: transparent;
+    }
+
+    .site-header.nav-open .nav-toggle span::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    .site-header.nav-open .nav-toggle span::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
+  }
+
+  @media (max-width: 499px) {
+    .nav {
+      justify-content: flex-start;
+      padding-top: 6rem;
+    }
+
+    .nav ul a {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      letter-spacing: 0.01em;
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    .nav {
+      justify-content: flex-start;
+      padding-top: 6rem;
+    }
+
+    .nav ul a {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      letter-spacing: 0.01em;
+    }
+  }
+</style>

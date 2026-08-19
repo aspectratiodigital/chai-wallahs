@@ -1,0 +1,333 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import TornBox from "../components/TornBox.astro";
+
+import HeroImg from "../assets/images/backgrounds/orange-1.png";
+import DirectBg from "../assets/images/backgrounds/plum-2.png";
+import ArtistIcon from "../assets/images/symbols/white/Artist.png";
+import CrewIcon from "../assets/images/symbols/white/Crew.png";
+import VenueIcon from "../assets/images/symbols/white/Venue.png";
+import FacebookIcon from "../assets/images/social/facebook.png";
+import InstagramIcon from "../assets/images/social/instagram.png";
+import YoutubeIcon from "../assets/images/social/youtube.png";
+import TiktokIcon from "../assets/images/social/tiktok.svg";
+
+const EMAIL = "sichai@chaiwallahs.co.uk";
+
+const socials = [
+  { label: "Facebook", href: "https://www.facebook.com/chaiwallahs", icon: FacebookIcon },
+  { label: "Instagram", href: "https://www.instagram.com/chaiwallahs/", icon: InstagramIcon },
+  { label: "YouTube", href: "https://www.youtube.com/@ChaiWallahs", icon: YoutubeIcon, large: true },
+  { label: "TikTok", href: "https://www.tiktok.com/@chaiwallahs_", icon: TiktokIcon, medium: true },
+];
+
+const tracks = [
+  {
+    id: "artists",
+    icon: ArtistIcon,
+    title: "Artists",
+    text: "To perform on our stage, fill in the sheet and come fill our tent, with big songs and phat beats. We're welcoming submissions for 2027 — send your most up-to-date videos, tracks, and biog to show us where you are now as performers.",
+    cta: "Apply to Play",
+    subject: "2027 Artist Application",
+    color: "ember",
+    rotate: -1.2,
+  },
+  {
+    id: "crew",
+    icon: CrewIcon,
+    title: "Crew",
+    text: "The Chai Wallahs bar and cafe is the beating heart of our venue. We're on the hunt for eccentric dependables with plenty of patter and a positive mental attitude to join our bar crew.",
+    cta: "Join the Chai Crew",
+    subject: "Joining the Chai Crew",
+    color: "velvet",
+    rotate: 0.8,
+  },
+  {
+    id: "production",
+    icon: VenueIcon,
+    title: "Event Production",
+    text: "To discuss Chai Wallahs' involvement in your event — bar, catering, and curated stage programmes in various sized freeform tents. We're open to all suggestions and opportunities.",
+    cta: "Discuss Your Event",
+    subject: "Event Production Enquiry",
+    color: "crown",
+    rotate: -0.8,
+  },
+];
+---
+
+<BaseLayout title="Contact" description="Get in touch with Chai Wallahs — apply to play, join the crew, or book us for your event.">
+  <section class="contact-hero">
+    <Image src={HeroImg} alt="" class="contact-hero-img" width={2000} height={900} priority />
+    <div class="contact-hero-scrim"></div>
+    <div class="wrap contact-hero-content">
+      <p class="eyebrow">&gt; Get In Touch</p>
+      <h1>Contact</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap tracks">
+      {
+        tracks.map((t) => (
+          <TornBox color={t.color} rotate={t.rotate} tag="div" class="track" id={t.id}>
+            <Image src={t.icon} alt="" width={48} height={48} />
+            <h2>{t.title}</h2>
+            <p>{t.text}</p>
+            <a class="btn btn-outline" href={`mailto:${EMAIL}?subject=${encodeURIComponent(t.subject)}`}>{t.cta}</a>
+          </TornBox>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="direct-band">
+    <Image src={DirectBg} alt="" class="direct-band-img" width={2200} height={1200} />
+    <div class="direct-band-scrim"></div>
+    <div class="wrap direct-band-content">
+      <p class="eyebrow">&gt; Speak with us</p>
+      <h2>Prefer to just email?</h2>
+      <a class="direct-email" href={`mailto:${EMAIL}`}>{EMAIL}</a>
+      <div class="socials">
+        {
+          socials.map((s) => (
+            <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
+              <span
+                class:list={["social-icon", { "social-icon--large": s.large, "social-icon--medium": s.medium }]}
+                style={`-webkit-mask-image:url("${s.icon.src}"); mask-image:url("${s.icon.src}");`}
+              />
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-hero {
+    position: relative;
+    min-height: 48vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .contact-hero :global(.contact-hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .contact-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.9) 15%, rgba(27, 21, 17, 0.25) 100%);
+  }
+
+  .contact-hero-content {
+    position: relative;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .contact-hero-content .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .contact-hero-content h1 {
+    color: var(--off-white);
+  }
+
+  .section {
+    background: var(--stage-black);
+    border-bottom: 1px solid rgba(239, 239, 239, 0.1);
+  }
+
+  .tracks {
+    max-width: calc(var(--content-max) * 1.2);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: stretch;
+    gap: var(--space-5);
+  }
+
+  .tracks :global(.track) {
+    scroll-margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    height: 100%;
+    min-height: 400px;
+    padding: var(--space-5) var(--space-4);
+  }
+
+  :global(.track) h2 {
+    font-size: 1.5rem;
+    color: var(--off-white);
+  }
+
+  :global(.track) p {
+    opacity: 0.9;
+    flex: 1;
+  }
+
+  :global(.track) .btn {
+    align-self: flex-start;
+  }
+
+  :global(.track) .btn:hover {
+    background: transparent;
+    color: var(--stage-black);
+    border-color: var(--stage-black);
+  }
+
+  .direct-band {
+    position: relative;
+    color: var(--off-white);
+    overflow: hidden;
+    padding: var(--space-6) 0;
+  }
+
+  .direct-band :global(.direct-band-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .direct-band-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(27, 21, 17, 0.72);
+  }
+
+  .direct-band-content {
+    position: relative;
+  }
+
+  .direct-band .eyebrow {
+    color: var(--chai-gold);
+  }
+
+  .direct-band h2 {
+    color: var(--off-white);
+    margin: var(--space-1) 0 var(--space-3);
+  }
+
+  .direct-email {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--chai-gold);
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.15em;
+  }
+
+  .socials {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .socials a {
+    display: block;
+    opacity: 0.75;
+    transition: opacity 0.15s ease;
+  }
+
+  .socials a:hover {
+    opacity: 1;
+  }
+
+  .social-icon {
+    display: block;
+    width: 30px;
+    height: 30px;
+    background-color: var(--off-white);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    transition: background-color 0.15s ease;
+  }
+
+  .socials a:hover .social-icon {
+    background-color: var(--chai-gold);
+  }
+
+  .social-icon--large {
+    width: 43px;
+    height: 43px;
+  }
+
+  .social-icon--medium {
+    width: 36px;
+    height: 36px;
+  }
+
+  @media (max-width: 860px) {
+    .tracks {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 499px) {
+    .contact-hero {
+      min-height: 33.6vh;
+    }
+
+    /* SPEAK WITH US: trim the space around the text */
+    .direct-band {
+      padding: var(--space-4) 0;
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    /* General tablet shrink — pages were running too tall */
+    .contact-hero {
+      min-height: 38vh;
+    }
+
+    .direct-band {
+      padding: var(--space-4) 0;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 850px) {
+    /* Side-by-side down to 600px, resizing with the page width — below that it
+       falls back to the single-column mobile-style stack from the 860px rule. */
+    .tracks {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+    }
+
+    .tracks :global(.track) {
+      /* Grid/flex items don't shrink below their content's width by default —
+         without this, long words/buttons were pushing past the card edge
+         instead of wrapping. */
+      min-width: 0;
+      min-height: 0;
+      padding: var(--space-3) var(--space-2);
+    }
+
+    :global(.track) h2 {
+      font-size: 1.15rem;
+    }
+
+    :global(.track) p {
+      font-size: 0.9rem;
+    }
+  }
+</style>

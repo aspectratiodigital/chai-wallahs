@@ -1,0 +1,100 @@
+---
+import { Image } from "astro:assets";
+
+interface Props {
+  title: string;
+  date: string;
+  venue?: string;
+  blurb: string;
+  ticketUrl?: string;
+  image: string;
+  featured?: boolean;
+}
+
+const { title, date, venue, blurb, ticketUrl, image, featured = false } = Astro.props;
+
+const images = import.meta.glob("../assets/images/gallery/*.{jpg,jpeg,png}", {
+  eager: true,
+  import: "default",
+});
+const imgSrc = images[`../assets/images/gallery/${image}`];
+---
+
+<article class:list={["event-card", { featured }]}>
+  <div class="event-media">
+    {imgSrc && <Image src={imgSrc} alt={title} width={featured ? 900 : 600} height={featured ? 600 : 420} />}
+  </div>
+  <div class="event-body">
+    <p class="eyebrow event-date">{date}{venue ? ` · ${venue}` : ""}</p>
+    <h3>{title}</h3>
+    <p class="event-blurb">{blurb}</p>
+    {
+      ticketUrl && (
+        <a class="btn btn-outline" href={ticketUrl} target="_blank" rel="noopener noreferrer">
+          Get Tickets
+        </a>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .event-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--stage-black);
+    color: var(--off-white);
+    border: 1px solid rgba(239, 239, 239, 0.18);
+  }
+
+  .event-media {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+
+  .featured .event-media {
+    aspect-ratio: 3 / 2;
+  }
+
+  .event-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.9) contrast(1.05);
+  }
+
+  .event-body {
+    padding: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    flex: 1;
+  }
+
+  .event-date {
+    color: var(--chai-gold);
+  }
+
+  .event-body h3 {
+    font-size: 1.5rem;
+    color: var(--off-white);
+  }
+
+  .event-blurb {
+    opacity: 0.85;
+    font-size: 0.95rem;
+    flex: 1;
+  }
+
+  .event-body .btn {
+    align-self: flex-start;
+    margin-top: 0.4rem;
+    color: var(--off-white);
+  }
+
+  .event-body .btn:hover {
+    background: var(--chai-gold);
+    color: var(--stage-black);
+    border-color: var(--chai-gold);
+  }
+</style>

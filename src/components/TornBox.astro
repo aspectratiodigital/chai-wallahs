@@ -1,0 +1,56 @@
+---
+// A hand-drawn "torn paper" box from the brand book, stretched behind slotted
+// content — the brand book's own pattern for pull-quotes, tags, and callouts.
+import black from "../assets/images/boxes/black.png";
+import crown from "../assets/images/boxes/crown.png";
+import ember from "../assets/images/boxes/ember.png";
+import velvet from "../assets/images/boxes/velvet.png";
+import gold from "../assets/images/boxes/gold.png";
+import gold2 from "../assets/images/boxes/gold-2.png";
+import white from "../assets/images/boxes/white.png";
+import white2 from "../assets/images/boxes/white-2.png";
+
+const boxes = { black, crown, ember, velvet, gold, "gold-2": gold2, white, "white-2": white2 };
+
+interface Props {
+  color?: "gold" | "gold-2" | "white" | "white-2" | "black" | "crown" | "ember" | "velvet";
+  rotate?: number;
+  tag?: string;
+  class?: string;
+  id?: string;
+}
+
+const { color = "gold", rotate = -1.2, tag = "div", class: className = "", id } = Astro.props;
+const Tag = tag;
+const box = boxes[color];
+// Per the brand book (typefaces slide): white/off-white text sits on every
+// coloured box (gold, black, crown) — only the pale "white" boxes get dark text.
+const textColor = color === "white" || color === "white-2" ? "on-light" : "on-dark";
+---
+
+<Tag id={id} class={`torn-box torn-box--${textColor} ${className}`} style={`--rotate:${rotate}deg; background-image:url("${box.src}");`}>
+  <slot />
+</Tag>
+
+<style>
+  .torn-box {
+    display: inline-block;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    transform: rotate(var(--rotate));
+    padding: 0.9em 1.2em;
+  }
+
+  .torn-box--on-light {
+    color: var(--stage-black);
+  }
+
+  .torn-box--on-dark {
+    color: var(--off-white);
+  }
+
+  .torn-box--on-dark :global(a) {
+    color: var(--off-white);
+  }
+</style>

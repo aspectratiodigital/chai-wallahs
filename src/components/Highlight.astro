@@ -1,0 +1,40 @@
+---
+// A "highlighter marker" behind a word or short phrase inside a headline —
+// the brand book's treatment on words like "GOOD THINGS" and "SHOUT".
+// Gold uses the wide hand-drawn box (the only shape built for this — the
+// others are all square panels, so "black" stretches the square one instead,
+// which the brand book itself does across formats).
+import goldWide from "../assets/images/boxes/gold-wide.png";
+import black from "../assets/images/boxes/black.png";
+import emberWide from "../assets/images/boxes/ember-wide.png";
+
+const boxes = { gold: goldWide, black, ember: emberWide };
+
+interface Props {
+  color?: "gold" | "black" | "ember";
+  rotate?: number;
+  class?: string;
+}
+
+const { color = "gold", rotate = -1.5, class: className = "" } = Astro.props;
+const box = boxes[color];
+---
+
+<span class={`highlight-word ${className}`} style={`--rotate:${rotate}deg; background-image:url("${box.src}");`}>
+  <slot />
+</span>
+
+<style>
+  .highlight-word {
+    display: inline-block;
+    line-height: 1.25;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    transform: rotate(var(--rotate));
+    padding: 0.12em 0.4em;
+    margin: 0 -0.1em;
+    color: var(--off-white);
+    white-space: nowrap;
+  }
+</style>

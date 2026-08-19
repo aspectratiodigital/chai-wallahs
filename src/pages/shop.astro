@@ -1,0 +1,247 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import Highlight from "../components/Highlight.astro";
+
+import HeroImg from "../assets/images/backgrounds/orange-3.png";
+import ChaiHoodieBlack from "../assets/images/shop/chai-hoodie-black.jpg";
+import ChaiHoodieBlackBack from "../assets/images/shop/chai-hoodie-black-back.jpg";
+import ChaiHoodieNavy from "../assets/images/shop/chai-hoodie-navy.jpg";
+import ChaiHoodieNavyBack from "../assets/images/shop/chai-hoodie-navy-back.jpg";
+import GrassrootsHoodieGrey from "../assets/images/shop/grassroots-hoodie-grey.jpg";
+import GrassrootsHoodieGreyBack from "../assets/images/shop/grassroots-hoodie-grey-back.jpg";
+import ChaiTeeBlack from "../assets/images/shop/chai-tee-black.jpg";
+import ChaiTeeBlackBack from "../assets/images/shop/chai-tee-black-back.jpg";
+import GrassrootsTeeBlack from "../assets/images/shop/grassroots-tee-black.jpg";
+import GrassrootsTeeBlackBack from "../assets/images/shop/grassroots-tee-black-back.jpg";
+import BeanieDuskyPink from "../assets/images/shop/chai-beanie-dusky-pink.jpg";
+import BeanieDuskyPinkSide from "../assets/images/shop/chai-beanie-dusky-pink-side.jpg";
+
+const STORE_URL = "https://www.chaiwallahs.co.uk/category/all-products";
+
+const products = [
+  { name: "Chai Wallah's Heavyweight Hoodie", price: "£50.00", image: ChaiHoodieBlack, imageHover: ChaiHoodieBlackBack, category: "Hoodies" },
+  { name: "Grassroots Supporter Heavyweight Hoodie", price: "£50.00", image: GrassrootsHoodieGrey, imageHover: GrassrootsHoodieGreyBack, category: "Hoodies" },
+  { name: "Chai Wallah's Reverse Heavyweight Hoodie", price: "£50.00", image: ChaiHoodieNavy, imageHover: ChaiHoodieNavyBack, category: "Hoodies" },
+  { name: "Chai Wallah's Organic T-Shirt", price: "£25.00", image: ChaiTeeBlack, imageHover: ChaiTeeBlackBack, category: "T-Shirts" },
+  { name: "Grassroots Supporter Organic T-Shirt", price: "£25.00", image: GrassrootsTeeBlack, imageHover: GrassrootsTeeBlackBack, category: "T-Shirts" },
+  { name: "Chai Wallah's Cuffed Beanie", price: "£17.50", image: BeanieDuskyPink, imageHover: BeanieDuskyPinkSide, category: "Hats" },
+];
+---
+
+<BaseLayout title="Shop" description="Chai Wallahs merch — 50% of all profits reinvested into grassroots initiatives.">
+  <section class="shop-hero">
+    <Image src={HeroImg} alt="" class="shop-hero-img" width={2000} height={900} priority />
+    <div class="shop-hero-scrim"></div>
+    <div class="wrap shop-hero-content">
+      <p class="eyebrow">&gt; We Got Merch</p>
+      <h1>Wear the<br /><Highlight rotate={-1.5}>Stamp</Highlight></h1>
+      <p class="shop-hero-sub">
+        50% of all profits from the Chai Wallahs shop are reinvested straight back into grassroots
+        initiatives — the artists, crew, and scene that make this whole thing worth doing.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="product-grid">
+        {
+          products.map((p) => (
+            <a class="product-card" href={STORE_URL} target="_blank" rel="noopener noreferrer">
+              <div class="product-media">
+                {p.image ? (
+                  <>
+                    <Image src={p.image} alt={p.name} width={640} height={640} class="product-img product-img--front" />
+                    {p.imageHover && (
+                      <Image src={p.imageHover} alt="" width={640} height={640} class="product-img product-img--back" />
+                    )}
+                  </>
+                ) : (
+                  <div class="product-placeholder" aria-hidden="true" />
+                )}
+              </div>
+              <p class="eyebrow product-category">{p.category}</p>
+              <p class="product-name">{p.name}</p>
+              <p class="product-price">{p.price}</p>
+            </a>
+          ))
+        }
+      </div>
+      <p class="shop-note">
+        All items are sold and fulfilled through the Chai Wallahs store. Tap any product to visit the shop
+        and check out.
+      </p>
+      <a href={STORE_URL} target="_blank" rel="noopener noreferrer" class="btn btn-solid">Visit the Full Store</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .shop-hero {
+    position: relative;
+    min-height: 48vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .shop-hero :global(.shop-hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .shop-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.92) 15%, rgba(27, 21, 17, 0.3) 100%);
+  }
+
+  .shop-hero-content {
+    position: relative;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .shop-hero-content .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .shop-hero-content h1 {
+    color: var(--off-white);
+  }
+
+  .shop-hero-sub {
+    max-width: 48ch;
+    margin-top: var(--space-2);
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+
+  .section {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .product-card {
+    text-decoration: none;
+    color: var(--off-white);
+    display: block;
+  }
+
+  .product-media {
+    position: relative;
+    aspect-ratio: 1;
+    background: var(--off-white);
+    border: 1px solid rgba(27, 21, 17, 0.1);
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+  }
+
+  .product-media :global(.product-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .product-media :global(.product-img--front) {
+    position: relative;
+  }
+
+  .product-media :global(.product-img--back) {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  .product-card:hover .product-media :global(.product-img--front) {
+    opacity: 0;
+  }
+
+  .product-card:hover .product-media :global(.product-img--back) {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  .product-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--chai-gold);
+  }
+
+  .product-category {
+    color: var(--chai-gold);
+    margin-bottom: 0.3rem;
+  }
+
+  .product-name {
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+    color: var(--off-white);
+  }
+
+  .product-price {
+    font-family: var(--font-mono);
+    color: var(--off-white);
+    opacity: 0.75;
+  }
+
+  .shop-note {
+    font-size: 0.9rem;
+    color: var(--off-white);
+    opacity: 0.6;
+    max-width: 60ch;
+    margin-bottom: var(--space-3);
+  }
+
+  @media (max-width: 860px) {
+    .product-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 499px) {
+    .product-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .shop-hero {
+      min-height: 33.6vh;
+    }
+
+    .shop-hero-sub {
+      display: none;
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    /* General tablet shrink — pages were running too tall */
+    .shop-hero {
+      min-height: 38vh;
+    }
+
+    /* No white letterboxing behind the product photos — let each image itself
+       fill and reshape to the card instead of showing background around it. */
+    .product-media {
+      aspect-ratio: 4 / 3;
+      background: transparent;
+      border: none;
+    }
+
+    .product-media :global(.product-img) {
+      object-fit: cover;
+    }
+  }
+</style>

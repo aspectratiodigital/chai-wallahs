@@ -1,0 +1,227 @@
+/* ============================================================
+   Chai Wallahs — Design Tokens
+   Chakra colour system + brand typography, per the brand book.
+   ============================================================ */
+
+@font-face {
+  font-family: "Poster Cut Neue";
+  src: url("/fonts/Poster Cut Neue Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ---- Chakra colour system (New Website Assets/Colours/Colour-Codes.png) ---- */
+  --stage-black: #1b1511; /* Muladhara - Root */
+  --off-white: #efefef;   /* The canvas */
+  --chai-gold: #f8b31b;   /* Manipura - Solar Plexus */
+  --velvet: #6a2832;      /* Anja - Third Eye */
+  --forest-deep: #294f40; /* Vishuddha - Throat */
+  --forest: #3f7c62;      /* Anahata - Heart */
+  --ember: #c25b1f;       /* Svadhisthana - Sacral */
+  --crown: #422438;       /* Sahasrara - Crown */
+
+  /* ---- Type ---- */
+  --font-display: "Poster Cut Neue", "Arial Narrow", sans-serif;
+  --font-body: "PT Sans", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* ---- Spacing scale ---- */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 3.5rem;
+  --space-6: 4.5rem;
+  --space-7: 7rem;
+
+  /* ---- Layout ---- */
+  --content-max: 1240px;
+  --radius: 2px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--off-white);
+  color: var(--stage-black);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: 0.01em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: clamp(2.75rem, 6vw + 1rem, 6rem);
+}
+
+h2 {
+  font-size: clamp(2.1rem, 4vw + 1rem, 3.6rem);
+}
+
+h3 {
+  font-size: clamp(1.5rem, 2vw + 1rem, 2.1rem);
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wrap {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--space-3);
+}
+
+.section {
+  padding: var(--space-6) 0;
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: var(--space-5) 0;
+  }
+  body {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 499px) {
+  .section {
+    padding-bottom: var(--space-4);
+  }
+}
+
+@media (min-width: 500px) and (max-width: 850px) {
+  /* General tablet shrink — pages were running too tall */
+  .section {
+    padding: var(--space-4) 0;
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.95em 1.6em;
+  border: 2px solid currentColor;
+  /* A hand-drawn-ish wobble instead of a hard rectangle, echoing the torn-box shapes. */
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:hover {
+  transform: translate(-2px, -2px);
+}
+
+/* Solid buttons: filled by default, reveal to a transparent/bordered "ghost" state on
+   hover — the header's Apply to Play button is the reference. --btn-accent lets any
+   section pick its own accent while keeping this same reveal behaviour. */
+.btn-solid {
+  --btn-accent: var(--chai-gold);
+  background: var(--btn-accent);
+  color: var(--stage-black);
+  border-color: var(--btn-accent);
+}
+
+.btn-solid:hover {
+  background: transparent;
+  color: var(--btn-accent);
+  border-color: var(--btn-accent);
+}
+
+/* Outline buttons: transparent/bordered by default, fill solid with dark text on hover. */
+.btn-outline {
+  --btn-accent: var(--off-white);
+  background: transparent;
+  color: var(--btn-accent);
+  border-color: var(--btn-accent);
+}
+
+.btn-outline:hover {
+  background: var(--btn-accent);
+  color: var(--stage-black);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
