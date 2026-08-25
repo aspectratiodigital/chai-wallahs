@@ -1,0 +1,176 @@
+backend:
+  name: github
+  repo: aspectratiodigital/chai-wallahs
+  branch: main
+  # Replace with the deployed OAuth Worker's URL once it exists (see cms-auth/README.md).
+  base_url: https://REPLACE-WITH-YOUR-WORKER.workers.dev
+  auth_endpoint: auth
+
+# Only takes effect when the admin UI is opened on localhost (with `npx decap-server`
+# running alongside `npm run dev`) — a no-op in production, safe to leave on.
+local_backend: true
+
+# One shared uploads location, inside src/ so Astro's image() schema helper can
+# see and optimize CMS-uploaded photos (public/ is copied verbatim and is
+# invisible to that pipeline — uploads there would fail the build).
+media_folder: "src/assets/uploads"
+public_folder: "src/assets/uploads"
+
+publish_mode: simple
+
+collections:
+  - name: events
+    label: Events
+    label_singular: Event
+    folder: src/content/events
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{date}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD" }
+      - { label: Venue, name: venue, widget: string, required: false }
+      - { label: Short blurb (shown on cards), name: blurb, widget: text }
+      - { label: Ticket URL, name: ticketUrl, widget: string, required: false, hint: "Leave blank for events with no ticket link (e.g. past events)." }
+      - { label: Image, name: image, widget: image }
+      - { label: Draft (hide from the site), name: draft, widget: boolean, default: false }
+      - { label: Full description (shown on the event's own page), name: body, widget: markdown, required: false }
+
+  - name: products
+    label: Shop Products
+    label_singular: Product
+    folder: src/content/products
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    summary: "{{name}} — £{{price}}"
+    fields:
+      - { label: Name, name: name, widget: string }
+      - { label: "Price (GBP, e.g. 25 or 17.50)", name: price, widget: number, value_type: float }
+      - { label: Image, name: image, widget: image }
+      - { label: Hover / back image, name: imageHover, widget: image, required: false }
+      - label: Category
+        name: category
+        widget: select
+        options: [Hoodies, T-Shirts, Hats]
+      - { label: "Featured on homepage (max 3 shown)", name: featured, widget: boolean, default: false }
+      - { label: "Shopify handle (reserved for later, leave blank)", name: shopifyHandle, widget: string, required: false }
+      - { label: "SKU (reserved for later, leave blank)", name: sku, widget: string, required: false }
+
+  - name: venues
+    label: "WIAB Venues"
+    label_singular: Venue
+    folder: src/content/venues
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Name, name: name, widget: string }
+      - { label: Description, name: text, widget: text }
+      - { label: Photo, name: image, widget: image }
+      - { label: "Display order (1 = first)", name: order, widget: number, default: 1 }
+
+  - name: partners
+    label: Partners
+    label_singular: Partner
+    folder: src/content/partners
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Name, name: name, widget: string }
+      - { label: Logo, name: logo, widget: image }
+      - { label: Website URL, name: url, widget: string, required: false }
+      - { label: Small logo, name: small, widget: boolean, default: false }
+      - { label: Extra-small logo, name: xsmall, widget: boolean, default: false }
+      - { label: Large logo, name: large, widget: boolean, default: false }
+      - { label: "Inverted mark (solid disc with cut-out monogram)", name: invert, widget: boolean, default: false }
+
+  - name: site
+    label: Page Content
+    files:
+      - name: home
+        label: Home Page
+        file: src/content/site/home.json
+        fields:
+          - { label: "Mission founding story", name: missionFounding, widget: text, required: false }
+          - { label: "WIAB cross-promo subtext", name: wiabSub, widget: text, required: false }
+          - { label: "Final CTA headline", name: finalCtaHeadline, widget: string, required: false }
+          - { label: "Final CTA body", name: finalCtaBody, widget: text, required: false }
+          - label: "Mission points (5 shown, each with a fixed icon)"
+            name: missionPoints
+            widget: list
+            required: false
+            fields:
+              - { label: Text, name: text, widget: string }
+
+      - name: about
+        label: About Page
+        file: src/content/site/about.json
+        fields:
+          - { label: "Mission — lead paragraph", name: missionLead, widget: text, required: false }
+          - { label: "Mission — left column", name: missionCol1, widget: text, required: false }
+          - { label: "Mission — right column", name: missionCol2, widget: text, required: false }
+          - { label: "Book Us body text", name: bookUsBody, widget: text, required: false }
+          - label: "Chai Story timeline"
+            name: timeline
+            widget: list
+            required: false
+            fields:
+              - { label: Year, name: year, widget: string }
+              - { label: Text, name: text, widget: text }
+          - label: "Our Symbols (8 shown, each with a fixed icon, in order)"
+            name: symbols
+            widget: list
+            required: false
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Text, name: text, widget: text }
+
+      - name: events
+        label: Events Page
+        file: src/content/site/events.json
+        fields:
+          - { label: "Hero note (under the Events heading)", name: heroNote, widget: string, required: false }
+
+      - name: shop
+        label: Shop Page
+        file: src/content/site/shop.json
+        fields:
+          - { label: Hero subtext, name: heroSub, widget: text, required: false }
+          - { label: "Note below the product grid", name: shopNote, widget: text, required: false }
+
+      - name: contact
+        label: Contact Page
+        file: src/content/site/contact.json
+        fields:
+          - label: "The 3 track boxes"
+            name: tracks
+            widget: list
+            fields:
+              - { label: "ID (must stay artists / crew / production — controls icon)", name: id, widget: select, options: [artists, crew, production] }
+              - { label: Title, name: title, widget: string }
+              - { label: Body text, name: text, widget: text }
+              - { label: Button text, name: cta, widget: string }
+              - { label: "Email subject line", name: subject, widget: string }
+              - { label: "Box colour", name: color, widget: select, options: [ember, velvet, crown] }
+
+      - name: wiab
+        label: "Where It All Began Page"
+        file: src/content/site/wiab.json
+        fields:
+          - { label: "Intro copy", name: introCopy, widget: text, required: false }
+          - label: "What This Means"
+            name: doesMean
+            widget: list
+            required: false
+            fields: [{ label: Text, name: text, widget: string }]
+          - label: "What This Doesn't Mean"
+            name: doesntMean
+            widget: list
+            required: false
+            fields: [{ label: Text, name: text, widget: string }]
+          - { label: "Venues section intro", name: venuesIntro, widget: text, required: false }
+          - { label: "Ethos body text", name: festivalCopy, widget: text, required: false }
+          - { label: "Ethos date/venue line", name: festivalMeta, widget: string, required: false }

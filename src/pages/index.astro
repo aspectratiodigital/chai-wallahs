@@ -3,7 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import EventCard from "../components/EventCard.astro";
 import Highlight from "../components/Highlight.astro";
 import { Image } from "astro:assets";
-import { upcomingEvents } from "../data/events.js";
+import { getCollection, getEntry } from "astro:content";
 
 import HeroBg from "../assets/images/backgrounds/orange-2.png";
 import StampWhite from "../assets/images/logos/Icon-Hand-drawn-White.png";
@@ -15,9 +15,6 @@ import DancingIcon from "../assets/images/symbols/white/Dancing1.png";
 import MissionBg from "../assets/images/backgrounds/green-1.png";
 import WiabBg from "../assets/images/backgrounds/green-4.png";
 import WiabSticker from "../assets/images/logos/wiab-sticker.svg";
-import GrassrootsHoodieGrey from "../assets/images/shop/grassroots-hoodie-grey.jpg";
-import ChaiTeeBlack from "../assets/images/shop/chai-tee-black.jpg";
-import ChaiHoodieBlack from "../assets/images/shop/chai-hoodie-black.jpg";
 import CtaBg from "../assets/images/gallery/chai-stage.jpg";
 import GreenmanLogo from "../assets/images/festivals/greenman.svg";
 import SgpLogo from "../assets/images/festivals/secret-garden-party.svg";
@@ -25,26 +22,33 @@ import BoomerangLogo from "../assets/images/festivals/boomerang.svg";
 import ShambalaLogo from "../assets/images/festivals/shambala.svg";
 import KendalCallingRaw from "../assets/images/festivals/kendal-calling.svg?raw";
 
-const merch = [
-  { name: "Grassroots Supporter Hoodie", price: "£50.00", image: GrassrootsHoodieGrey },
-  { name: "Chai Wallah's Organic T-Shirt", price: "£25.00", image: ChaiTeeBlack },
-  { name: "Chai Wallah's Heavyweight Hoodie", price: "£50.00", image: ChaiHoodieBlack },
-];
+const siteContent = await getEntry("site", "home");
+const allEvents = await getCollection("events", ({ data }) => !data.draft);
+const now = new Date();
+const upcomingEvents = allEvents
+  .filter((e) => e.data.date >= now)
+  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf())
+  .slice(0, 2);
 
+const allProducts = await getCollection("products");
+const merch = allProducts.filter((p) => p.data.featured);
+
+// Icons are fixed brand assets, matched to the CMS-editable text by position.
+const missionIcons = [RootsIcon, CrewIcon, SoundIcon, DancingIcon, CommunityIcon];
+const missionPoints = (siteContent?.data.missionPoints ?? []).map((point, i) => ({
+  ...point,
+  icon: missionIcons[i],
+}));
+
+// The 5 festival-logo marquee entries — kept here rather than in the CMS: Kendal
+// Calling needs its multi-colour artwork inlined raw (a mask-image would flatten
+// it to one silhouette), which content-collection image() fields can't express.
 const festivals = [
   { name: "Greenman", logo: GreenmanLogo },
   { name: "Kendal Calling", inlineSvg: KendalCallingRaw, big: true },
   { name: "Secret Garden Party", logo: SgpLogo, big: true },
   { name: "Boomerang", logo: BoomerangLogo },
   { name: "Shambala", logo: ShambalaLogo },
-];
-
-const missionPoints = [
-  { icon: RootsIcon, text: "A platform where non-commercial music is not a compromise — it's the entire point." },
-  { icon: CrewIcon, text: "First stages for voices that deserve to be heard." },
-  { icon: SoundIcon, text: "Fair pay for artists isn't a radical idea. Just the right one." },
-  { icon: DancingIcon, text: "Festivals that feel alive again — made for you, not sold to you." },
-  { icon: CommunityIcon, text: "So the music sounds, as the artists intended." },
 ];
 
 const stats = [
@@ -79,7 +83,7 @@ const stats = [
         <h2>Next up on the stage</h2>
       </div>
       <div class="events-grid">
-        {upcomingEvents.map((e) => <EventCard {...e} featured />)}
+        {upcomingEvents.map((e) => <EventCard event={e} featured />)}
       </div>
       <a href="/events/" class="btn btn-outline see-all">See All Events</a>
     </div>
@@ -93,10 +97,7 @@ const stats = [
       <div class="mission-copy">
         <p class="eyebrow">&gt; Why We Exist</p>
         <h2>We exist to support the <Highlight color="ember" rotate={1}>unsupported</Highlight></h2>
-        <p class="mission-founding">
-          In 1999, Richard Howard and Si Chai sat down with a cuppa and believed the music industry
-          could be a fairer place. 27 years later, we still do.
-        </p>
+        <p class="mission-founding">{siteContent?.data.missionFounding}</p>
       </div>
       <ul class="mission-points">
         {
@@ -178,10 +179,7 @@ const stats = [
       <div class="wiab-content">
         <Image src={WiabSticker} alt="Where It All Began" width={110} height={96} class="wiab-logo" />
         <h2>We're the <Highlight color="ember" rotate={1.2}>people</Highlight> behind it.</h2>
-        <p class="wiab-sub">
-          Not "Chai Wallahs presents." Same people, same standards, new scale — a whole new festival,
-          brought to you by the people behind Chai Wallahs.
-        </p>
+        <p class="wiab-sub">{siteContent?.data.wiabSub}</p>
         <a href="/where-it-all-began/" class="btn btn-outline wiab-btn">Find out more</a>
       </div>
     </div>
@@ -199,10 +197,10 @@ const stats = [
           merch.map((item) => (
             <a href="/shop/" class="merch-card">
               <div class="merch-swatch">
-                <Image src={item.image} alt={item.name} width={480} height={480} />
+                <Image src={item.data.image} alt={item.data.name} width={480} height={480} />
               </div>
-              <p class="merch-name">{item.name}</p>
-              <p class="merch-price eyebrow">{item.price}</p>
+              <p class="merch-name">{item.data.name}</p>
+              <p class="merch-price eyebrow">{new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(item.data.price)}</p>
             </a>
           ))
         }
@@ -216,8 +214,8 @@ const stats = [
     <Image src={CtaBg} alt="" class="final-cta-img" width={2048} height={1254} />
     <div class="final-cta-scrim"></div>
     <div class="wrap final-cta-content">
-      <h2>Apply to play Chai Wallahs 2027</h2>
-      <p>The Chai Wallahs family are welcoming submissions for new artists to join us for the 2027 season and our new festival, Where It All Began. Show us where you are now as performers.</p>
+      <h2>{siteContent?.data.finalCtaHeadline}</h2>
+      <p>{siteContent?.data.finalCtaBody}</p>
       <a href="/contact/#artists" class="btn btn-solid">Apply to Play</a>
     </div>
   </section>

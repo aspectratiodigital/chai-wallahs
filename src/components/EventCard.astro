@@ -1,42 +1,38 @@
 ---
 import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
 
 interface Props {
-  title: string;
-  date: string;
-  venue?: string;
-  blurb: string;
-  ticketUrl?: string;
-  image: string;
+  event: CollectionEntry<"events">;
   featured?: boolean;
 }
 
-const { title, date, venue, blurb, ticketUrl, image, featured = false } = Astro.props;
+const { event, featured = false } = Astro.props;
+const { title, date, venue, blurb, ticketUrl, image } = event.data;
 
-const images = import.meta.glob("../assets/images/gallery/*.{jpg,jpeg,png}", {
-  eager: true,
-  import: "default",
+const formattedDate = date.toLocaleDateString("en-GB", {
+  weekday: "short",
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
 });
-const imgSrc = images[`../assets/images/gallery/${image}`];
 ---
 
-<article class:list={["event-card", { featured }]}>
+<a href={`/events/${event.id}/`} class:list={["event-card", { featured }]}>
   <div class="event-media">
-    {imgSrc && <Image src={imgSrc} alt={title} width={featured ? 900 : 600} height={featured ? 600 : 420} />}
+    <Image src={image} alt={title} width={featured ? 900 : 600} height={featured ? 600 : 420} />
   </div>
   <div class="event-body">
-    <p class="eyebrow event-date">{date}{venue ? ` · ${venue}` : ""}</p>
+    <p class="eyebrow event-date">{formattedDate}{venue ? ` · ${venue}` : ""}</p>
     <h3>{title}</h3>
     <p class="event-blurb">{blurb}</p>
     {
       ticketUrl && (
-        <a class="btn btn-outline" href={ticketUrl} target="_blank" rel="noopener noreferrer">
-          Get Tickets
-        </a>
+        <span class="btn btn-outline">Get Tickets</span>
       )
     }
   </div>
-</article>
+</a>
 
 <style>
   .event-card {
@@ -45,6 +41,7 @@ const imgSrc = images[`../assets/images/gallery/${image}`];
     background: var(--stage-black);
     color: var(--off-white);
     border: 1px solid rgba(239, 239, 239, 0.18);
+    text-decoration: none;
   }
 
   .event-media {
@@ -92,7 +89,7 @@ const imgSrc = images[`../assets/images/gallery/${image}`];
     color: var(--off-white);
   }
 
-  .event-body .btn:hover {
+  .event-card:hover .event-body .btn {
     background: var(--chai-gold);
     color: var(--stage-black);
     border-color: var(--chai-gold);

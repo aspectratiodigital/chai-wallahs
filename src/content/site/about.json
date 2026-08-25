@@ -1,0 +1,22 @@
+{
+  "missionLead": "To be the host with the most. To furnish the finest in beauteous brews. To fastidiously fuse an eclectic, diverse and fiercely independent line-up of outstanding acts from the grassroots scene, and declare their delectability through the most magnificent sound system on the festival circuit.",
+  "missionCol1": "To support the un-supported. To provide a platform for non-commercial music and musicians. To offer an alternative to the noise in the newsfeeds, and create a tangible territory for new paths trodden, unforgettable experiences, and peerless party proceedings.",
+  "missionCol2": "To bring warmth into the heart, and a twinkle to the eye. To advocate healing, compassion, and creativity. To construct a community of open-minded, forward-thinking, caring individuals, who in turn can affect the change we seek in our challenging world.",
+  "bookUsBody": "We offer bespoke production packages to suit your event's specific needs — bar, catering, and curated stage programmes in various sized freeform tents. Sustainability, through long-term relationships with event organisers, remains at the heart of what we do — it's how we keep our crew in employment, and keep the platform standing for the artists we work with.",
+  "timeline": [
+    { "year": "1999", "text": "Founded by Richard Howard, Chai Wallahs began life as a chai stall — selling incense, tea, and housing drumming workshops." },
+    { "year": "2004", "text": "Si Blatchly's 'Creative Nature' joined forces with Chai Wallahs. Herbal shots, juices, smoothies, under-the-counter brandies and DJs — the landscape began to shift." },
+    { "year": "2007", "text": "A live stage was introduced. Since then the venue has hosted over 3,000 bands and artists, in front of more than 2 million spectators." },
+    { "year": "Now", "text": "From Jamie Woon, Polar Bear and Portico Quartet in the early days, to Gentleman's Dub Club, Dizraeli and this year's KOG, TC & the Groove Family and Afro Cluster — the journey continues." }
+  ],
+  "symbols": [
+    { "title": "The Venue", "text": "Meters of soft, undulating, freeform canvas create an intimate backdrop unlike any other festival venue. Immediately upon arrival, reality shifts — the senses prickle with the unmistakeable sounds and smells of Chai." },
+    { "title": "The Stage", "text": "From solo performers to 50-piece orchestras, our highly skilled, personable and focused stage crew are well versed for any eventuality — super-fast changeovers, calm and comfort on stage, a faultless production." },
+    { "title": "The Programming", "text": "Daily programming is deliberately designed with a sonic journey in mind — a clear emotional and spiritual arc, curated to suit energy levels and mood. Acoustic soul by day, new wave jazz after lunch, Afrobeat and world fusion by night." },
+    { "title": "The Sound", "text": "Minimal processing so the music can breathe — tight and punchy with crystal clear definition. TW AUDiO loudspeakers, paired with Dynacord amplifiers and controlled with tour-grade Allen & Heath dLive mixers." },
+    { "title": "The Crew", "text": "Absolute family. A tight-knit cluster of riggers, bar staff, logistics and stock, each member intrinsically linked to the next — all completely vital, and downright lush, the lot of 'em." },
+    { "title": "The Artists", "text": "Who without there would be no party. From brand new acts on their first tours to seasoned pros who've constantly absconded from corporate temptation to remain independent — we're fiercely proud of the relationships built over the years." },
+    { "title": "The Bar", "text": "Uniquely characterful, ethically sourced, specialist bar — bespoke cocktails, hot alcoholic brews, and delectable drinks. Seasonal, sustainable recipes that support small business and offer an alternative to the mainstream." },
+    { "title": "The Recipe", "text": "Tasteful lighting and subtle projections create a comfortable, soothing, uplifting atmosphere. Every element considered — the smell, the taste, the sound, the movement, the connection. Not a festival stage. A full-body experience." }
+  ]
+}

@@ -1,0 +1,131 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const events = await getCollection("events", ({ data }) => !data.draft);
+  return events.map((event) => ({
+    params: { slug: event.id },
+    props: { event },
+  }));
+}
+
+const { event } = Astro.props;
+const { title, date, venue, blurb, ticketUrl, image } = event.data;
+const { Content } = await render(event);
+
+const formattedDate = date.toLocaleDateString("en-GB", {
+  weekday: "long",
+  day: "2-digit",
+  month: "long",
+  year: "numeric",
+});
+---
+
+<BaseLayout title={title} description={blurb}>
+  <section class="event-hero">
+    <Image src={image} alt={title} class="event-hero-img" width={2000} height={1300} priority />
+    <div class="event-hero-scrim"></div>
+    <div class="wrap event-hero-content">
+      <p class="eyebrow">{formattedDate}{venue ? ` · ${venue}` : ""}</p>
+      <h1>{title}</h1>
+    </div>
+  </section>
+
+  <section class="section event-detail">
+    <div class="wrap event-detail-grid">
+      <div class="event-detail-body">
+        <p class="event-blurb">{blurb}</p>
+        <Content />
+      </div>
+      <div class="event-detail-side">
+        {
+          ticketUrl && (
+            <a class="btn btn-solid" href={ticketUrl} target="_blank" rel="noopener noreferrer">
+              Get Tickets
+            </a>
+          )
+        }
+        <a class="btn btn-outline" href="/events/">Back to All Events</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .event-hero {
+    position: relative;
+    min-height: 44vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .event-hero :global(.event-hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .event-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.95) 15%, rgba(27, 21, 17, 0.35) 100%);
+  }
+
+  .event-hero-content {
+    position: relative;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .event-hero-content .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .event-hero-content h1 {
+    color: var(--off-white);
+  }
+
+  .event-detail {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .event-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.4fr;
+    gap: var(--space-5);
+    align-items: start;
+  }
+
+  .event-blurb {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin-bottom: var(--space-3);
+  }
+
+  .event-detail-body :global(p) {
+    opacity: 0.85;
+  }
+
+  .event-detail-side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .event-detail-side .btn {
+    justify-content: center;
+  }
+
+  @media (max-width: 700px) {
+    .event-detail-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -2,10 +2,21 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import EventCard from "../components/EventCard.astro";
 import { Image } from "astro:assets";
-import { upcomingEvents, pastEvents } from "../data/events.js";
+import { getCollection, getEntry } from "astro:content";
 
 import HeroImg from "../assets/images/backgrounds/orange-4.png";
 import PastBg from "../assets/images/gallery/crowd-night-hires.jpg";
+
+const siteContent = await getEntry("site", "events");
+const allEvents = await getCollection("events", ({ data }) => !data.draft);
+
+const now = new Date();
+const upcomingEvents = allEvents
+  .filter((e) => e.data.date >= now)
+  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+const pastEvents = allEvents
+  .filter((e) => e.data.date < now)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
 <BaseLayout title="Events" description="Upcoming and past Chai Wallahs stages — from grassroots venues to the UK's biggest independent festivals.">
@@ -15,7 +26,7 @@ import PastBg from "../assets/images/gallery/crowd-night-hires.jpg";
     <div class="wrap events-hero-content">
       <p class="eyebrow">&gt; The Stage</p>
       <h1>Events</h1>
-      <p>All venue shows are 18+.</p>
+      <p>{siteContent?.data.heroNote}</p>
     </div>
   </section>
 
@@ -24,7 +35,7 @@ import PastBg from "../assets/images/gallery/crowd-night-hires.jpg";
       <p class="eyebrow section-label">&gt; Upcoming</p>
       <h2 class="section-title">Where to find us next</h2>
       <div class="events-grid upcoming-grid">
-        {upcomingEvents.map((e) => <EventCard {...e} featured />)}
+        {upcomingEvents.map((e) => <EventCard event={e} featured />)}
       </div>
     </div>
   </section>
@@ -36,7 +47,7 @@ import PastBg from "../assets/images/gallery/crowd-night-hires.jpg";
       <p class="eyebrow section-label">&gt; Past Events</p>
       <h2 class="section-title">Where we've been</h2>
       <div class="events-grid past-grid">
-        {pastEvents.map((e) => <EventCard {...e} />)}
+        {pastEvents.map((e) => <EventCard event={e} />)}
       </div>
     </div>
   </section>

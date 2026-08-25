@@ -2,31 +2,15 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import Highlight from "../components/Highlight.astro";
+import { getCollection, getEntry } from "astro:content";
 
 import HeroImg from "../assets/images/backgrounds/orange-3.png";
-import ChaiHoodieBlack from "../assets/images/shop/chai-hoodie-black.jpg";
-import ChaiHoodieBlackBack from "../assets/images/shop/chai-hoodie-black-back.jpg";
-import ChaiHoodieNavy from "../assets/images/shop/chai-hoodie-navy.jpg";
-import ChaiHoodieNavyBack from "../assets/images/shop/chai-hoodie-navy-back.jpg";
-import GrassrootsHoodieGrey from "../assets/images/shop/grassroots-hoodie-grey.jpg";
-import GrassrootsHoodieGreyBack from "../assets/images/shop/grassroots-hoodie-grey-back.jpg";
-import ChaiTeeBlack from "../assets/images/shop/chai-tee-black.jpg";
-import ChaiTeeBlackBack from "../assets/images/shop/chai-tee-black-back.jpg";
-import GrassrootsTeeBlack from "../assets/images/shop/grassroots-tee-black.jpg";
-import GrassrootsTeeBlackBack from "../assets/images/shop/grassroots-tee-black-back.jpg";
-import BeanieDuskyPink from "../assets/images/shop/chai-beanie-dusky-pink.jpg";
-import BeanieDuskyPinkSide from "../assets/images/shop/chai-beanie-dusky-pink-side.jpg";
 
 const STORE_URL = "https://www.chaiwallahs.co.uk/category/all-products";
 
-const products = [
-  { name: "Chai Wallah's Heavyweight Hoodie", price: "£50.00", image: ChaiHoodieBlack, imageHover: ChaiHoodieBlackBack, category: "Hoodies" },
-  { name: "Grassroots Supporter Heavyweight Hoodie", price: "£50.00", image: GrassrootsHoodieGrey, imageHover: GrassrootsHoodieGreyBack, category: "Hoodies" },
-  { name: "Chai Wallah's Reverse Heavyweight Hoodie", price: "£50.00", image: ChaiHoodieNavy, imageHover: ChaiHoodieNavyBack, category: "Hoodies" },
-  { name: "Chai Wallah's Organic T-Shirt", price: "£25.00", image: ChaiTeeBlack, imageHover: ChaiTeeBlackBack, category: "T-Shirts" },
-  { name: "Grassroots Supporter Organic T-Shirt", price: "£25.00", image: GrassrootsTeeBlack, imageHover: GrassrootsTeeBlackBack, category: "T-Shirts" },
-  { name: "Chai Wallah's Cuffed Beanie", price: "£17.50", image: BeanieDuskyPink, imageHover: BeanieDuskyPinkSide, category: "Hats" },
-];
+const siteContent = await getEntry("site", "shop");
+const products = await getCollection("products");
+const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 ---
 
 <BaseLayout title="Shop" description="Chai Wallahs merch — 50% of all profits reinvested into grassroots initiatives.">
@@ -36,10 +20,7 @@ const products = [
     <div class="wrap shop-hero-content">
       <p class="eyebrow">&gt; We Got Merch</p>
       <h1>Wear the<br /><Highlight rotate={-1.5}>Stamp</Highlight></h1>
-      <p class="shop-hero-sub">
-        50% of all profits from the Chai Wallahs shop are reinvested straight back into grassroots
-        initiatives — the artists, crew, and scene that make this whole thing worth doing.
-      </p>
+      <p class="shop-hero-sub">{siteContent?.data.heroSub}</p>
     </div>
   </section>
 
@@ -50,28 +31,19 @@ const products = [
           products.map((p) => (
             <a class="product-card" href={STORE_URL} target="_blank" rel="noopener noreferrer">
               <div class="product-media">
-                {p.image ? (
-                  <>
-                    <Image src={p.image} alt={p.name} width={640} height={640} class="product-img product-img--front" />
-                    {p.imageHover && (
-                      <Image src={p.imageHover} alt="" width={640} height={640} class="product-img product-img--back" />
-                    )}
-                  </>
-                ) : (
-                  <div class="product-placeholder" aria-hidden="true" />
+                <Image src={p.data.image} alt={p.data.name} width={640} height={640} class="product-img product-img--front" />
+                {p.data.imageHover && (
+                  <Image src={p.data.imageHover} alt="" width={640} height={640} class="product-img product-img--back" />
                 )}
               </div>
-              <p class="eyebrow product-category">{p.category}</p>
-              <p class="product-name">{p.name}</p>
-              <p class="product-price">{p.price}</p>
+              <p class="eyebrow product-category">{p.data.category}</p>
+              <p class="product-name">{p.data.name}</p>
+              <p class="product-price">{currency.format(p.data.price)}</p>
             </a>
           ))
         }
       </div>
-      <p class="shop-note">
-        All items are sold and fulfilled through the Chai Wallahs store. Tap any product to visit the shop
-        and check out.
-      </p>
+      <p class="shop-note">{siteContent?.data.shopNote}</p>
       <a href={STORE_URL} target="_blank" rel="noopener noreferrer" class="btn btn-solid">Visit the Full Store</a>
     </div>
   </section>

@@ -2,87 +2,30 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import Highlight from "../components/Highlight.astro";
+import { getCollection, getEntry } from "astro:content";
 
 import HeroPhoto from "../assets/images/wiab/wiab-hero-crowd.jpg";
 import EthosPhoto from "../assets/images/wiab/wiab-crowd.jpg";
 import BlackboardBg from "../assets/images/backgrounds/plum-1.png";
 import WiabSticker from "../assets/images/logos/wiab-sticker.svg";
-import ChaiStageImg from "../assets/images/gallery/chai-stage.jpg";
 import SquiggleIcon from "../assets/images/symbols/white/Roots1.png";
-import WildThingsImg from "../assets/images/wiab/venue-wild-things.jpg";
-import GrandUnionImg from "../assets/images/wiab/venue-grand-union.jpg";
-import BohemianImg from "../assets/images/wiab/venue-bohemian.jpg";
-
-import AifLogo from "../assets/images/partners/aif.svg";
-import ArtsCouncilLogo from "../assets/images/partners/arts-council-england.svg";
-import BauLogo from "../assets/images/partners/bau-drinks.svg";
-import BplLogo from "../assets/images/partners/bpl.svg";
-import ChaiLogo from "../assets/images/partners/chai-wallahs.svg";
-import ClwbLogo from "../assets/images/partners/clwb-ifor-bach.svg";
-import DbsLogo from "../assets/images/partners/dbs-institute.svg";
-import DosLogo from "../assets/images/partners/diplomats-of-sound.svg";
-import FenderLogo from "../assets/images/partners/fender.svg";
-import GlobalLocalLogo from "../assets/images/partners/global-local.svg";
-import HpaLogo from "../assets/images/partners/hpa.svg";
-import JamJarLogo from "../assets/images/partners/jam-jar-bristol.svg";
-import MelancholyClownLogo from "../assets/images/partners/melancholy-clown.svg";
-import MesaLogo from "../assets/images/partners/mesa-engineering.svg";
-import MvtLogo from "../assets/images/partners/music-venue-trust.svg";
-import ProofLogo from "../assets/images/partners/proof-drinks.svg";
-import SaveOurSceneLogo from "../assets/images/partners/save-our-scene.svg";
-import SgpLogo from "../assets/images/partners/secret-garden-party.svg";
-import The100ClubLogo from "../assets/images/partners/the-100-club.svg";
-import BeatGoesOnLogo from "../assets/images/partners/the-beat-goes-on.svg";
-import TwAudioLogo from "../assets/images/partners/tw-audio.svg";
-import YamahaLogo from "../assets/images/partners/yamaha.svg";
-import LeedsConservatoireLogo from "../assets/images/partners/leeds-conservatoire.svg";
-import AspectRatioLogo from "../assets/images/partners/aspect-ratio.svg";
-import GreenmanLogo from "../assets/images/partners/greenman.svg";
-import NewBristolBreweryLogo from "../assets/images/partners/new-bristol-brewery.svg";
 
 // Trinity & Kendal Calling are multi-layer vectors — mask-image would flatten them to
 // one silhouette, so they're inlined raw with dark paths on currentColor (recolours with
-// hover like every other logo) and light paths fixed off-white.
+// hover like every other logo) and light paths fixed off-white. That technique can't be
+// expressed through a CMS image field, so — unlike the other 26 partners — these two
+// stay hardcoded here rather than living in the `partners` collection.
 import TrinityLogoRaw from "../assets/images/partners/trinity-bristol.svg?raw";
 import KendalCallingLogoRaw from "../assets/images/partners/kendal-calling.svg?raw";
 
 const TICKETS_URL = "https://events.humanitix.com/where-it-all-began-festival?c=chai-wallahs";
 const SITE_URL = "https://www.whereitallbeganfestival.org";
 
-const doesMean = [
-  "Same people. Same standards. New scale.",
-  "Chai's history is the proof this way works.",
-  "When we talk about WIAB, we're the people behind it — not the brand behind it.",
-];
+const siteContent = await getEntry("site", "wiab");
+const doesMean = (siteContent?.data.doesMean ?? []).map((d) => d.text);
+const doesntMean = (siteContent?.data.doesntMean ?? []).map((d) => d.text);
 
-const doesntMean = [
-  'WIAB isn\'t "Chai Wallahs presents."',
-  "We don't lend our name to take the credit.",
-  "This isn't a rebrand of Chai — it's something new, from people you already know.",
-];
-
-const venues = [
-  {
-    image: ChaiStageImg,
-    name: "Chai Wallahs",
-    text: "The UK's unrivalled, critically acclaimed, independent festival venue. The alternative to the mainstream.",
-  },
-  {
-    image: WildThingsImg,
-    name: "Where The Wild Things Are",
-    text: "The iconic open-air stage from our friends at Secret Garden Party.",
-  },
-  {
-    image: GrandUnionImg,
-    name: "The Grand Union",
-    text: "Could be a venue, could be a village. A collaborative programming project from the country's leading grassroots music venues.",
-  },
-  {
-    image: BohemianImg,
-    name: "The Bohemian Triangle",
-    text: "An ever-shifting dance experience. Follow your ears, chase the vibe, and move through eclectic spaces as the rhythm shifts, sun-up til sun-up.",
-  },
-];
+const venues = (await getCollection("venues")).sort((a, b) => a.data.order - b.data.order);
 
 const stats = [
   { target: 190000, prefix: "£", label: "Raised So Far" },
@@ -91,36 +34,22 @@ const stats = [
   { target: 0, prefix: "", label: "Shareholders" },
 ];
 
-// Real partners + live links, scraped from whereitallbeganfestival.org/about-us
-const partners = [
-  { name: "Chai Wallahs", url: "https://www.chaiwallahs.co.uk", logo: ChaiLogo },
-  { name: "Diplomats of Sound", url: "https://diplomatsofsound.org", logo: DosLogo },
-  { name: "Arts Council England", url: "https://www.artscouncil.org.uk/", logo: ArtsCouncilLogo },
-  { name: "Secret Garden Party", url: "https://www.secretgardenparty.com", logo: SgpLogo },
-  { name: "The Beat Goes On", url: "https://thebeatgoesonfestival.com", logo: BeatGoesOnLogo, large: true },
-  { name: "Global Local", url: "https://www.globallocal.co.uk/festivalandcarnivallabbristol", logo: GlobalLocalLogo },
-  { name: "dBs Institute", url: "https://www.dbsinstitute.ac.uk", logo: DbsLogo },
-  { name: "Leeds Conservatoire", url: "https://www.leedsconservatoire.ac.uk", logo: LeedsConservatoireLogo, xsmall: true },
-  { name: "Music Venue Trust", url: "https://www.musicvenuetrust.com", logo: MvtLogo, large: true },
-  { name: "Association of Independent Festivals", url: "https://www.aiforg.com", logo: AifLogo },
-  { name: "Save Our Scene", url: "https://www.saveourscene.uk", logo: SaveOurSceneLogo },
+const cmsPartners = await getCollection("partners");
+const hardcodedPartners = [
   { name: "Trinity Bristol", url: "https://www.trinitybristol.org.uk", inlineSvg: TrinityLogoRaw },
-  { name: "The Jam Jar Bristol", url: "https://www.thejamjarbristol.com", logo: JamJarLogo },
-  { name: "Clwb Ifor Bach", url: "https://clwb.net", logo: ClwbLogo, small: true },
-  { name: "The 100 Club", url: "https://the100club.co.uk", logo: The100ClubLogo },
-  { name: "HPA", url: "https://hpa.uk.com", logo: HpaLogo },
-  { name: "Melancholy Clown", url: "https://www.melancholyclown.com/", logo: MelancholyClownLogo },
-  { name: "New Bristol Brewery", url: "https://www.newbristolbrewery.co.uk/", logo: NewBristolBreweryLogo, invert: true },
-  { name: "Bau Drinks", url: "https://baudrinks.com/", logo: BauLogo },
-  { name: "Proof", url: "https://proofdrinks.com", logo: ProofLogo },
-  { name: "TW Audio", url: "https://twaudio.de/", logo: TwAudioLogo },
-  { name: "Fender", url: "https://uk.fender.com/", logo: FenderLogo },
-  { name: "BPL", url: "https://www.bplglobal.co.uk/", logo: BplLogo },
-  { name: "Mesa Engineering", url: "https://www.mesaboogie.com/en-US/", logo: MesaLogo },
-  { name: "Yamaha Audio", url: "https://uk.yamaha.com/en/audio/home-audio/", logo: YamahaLogo },
-  { name: "Aspect Ratio Digital", url: "http://aspectratiodigital.com", logo: AspectRatioLogo, small: true },
-  { name: "Green Man Festival", url: "https://www.greenman.net", logo: GreenmanLogo, small: true },
   { name: "Kendal Calling", url: "https://www.kendalcalling.co.uk", inlineSvg: KendalCallingLogoRaw },
+];
+const partners = [
+  ...cmsPartners.map((p) => ({
+    name: p.data.name,
+    url: p.data.url,
+    logo: p.data.logo,
+    small: p.data.small,
+    xsmall: p.data.xsmall,
+    large: p.data.large,
+    invert: p.data.invert,
+  })),
+  ...hardcodedPartners,
 ];
 ---
 
@@ -146,13 +75,7 @@ const partners = [
         <p class="eyebrow">&gt; What Is WIAB</p>
         <h2>We're the <Highlight rotate={-1}>people</Highlight><br />behind it.</h2>
       </div>
-      <p class="intro-copy">
-        27 years of Chai Wallahs proved something — that you can run things fairly, pay people properly,
-        and build a real community, and it works. Not as a nice idea. As a model that lasts. Where It All
-        Began is what happens when the same people ask: what if we built a whole festival that way? It's
-        not our name on someone else's idea. It's the same hands, the same standards, the same belief —
-        applied to something bigger than one stage.
-      </p>
+      <p class="intro-copy">{siteContent?.data.introCopy}</p>
     </div>
   </section>
 
@@ -181,19 +104,15 @@ const partners = [
     <div class="wrap">
       <p class="eyebrow venues-label">&gt; The Site</p>
       <h2>Four venues. One festival.</h2>
-      <p class="venues-intro">
-        Held at the iconic home of Secret Garden Party — Grange Farm, Abbots Ripton. Alongside sharing the
-        site, the SGP team programme their own stage, bringing their unmistakable spirit and creative
-        chaos into the heart of the festival. A familiar setting, reimagined for something new.
-      </p>
+      <p class="venues-intro">{siteContent?.data.venuesIntro}</p>
       <div class="venues-accordion">
         {
           venues.map((v) => (
             <div class="venue-tile">
-              <Image src={v.image} alt={v.name} width={900} height={700} class="venue-photo" />
+              <Image src={v.data.image} alt={v.data.name} width={900} height={700} class="venue-photo" />
               <div class="venue-caption">
-                <h3>{v.name}</h3>
-                <p>{v.text}</p>
+                <h3>{v.data.name}</h3>
+                <p>{v.data.text}</p>
               </div>
             </div>
           ))
@@ -261,13 +180,8 @@ const partners = [
       <div>
         <p class="eyebrow">&gt; The Ethos</p>
         <h2>A return to the roots</h2>
-        <p class="festival-copy">
-          A place where the creative spirit and the core values of festival culture are upheld. High
-          quality production is standard, musical diversity the foundation, and audiences feel valued,
-          respected, and part of a deep sense of community. No shareholders. Artists paid fairly. Every
-          partner benefits from the success.
-        </p>
-        <p class="festival-meta">Fri 18 &ndash; Sun 20 June 2027 &middot; Grange Farm, Abbots Ripton, Cambridgeshire</p>
+        <p class="festival-copy">{siteContent?.data.festivalCopy}</p>
+        <p class="festival-meta">{siteContent?.data.festivalMeta}</p>
         <a href={TICKETS_URL} target="_blank" rel="noopener noreferrer" class="btn btn-outline">Get Tickets</a>
       </div>
     </div>

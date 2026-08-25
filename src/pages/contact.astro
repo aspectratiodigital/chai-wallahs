@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import TornBox from "../components/TornBox.astro";
+import { getEntry } from "astro:content";
 
 import HeroImg from "../assets/images/backgrounds/orange-1.png";
 import DirectBg from "../assets/images/backgrounds/plum-2.png";
@@ -22,38 +23,19 @@ const socials = [
   { label: "TikTok", href: "https://www.tiktok.com/@chaiwallahs_", icon: TiktokIcon, medium: true },
 ];
 
-const tracks = [
-  {
-    id: "artists",
-    icon: ArtistIcon,
-    title: "Artists",
-    text: "To perform on our stage, fill in the sheet and come fill our tent, with big songs and phat beats. We're welcoming submissions for 2027 — send your most up-to-date videos, tracks, and biog to show us where you are now as performers.",
-    cta: "Apply to Play",
-    subject: "2027 Artist Application",
-    color: "ember",
-    rotate: -1.2,
-  },
-  {
-    id: "crew",
-    icon: CrewIcon,
-    title: "Crew",
-    text: "The Chai Wallahs bar and cafe is the beating heart of our venue. We're on the hunt for eccentric dependables with plenty of patter and a positive mental attitude to join our bar crew.",
-    cta: "Join the Chai Crew",
-    subject: "Joining the Chai Crew",
-    color: "velvet",
-    rotate: 0.8,
-  },
-  {
-    id: "production",
-    icon: VenueIcon,
-    title: "Event Production",
-    text: "To discuss Chai Wallahs' involvement in your event — bar, catering, and curated stage programmes in various sized freeform tents. We're open to all suggestions and opportunities.",
-    cta: "Discuss Your Event",
-    subject: "Event Production Enquiry",
-    color: "crown",
-    rotate: -0.8,
-  },
-];
+// Icon + rotation are fixed per track by id — CMS controls title/text/cta/subject/color.
+const trackVisuals: Record<string, { icon: ImageMetadata; rotate: number }> = {
+  artists: { icon: ArtistIcon, rotate: -1.2 },
+  crew: { icon: CrewIcon, rotate: 0.8 },
+  production: { icon: VenueIcon, rotate: -0.8 },
+};
+
+const siteContent = await getEntry("site", "contact");
+const tracks = (siteContent?.data.tracks ?? []).map((t) => ({
+  ...t,
+  icon: trackVisuals[t.id]?.icon,
+  rotate: trackVisuals[t.id]?.rotate ?? 0,
+}));
 ---
 
 <BaseLayout title="Contact" description="Get in touch with Chai Wallahs — apply to play, join the crew, or book us for your event.">
