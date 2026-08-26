@@ -1,5 +1,5 @@
 ---
-title: Boomerang Festival 2026
+title: Boomerang Festival 2025
 date: 2025-05-30
 venue: UK
 blurb: A riot of sound, rhythm, and raw energy spanning house and techno, funk
