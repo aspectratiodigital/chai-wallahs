@@ -1,8 +1,8 @@
 ---
 name: "Grassroots Supporter Organic T-Shirt"
 price: 25
-image: "/src/assets/images/shop/grassroots-tee-black.jpg"
-imageHover: "/src/assets/images/shop/grassroots-tee-black-back.jpg"
+image: "/uploads/products/grassroots-tee-black.jpg"
+imageHover: "/uploads/products/grassroots-tee-black-back.jpg"
 category: "T-Shirts"
 featured: false
 ---

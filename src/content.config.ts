@@ -3,58 +3,54 @@ import { glob } from "astro/loaders";
 
 const events = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/events" }),
-  schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      date: z.coerce.date(),
-      venue: z.string().optional(),
-      blurb: z.string(),
-      ticketUrl: z.string().url().optional(),
-      image: image(),
-      draft: z.boolean().default(false),
-    }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    venue: z.string().optional(),
+    blurb: z.string(),
+    ticketUrl: z.string().url().optional(),
+    image: z.string(),
+    draft: z.boolean().default(false),
+  }),
 });
 
 const products = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/products" }),
-  schema: ({ image }) =>
-    z.object({
-      name: z.string(),
-      price: z.number(),
-      image: image(),
-      imageHover: image().optional(),
-      category: z.string(),
-      featured: z.boolean().default(false),
-      // Unused today — reserved so a future Shopify Storefront API swap doesn't
-      // need a schema change, just a new data source mapped to the same shape.
-      shopifyHandle: z.string().optional(),
-      sku: z.string().optional(),
-    }),
+  schema: z.object({
+    name: z.string(),
+    price: z.number(),
+    image: z.string(),
+    imageHover: z.string().optional(),
+    category: z.string(),
+    featured: z.boolean().default(false),
+    // Unused today — reserved so a future Shopify Storefront API swap doesn't
+    // need a schema change, just a new data source mapped to the same shape.
+    shopifyHandle: z.string().optional(),
+    sku: z.string().optional(),
+  }),
 });
 
 const venues = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/venues" }),
-  schema: ({ image }) =>
-    z.object({
-      name: z.string(),
-      text: z.string(),
-      image: image(),
-      order: z.number().default(0),
-    }),
+  schema: z.object({
+    name: z.string(),
+    text: z.string(),
+    image: z.string(),
+    order: z.number().default(0),
+  }),
 });
 
 const partners = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/partners" }),
-  schema: ({ image }) =>
-    z.object({
-      name: z.string(),
-      logo: image(),
-      url: z.string().url().optional(),
-      small: z.boolean().default(false),
-      xsmall: z.boolean().default(false),
-      large: z.boolean().default(false),
-      invert: z.boolean().default(false),
-    }),
+  schema: z.object({
+    name: z.string(),
+    logo: z.string(),
+    url: z.string().url().optional(),
+    small: z.boolean().default(false),
+    xsmall: z.boolean().default(false),
+    large: z.boolean().default(false),
+    invert: z.boolean().default(false),
+  }),
 });
 
 // One JSON file per page — hero/body copy plus the small repeating arrays that

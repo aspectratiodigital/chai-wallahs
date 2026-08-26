@@ -1,5 +1,5 @@
 ---
 name: "Save Our Scene"
 url: "https://www.saveourscene.uk"
-logo: "/src/assets/images/partners/save-our-scene.svg"
+logo: "/uploads/partners/save-our-scene.svg"
 ---

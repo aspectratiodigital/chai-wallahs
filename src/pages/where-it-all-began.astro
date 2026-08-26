@@ -207,8 +207,8 @@ const partners = [
                   class:list={["partner-logo", { "partner-logo--small": p.small, "partner-logo--xsmall": p.xsmall, "partner-logo--large": p.large, "partner-logo--invert": p.invert }]}
                   style={
                     p.invert
-                      ? `--logo-url:url("${p.logo.src}");`
-                      : `-webkit-mask-image:url("${p.logo.src}"); mask-image:url("${p.logo.src}");`
+                      ? `--logo-url:url("${p.logo}");`
+                      : `-webkit-mask-image:url("${p.logo}"); mask-image:url("${p.logo}");`
                   }
                 />
               </a>

@@ -1,6 +1,6 @@
 ---
 name: "Music Venue Trust"
 url: "https://www.musicvenuetrust.com"
-logo: "/src/assets/images/partners/music-venue-trust.svg"
+logo: "/uploads/partners/music-venue-trust.svg"
 large: true
 ---
