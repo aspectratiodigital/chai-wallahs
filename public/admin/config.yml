@@ -32,7 +32,7 @@ collections:
     delete: true
     slug: "{{slug}}"
     summary: "{{title}} — {{date}}"
-    media_folder: "public/uploads/events"
+    media_folder: "/public/uploads/events"
     public_folder: "/uploads/events"
     fields:
       - { label: Title, name: title, widget: string }
@@ -52,7 +52,7 @@ collections:
     delete: true
     slug: "{{slug}}"
     summary: "{{name}} — £{{price}}"
-    media_folder: "public/uploads/products"
+    media_folder: "/public/uploads/products"
     public_folder: "/uploads/products"
     fields:
       - { label: Name, name: name, widget: string }
@@ -74,7 +74,7 @@ collections:
     create: true
     delete: true
     slug: "{{slug}}"
-    media_folder: "public/uploads/venues"
+    media_folder: "/public/uploads/venues"
     public_folder: "/uploads/venues"
     fields:
       - { label: Name, name: name, widget: string }
@@ -89,7 +89,7 @@ collections:
     create: true
     delete: true
     slug: "{{slug}}"
-    media_folder: "public/uploads/partners"
+    media_folder: "/public/uploads/partners"
     public_folder: "/uploads/partners"
     fields:
       - { label: Name, name: name, widget: string }
