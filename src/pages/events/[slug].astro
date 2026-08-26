@@ -12,7 +12,7 @@ export async function getStaticPaths() {
 }
 
 const { event } = Astro.props;
-const { title, date, venue, blurb, ticketUrl, image } = event.data;
+const { title, date, time, venue, address, blurb, ticketUrl, image } = event.data;
 const { Content } = await render(event);
 
 const formattedDate = date.toLocaleDateString("en-GB", {
@@ -36,10 +36,41 @@ const formattedDate = date.toLocaleDateString("en-GB", {
   <section class="section event-detail">
     <div class="wrap event-detail-grid">
       <div class="event-detail-body">
+        <h2 class="about-heading">About This Event</h2>
         <p class="event-blurb">{blurb}</p>
         <Content />
       </div>
       <div class="event-detail-side">
+        <div class="event-info-card">
+          <div class="info-row">
+            <span class="info-label">Date</span>
+            <span class="info-value">{formattedDate}</span>
+          </div>
+          {
+            time && (
+              <div class="info-row">
+                <span class="info-label">Time</span>
+                <span class="info-value">{time}</span>
+              </div>
+            )
+          }
+          {
+            venue && (
+              <div class="info-row">
+                <span class="info-label">Location</span>
+                <span class="info-value">
+                  {venue}
+                  {address && (
+                    <>
+                      <br />
+                      <span class="info-address">{address}</span>
+                    </>
+                  )}
+                </span>
+              </div>
+            )
+          }
+        </div>
         {
           ticketUrl && (
             <a class="btn btn-solid" href={ticketUrl} target="_blank" rel="noopener noreferrer">
@@ -48,6 +79,18 @@ const formattedDate = date.toLocaleDateString("en-GB", {
           )
         }
         <a class="btn btn-outline" href="/events/">Back to All Events</a>
+        {
+          address && (
+            <div class="event-map">
+              <iframe
+                src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title={`Map showing ${venue}`}
+              />
+            </div>
+          )
+        }
       </div>
     </div>
   </section>
@@ -103,6 +146,15 @@ const formattedDate = date.toLocaleDateString("en-GB", {
     align-items: start;
   }
 
+  .about-heading {
+    color: var(--chai-gold);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-2);
+  }
+
   .event-blurb {
     font-size: 1.1rem;
     opacity: 0.95;
@@ -121,6 +173,56 @@ const formattedDate = date.toLocaleDateString("en-GB", {
 
   .event-detail-side .btn {
     justify-content: center;
+  }
+
+  .event-info-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border: 1px solid rgba(239, 239, 239, 0.18);
+    margin-bottom: var(--space-1);
+  }
+
+  .info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .info-label {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--chai-gold);
+  }
+
+  .info-value {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .info-address {
+    font-size: 0.85rem;
+    opacity: 0.75;
+  }
+
+  .event-map {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid rgba(239, 239, 239, 0.18);
+    filter: grayscale(0.3) contrast(1.05);
+  }
+
+  .event-map iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
   }
 
   @media (max-width: 700px) {

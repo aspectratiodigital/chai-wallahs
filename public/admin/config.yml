@@ -37,7 +37,9 @@ collections:
     fields:
       - { label: Title, name: title, widget: string }
       - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD" }
-      - { label: Venue, name: venue, widget: string, required: false }
+      - { label: "Time (e.g. \"7:30pm – 1:00am\" or \"Fri 30 May – Sun 1 Jun\")", name: time, widget: string, required: false }
+      - { label: "Venue name", name: venue, widget: string, required: false }
+      - { label: "Full address (used for the map on the event page)", name: address, widget: string, required: false }
       - { label: Short blurb (shown on cards), name: blurb, widget: text }
       - { label: Ticket URL, name: ticketUrl, widget: string, required: false, hint: "Leave blank for events with no ticket link (e.g. past events)." }
       - { label: Image, name: image, widget: image }
