@@ -1,5 +1,5 @@
 ---
 name: "Proof"
 url: "https://proofdrinks.com"
-logo: ../../assets/images/partners/proof-drinks.svg
+logo: "@assets/images/partners/proof-drinks.svg"
 ---

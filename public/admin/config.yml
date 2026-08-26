@@ -9,13 +9,22 @@ backend:
 # running alongside `npm run dev`) — a no-op in production, safe to leave on.
 local_backend: true
 
-# Points at the same folder every existing site image already lives under
-# (gallery/, shop/, partners/, wiab/, etc.) — inside src/ so Astro's image()
-# schema helper can see and optimize CMS-uploaded photos (public/ is copied
-# verbatim and invisible to that pipeline; uploads there would fail the build).
-# Decap's media browser lets editors navigate into the existing subfolders.
+# Global fallback (unused today — no collection currently has an image field
+# outside its own per-collection override below, kept as a sane default for
+# any future one-off image field). Each collection below overrides this to
+# point at its own specific images subfolder — Decap's media browser only
+# lists files sitting directly in the configured folder, not subfolders, so
+# pointing at the shared parent folder (which holds only subfolders, no loose
+# files) would always show "No assets found".
+#
+# public_folder uses the "@assets" alias (see astro.config.mjs) rather than a
+# plain path — Astro's image() schema helper resolves image paths relative to
+# the content file by default, which doesn't match how Decap composes a
+# preview path from public_folder + filename. The alias sidesteps that: both
+# Decap and Astro resolve "@assets/..." to the same place regardless of which
+# content folder is asking.
 media_folder: "src/assets/images"
-public_folder: "src/assets/images"
+public_folder: "@assets/images"
 
 publish_mode: simple
 
@@ -28,6 +37,8 @@ collections:
     delete: true
     slug: "{{slug}}"
     summary: "{{title}} — {{date}}"
+    media_folder: "src/assets/images/gallery"
+    public_folder: "@assets/images/gallery"
     fields:
       - { label: Title, name: title, widget: string }
       - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD" }
@@ -46,6 +57,8 @@ collections:
     delete: true
     slug: "{{slug}}"
     summary: "{{name}} — £{{price}}"
+    media_folder: "src/assets/images/shop"
+    public_folder: "@assets/images/shop"
     fields:
       - { label: Name, name: name, widget: string }
       - { label: "Price (GBP, e.g. 25 or 17.50)", name: price, widget: number, value_type: float }
@@ -66,6 +79,8 @@ collections:
     create: true
     delete: true
     slug: "{{slug}}"
+    media_folder: "src/assets/images/wiab"
+    public_folder: "@assets/images/wiab"
     fields:
       - { label: Name, name: name, widget: string }
       - { label: Description, name: text, widget: text }
@@ -79,6 +94,8 @@ collections:
     create: true
     delete: true
     slug: "{{slug}}"
+    media_folder: "src/assets/images/partners"
+    public_folder: "@assets/images/partners"
     fields:
       - { label: Name, name: name, widget: string }
       - { label: Logo, name: logo, widget: image }
