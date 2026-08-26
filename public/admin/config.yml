@@ -43,6 +43,7 @@ collections:
       - { label: Short blurb (shown on cards), name: blurb, widget: text }
       - { label: Ticket URL, name: ticketUrl, widget: string, required: false, hint: "Leave blank for events with no ticket link (e.g. past events)." }
       - { label: Image, name: image, widget: image }
+      - { label: "Poster / lineup image (shown alongside the date, time & location)", name: poster, widget: image, required: false }
       - { label: Draft (hide from the site), name: draft, widget: boolean, default: false }
       - { label: Full description (shown on the event's own page), name: body, widget: markdown, required: false }
 

@@ -12,6 +12,7 @@ const events = defineCollection({
     blurb: z.string(),
     ticketUrl: z.string().url().optional(),
     image: z.string(),
+    poster: z.string().optional(),
     draft: z.boolean().default(false),
   }),
 });
