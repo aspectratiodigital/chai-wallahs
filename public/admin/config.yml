@@ -9,11 +9,13 @@ backend:
 # running alongside `npm run dev`) — a no-op in production, safe to leave on.
 local_backend: true
 
-# One shared uploads location, inside src/ so Astro's image() schema helper can
-# see and optimize CMS-uploaded photos (public/ is copied verbatim and is
-# invisible to that pipeline — uploads there would fail the build).
-media_folder: "src/assets/uploads"
-public_folder: "src/assets/uploads"
+# Points at the same folder every existing site image already lives under
+# (gallery/, shop/, partners/, wiab/, etc.) — inside src/ so Astro's image()
+# schema helper can see and optimize CMS-uploaded photos (public/ is copied
+# verbatim and invisible to that pipeline; uploads there would fail the build).
+# Decap's media browser lets editors navigate into the existing subfolders.
+media_folder: "src/assets/images"
+public_folder: "src/assets/images"
 
 publish_mode: simple
 
