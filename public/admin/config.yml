@@ -10,21 +10,20 @@ backend:
 local_backend: true
 
 # Global fallback (unused today — no collection currently has an image field
-# outside its own per-collection override below, kept as a sane default for
-# any future one-off image field). Each collection below overrides this to
-# point at its own specific images subfolder — Decap's media browser only
-# lists files sitting directly in the configured folder, not subfolders, so
-# pointing at the shared parent folder (which holds only subfolders, no loose
-# files) would always show "No assets found".
+# outside its own per-collection override below). Each collection overrides
+# this to point at its own specific images subfolder — Decap's media browser
+# only lists files sitting directly in the configured folder, not subfolders,
+# so pointing at a folder that holds only subfolders (no loose files) always
+# shows "No assets found".
 #
-# public_folder uses the "@assets" alias (see astro.config.mjs) rather than a
-# plain path — Astro's image() schema helper resolves image paths relative to
-# the content file by default, which doesn't match how Decap composes a
-# preview path from public_folder + filename. The alias sidesteps that: both
-# Decap and Astro resolve "@assets/..." to the same place regardless of which
-# content folder is asking.
+# public_folder has a leading slash — matching Decap's own documented
+# convention (their reference example is "/images/uploads") rather than a
+# bare repo path. Astro's image() schema helper also accepts a leading-slash
+# path as project-root-relative, so this one string resolves correctly on
+# both sides. (An earlier attempt used a Vite-only "@assets" alias, which
+# Astro understood but Decap's own path handling silently corrupted.)
 media_folder: "src/assets/images"
-public_folder: "@assets/images"
+public_folder: "/src/assets/images"
 
 publish_mode: simple
 
@@ -38,7 +37,7 @@ collections:
     slug: "{{slug}}"
     summary: "{{title}} — {{date}}"
     media_folder: "src/assets/images/gallery"
-    public_folder: "@assets/images/gallery"
+    public_folder: "/src/assets/images/gallery"
     fields:
       - { label: Title, name: title, widget: string }
       - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD" }
@@ -58,7 +57,7 @@ collections:
     slug: "{{slug}}"
     summary: "{{name}} — £{{price}}"
     media_folder: "src/assets/images/shop"
-    public_folder: "@assets/images/shop"
+    public_folder: "/src/assets/images/shop"
     fields:
       - { label: Name, name: name, widget: string }
       - { label: "Price (GBP, e.g. 25 or 17.50)", name: price, widget: number, value_type: float }
@@ -80,7 +79,7 @@ collections:
     delete: true
     slug: "{{slug}}"
     media_folder: "src/assets/images/wiab"
-    public_folder: "@assets/images/wiab"
+    public_folder: "/src/assets/images/wiab"
     fields:
       - { label: Name, name: name, widget: string }
       - { label: Description, name: text, widget: text }
@@ -95,7 +94,7 @@ collections:
     delete: true
     slug: "{{slug}}"
     media_folder: "src/assets/images/partners"
-    public_folder: "@assets/images/partners"
+    public_folder: "/src/assets/images/partners"
     fields:
       - { label: Name, name: name, widget: string }
       - { label: Logo, name: logo, widget: image }

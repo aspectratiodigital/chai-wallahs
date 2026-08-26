@@ -1,5 +1,5 @@
 ---
 name: "Melancholy Clown"
 url: "https://www.melancholyclown.com/"
-logo: "@assets/images/partners/melancholy-clown.svg"
+logo: "/src/assets/images/partners/melancholy-clown.svg"
 ---
