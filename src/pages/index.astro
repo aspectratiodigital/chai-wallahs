@@ -593,8 +593,6 @@ const stats = [
 
   .merch-swatch {
     aspect-ratio: 1;
-    background: var(--off-white);
-    border: 1px solid rgba(27, 21, 17, 0.1);
     margin-bottom: var(--space-2);
     overflow: hidden;
   }
@@ -602,7 +600,7 @@ const stats = [
   .merch-swatch :global(img) {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     transition: transform 0.25s ease;
   }
 
