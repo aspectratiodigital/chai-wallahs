@@ -87,10 +87,12 @@ const formattedDate = date.toLocaleDateString("en-GB", {
   </section>
 
   <section class="section event-about-section">
-    <div class="wrap event-about-wrap">
-      <h2 class="about-heading">About This Event</h2>
-      <div class="event-about-body">
-        {hasBody ? <Content /> : <p>{blurb}</p>}
+    <div class="wrap">
+      <div class="event-about-wrap">
+        <h2 class="about-heading">About This Event</h2>
+        <div class="event-about-body">
+          {hasBody ? <Content /> : <p>{blurb}</p>}
+        </div>
       </div>
     </div>
   </section>
