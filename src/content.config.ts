@@ -56,6 +56,17 @@ const partners = defineCollection({
   }),
 });
 
+const artists = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/artists" }),
+  schema: z.object({
+    name: z.string(),
+    genres: z.array(z.string()).default([]),
+    image: z.string(),
+    socials: z.array(z.object({ platform: z.string(), url: z.string().url() })).default([]),
+    years: z.array(z.number()),
+  }),
+});
+
 // One JSON file per page — hero/body copy plus the small repeating arrays that
 // are tightly coupled to that page's narrative (mission points, timeline, etc.).
 const site = defineCollection({
@@ -101,4 +112,4 @@ const site = defineCollection({
   }),
 });
 
-export const collections = { events, products, venues, partners, site };
+export const collections = { events, products, venues, partners, site, artists };

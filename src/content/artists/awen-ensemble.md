@@ -1,0 +1,12 @@
+---
+name: "AWEN ENSEMBLE"
+genres: ["JAZZ", "FOLK"]
+image: "/uploads/artists/awen-ensemble.jpg"
+years: [2023, 2024]
+socials:
+  - { platform: "facebook", url: "https://www.facebook.com/watch/awenensemble/" }
+  - { platform: "instagram", url: "https://www.instagram.com/awenensemble/" }
+  - { platform: "youtube", url: "https://www.youtube.com/playlist?list=PLrjgvOJgwEnGztr16mzDq6_UULUlOdm-C" }
+---
+
+Awen Ensemble are a Leeds based Contemporary Jazz Collective. Taking inspiration from global folk music, the band are melodically driven with a modal and groove based focus. Incredible virtuosic performances from all members……These guys are properly listening to each other which means you should too!​​

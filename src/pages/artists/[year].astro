@@ -1,0 +1,14 @@
+---
+import ArtistRoster from "../../components/ArtistRoster.astro";
+
+export async function getStaticPaths() {
+  return [2023, 2024, 2025].map((year) => ({
+    params: { year: String(year) },
+    props: { year },
+  }));
+}
+
+const { year } = Astro.props;
+---
+
+<ArtistRoster year={year} />

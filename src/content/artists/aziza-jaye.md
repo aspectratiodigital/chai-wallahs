@@ -1,0 +1,12 @@
+---
+name: "AZIZA JAYE"
+genres: ["SOUL", "AFRO", "DRUM & BASS", "REGGAE"]
+image: "/uploads/artists/aziza-jaye.jpg"
+years: [2024, 2025, 2026]
+socials:
+  - { platform: "facebook", url: "https://www.facebook.com/azizajaye/" }
+  - { platform: "instagram", url: "https://www.instagram.com/azizajaye/?hl=en-gb" }
+  - { platform: "youtube", url: "https://www.youtube.com/@AzizaJaye/videos" }
+---
+
+With influences stemming from her Jamaican roots in reggae, dancehall and lovers rock to a love for rare Soul and Motown with an undeniable passion for Afrobeat, House and Drum and Bass, one can only imagine the soundscape of her mind. She coined the term ‘Genre - less', to describe what we can only translate as true versatility and flexibility to musically shape shift, effortlessly.

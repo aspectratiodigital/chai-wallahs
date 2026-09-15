@@ -1,0 +1,238 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import { getCollection, render } from "astro:content";
+
+import FacebookIcon from "../../assets/images/social/facebook.png";
+import InstagramIcon from "../../assets/images/social/instagram.png";
+import YoutubeIcon from "../../assets/images/social/youtube.png";
+import TiktokIcon from "../../assets/images/social/tiktok.svg";
+import XIcon from "../../assets/images/social/x.svg";
+
+const PLATFORM_ICON: Record<string, ImageMetadata> = {
+  facebook: FacebookIcon,
+  instagram: InstagramIcon,
+  youtube: YoutubeIcon,
+  tiktok: TiktokIcon,
+  twitter: XIcon,
+};
+
+const PLATFORM_LABEL: Record<string, string> = {
+  facebook: "Facebook",
+  instagram: "Instagram",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  twitter: "X",
+};
+
+export async function getStaticPaths() {
+  const artists = await getCollection("artists");
+  return artists.map((artist) => ({
+    params: { slug: artist.id },
+    props: { artist },
+  }));
+}
+
+const { artist } = Astro.props;
+const { name, genres, image, socials, years } = artist.data;
+const { Content } = await render(artist);
+const hasBody = (artist.body ?? "").trim().length > 0;
+
+const sortedYears = [...years].sort((a, b) => b - a);
+---
+
+<BaseLayout title={name} description={genres.length ? `${name} — ${genres.join(", ")}` : name}>
+  <section class="artist-hero">
+    <div class="wrap artist-hero-content">
+      <a class="eyebrow back-link" href="/artists/">&lt; Back to Artists</a>
+      <h1>{name}</h1>
+    </div>
+  </section>
+
+  <section class="section artist-main-section">
+    <div class="wrap artist-main-grid">
+      <div class="artist-photo-frame">
+        <Image src={image} alt={name} width={900} height={1125} class="artist-photo" />
+      </div>
+      <div class="artist-info">
+        {
+          genres.length > 0 && (
+            <div class="artist-genres">
+              {genres.map((g) => (
+                <span class="genre-chip">{g}</span>
+              ))}
+            </div>
+          )
+        }
+        {
+          socials.length > 0 && (
+            <div class="artist-socials">
+              {socials.map((s) => (
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="social-link"
+                  aria-label={`${name} on ${PLATFORM_LABEL[s.platform] ?? s.platform}`}
+                >
+                  {PLATFORM_ICON[s.platform] ? (
+                    <Image src={PLATFORM_ICON[s.platform]} alt="" width={22} height={22} />
+                  ) : (
+                    <span class="social-fallback">{PLATFORM_LABEL[s.platform] ?? s.platform}</span>
+                  )}
+                </a>
+              ))}
+            </div>
+          )
+        }
+        <p class="artist-years">On the roster: {sortedYears.join(", ")}</p>
+      </div>
+    </div>
+
+    {
+      hasBody && (
+        <div class="wrap artist-about-wrap">
+          <h2 class="about-heading">About</h2>
+          <div class="artist-about-body">
+            <Content />
+          </div>
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .artist-hero {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .artist-hero-content {
+    padding: var(--space-5) var(--space-3) var(--space-2);
+  }
+
+  .back-link {
+    display: inline-block;
+    color: var(--chai-gold);
+    text-decoration: none;
+    margin-bottom: var(--space-1);
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .artist-hero-content h1 {
+    color: var(--off-white);
+    text-transform: uppercase;
+  }
+
+  .artist-main-section {
+    background: var(--stage-black);
+    color: var(--off-white);
+    padding-top: var(--space-2);
+  }
+
+  .artist-main-grid {
+    display: grid;
+    grid-template-columns: 0.75fr 1fr;
+    gap: var(--space-5);
+    align-items: start;
+  }
+
+  .artist-photo-frame {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .artist-photo-frame :global(.artist-photo) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .artist-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .artist-genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+  }
+
+  .genre-chip {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--chai-gold);
+    border: 1px solid rgba(248, 179, 27, 0.4);
+    padding: 0.4em 0.85em;
+  }
+
+  .artist-socials {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(239, 239, 239, 0.25);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .social-link:hover {
+    border-color: var(--chai-gold);
+    background: rgba(248, 179, 27, 0.1);
+  }
+
+  .social-fallback {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--off-white);
+  }
+
+  .artist-years {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    opacity: 0.65;
+  }
+
+  .artist-about-wrap {
+    max-width: 800px;
+    margin-top: var(--space-4);
+  }
+
+  .about-heading {
+    color: var(--chai-gold);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-2);
+  }
+
+  .artist-about-body :global(p) {
+    opacity: 0.85;
+    line-height: 1.6;
+    margin-bottom: 1em;
+  }
+
+  @media (max-width: 700px) {
+    .artist-main-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .artist-photo-frame {
+      max-width: 340px;
+    }
+  }
+</style>

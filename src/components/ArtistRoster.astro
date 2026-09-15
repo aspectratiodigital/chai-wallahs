@@ -1,0 +1,289 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArtistCard from "../components/ArtistCard.astro";
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+
+import HeroBg from "../assets/images/backgrounds/plum-1.png";
+
+interface Props {
+  year: number;
+}
+
+const { year } = Astro.props;
+
+const allArtists = await getCollection("artists");
+const artists = allArtists
+  .filter((a) => a.data.years.includes(year))
+  .sort((a, b) => a.data.name.localeCompare(b.data.name));
+
+// Genre pills, deduped case-insensitively (some years used different casing
+// conventions on the source site), keeping the first-seen display casing.
+const genreByKey = new Map<string, string>();
+for (const a of artists) {
+  for (const g of a.data.genres) {
+    const key = g.toLowerCase();
+    if (!genreByKey.has(key)) genreByKey.set(key, g);
+  }
+}
+const genres = [...genreByKey.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+
+const YEARS = [2026, 2025, 2024, 2023];
+---
+
+<BaseLayout title={`${year} Artist Roster`} description={`The full ${year} Chai Wallahs artist roster — every act that graced the stage.`}>
+  <section class="artists-hero">
+    <Image src={HeroBg} alt="" class="artists-hero-img" width={2000} height={700} priority />
+    <div class="artists-hero-scrim"></div>
+    <div class="wrap artists-hero-content">
+      <p class="eyebrow">&gt; The Roster</p>
+      <h1>{year} Artists</h1>
+      <div class="year-switcher">
+        {
+          YEARS.map((y) => (
+            <a href={y === 2026 ? "/artists/" : `/artists/${y}/`} class:list={["year-pill", { active: y === year }]}>
+              {y}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section artists-controls-section">
+    <div class="wrap">
+      <div class="artists-controls">
+        <input
+          type="search"
+          class="artist-search"
+          placeholder="Search artists…"
+          data-artist-search
+          aria-label="Search artists by name"
+        />
+        <div class="genre-pills" data-genre-pills>
+          {
+            genres.map(([key, label]) => (
+              <button type="button" class="genre-pill" data-genre-pill={key}>
+                {label}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <p class="no-results" data-no-results hidden>No artists match your search.</p>
+
+      <div class="artists-grid" data-artist-grid>
+        {artists.map((artist) => <ArtistCard artist={artist} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function initArtistFilters() {
+    const grid = document.querySelector("[data-artist-grid]");
+    const searchInput = document.querySelector<HTMLInputElement>("[data-artist-search]");
+    const genrePills = [...document.querySelectorAll<HTMLButtonElement>("[data-genre-pill]")];
+    const noResults = document.querySelector<HTMLElement>("[data-no-results]");
+    if (!grid) return;
+
+    const cards = [...grid.querySelectorAll<HTMLElement>("[data-artist-card]")];
+    const activeGenres = new Set<string>();
+
+    function applyFilters() {
+      const q = (searchInput?.value ?? "").trim().toLowerCase();
+      let visibleCount = 0;
+      cards.forEach((card) => {
+        const name = card.dataset.name ?? "";
+        const cardGenres = (card.dataset.genres ?? "").split("|");
+        const matchesSearch = !q || name.includes(q);
+        const matchesGenre = activeGenres.size === 0 || cardGenres.some((g) => activeGenres.has(g));
+        const visible = matchesSearch && matchesGenre;
+        card.hidden = !visible;
+        if (visible) visibleCount++;
+      });
+      if (noResults) noResults.hidden = visibleCount !== 0;
+    }
+
+    searchInput?.addEventListener("input", applyFilters);
+
+    genrePills.forEach((pill) => {
+      pill.addEventListener("click", () => {
+        const key = pill.dataset.genrePill ?? "";
+        if (activeGenres.has(key)) {
+          activeGenres.delete(key);
+          pill.classList.remove("active");
+        } else {
+          activeGenres.add(key);
+          pill.classList.add("active");
+        }
+        applyFilters();
+      });
+    });
+  }
+
+  initArtistFilters();
+</script>
+
+<style>
+  .artists-hero {
+    position: relative;
+    min-height: 40vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .artists-hero :global(.artists-hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .artists-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.95) 20%, rgba(27, 21, 17, 0.4) 100%);
+  }
+
+  .artists-hero-content {
+    position: relative;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .artists-hero-content .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .artists-hero-content h1 {
+    color: var(--off-white);
+    margin-bottom: var(--space-3);
+  }
+
+  .year-switcher {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .year-pill {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    color: var(--off-white);
+    opacity: 0.7;
+    padding: 0.5em 1em;
+    border: 1px solid rgba(239, 239, 239, 0.3);
+    transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .year-pill:hover {
+    opacity: 1;
+    color: var(--chai-gold);
+  }
+
+  .year-pill.active {
+    opacity: 1;
+    color: var(--stage-black);
+    background: var(--chai-gold);
+    border-color: var(--chai-gold);
+  }
+
+  .artists-controls-section {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .artists-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .artist-search {
+    font-family: var(--font-body, inherit);
+    font-size: 1rem;
+    padding: 0.8em 1em;
+    background: transparent;
+    border: 1px solid rgba(239, 239, 239, 0.3);
+    color: var(--off-white);
+    max-width: 360px;
+  }
+
+  .artist-search::placeholder {
+    color: rgba(239, 239, 239, 0.5);
+  }
+
+  .artist-search:focus {
+    outline: none;
+    border-color: var(--chai-gold);
+  }
+
+  .genre-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+  }
+
+  .genre-pill {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--off-white);
+    opacity: 0.75;
+    background: transparent;
+    border: 1px solid rgba(239, 239, 239, 0.25);
+    padding: 0.45em 0.9em;
+    cursor: pointer;
+    transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .genre-pill:hover {
+    opacity: 1;
+    border-color: var(--chai-gold);
+  }
+
+  .genre-pill.active {
+    opacity: 1;
+    color: var(--stage-black);
+    background: var(--chai-gold);
+    border-color: var(--chai-gold);
+  }
+
+  .no-results {
+    opacity: 0.7;
+    margin-bottom: var(--space-3);
+  }
+
+  .artists-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+  }
+
+  @media (max-width: 1000px) {
+    .artists-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .artists-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .artists-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2);
+    }
+  }
+</style>
