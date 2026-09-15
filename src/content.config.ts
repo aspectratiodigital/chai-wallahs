@@ -1,20 +1,30 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
-const events = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/events" }),
-  schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    time: z.string().optional(),
-    venue: z.string().optional(),
-    address: z.string().optional(),
-    blurb: z.string(),
-    ticketUrl: z.string().url().optional(),
-    image: z.string(),
-    poster: z.string().optional(),
-    draft: z.boolean().default(false),
-  }),
+// Gigs (Bristol one-night shows) and Festivals (multi-day touring festivals)
+// share an identical schema - same shape, different folders/routes so each
+// gets its own listing page and URL space (/gigs/ vs /festivals/).
+const eventSchema = z.object({
+  title: z.string(),
+  date: z.coerce.date(),
+  time: z.string().optional(),
+  venue: z.string().optional(),
+  address: z.string().optional(),
+  blurb: z.string(),
+  ticketUrl: z.string().url().optional(),
+  image: z.string(),
+  poster: z.string().optional(),
+  draft: z.boolean().default(false),
+});
+
+const gigs = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/gigs" }),
+  schema: eventSchema,
+});
+
+const festivals = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/festivals" }),
+  schema: eventSchema,
 });
 
 const products = defineCollection({
@@ -112,4 +122,4 @@ const site = defineCollection({
   }),
 });
 
-export const collections = { events, products, venues, partners, site, artists };
+export const collections = { gigs, festivals, products, venues, partners, site, artists };

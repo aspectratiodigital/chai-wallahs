@@ -1,0 +1,296 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import { render, type CollectionEntry } from "astro:content";
+
+import HeroBg from "../assets/images/backgrounds/orange-4.png";
+
+interface Props {
+  kind: "gigs" | "festivals";
+  event: CollectionEntry<"gigs"> | CollectionEntry<"festivals">;
+}
+
+const { kind, event } = Astro.props;
+const basePath = kind === "gigs" ? "/gigs/" : "/festivals/";
+const backLabel = kind === "gigs" ? "All Gigs" : "All Festivals";
+
+const { title, date, time, venue, address, blurb, ticketUrl, image, poster } = event.data;
+const { Content } = await render(event);
+
+const posterSrc = poster ?? image;
+const hasBody = (event.body ?? "").trim().length > 0;
+
+const formattedDate = date.toLocaleDateString("en-GB", {
+  weekday: "long",
+  day: "2-digit",
+  month: "long",
+  year: "numeric",
+});
+---
+
+<BaseLayout title={title} description={blurb}>
+  <section class="event-hero">
+    <Image src={HeroBg} alt="" class="event-hero-img" width={2000} height={700} priority />
+    <div class="event-hero-scrim"></div>
+    <div class="wrap event-hero-content">
+      <a class="eyebrow back-link" href={basePath}>&lt; Back to {backLabel}</a>
+      <h1>{title}</h1>
+    </div>
+  </section>
+
+  <section class="section event-poster-section">
+    <div class="wrap event-poster-grid">
+      <div class="event-poster-frame">
+        <Image src={posterSrc} alt={`${title} poster`} width={1000} height={1250} class="event-poster-img" />
+      </div>
+      <div class="event-info">
+        <div class="event-info-card">
+          <div class="info-row">
+            <span class="info-label">Date</span>
+            <span class="info-value">{formattedDate}</span>
+          </div>
+          {
+            time && (
+              <div class="info-row">
+                <span class="info-label">Time</span>
+                <span class="info-value">{time}</span>
+              </div>
+            )
+          }
+          {
+            venue && (
+              <div class="info-row">
+                <span class="info-label">Location</span>
+                <span class="info-value">
+                  {venue}
+                  {address && (
+                    <>
+                      <br />
+                      <span class="info-address">{address}</span>
+                    </>
+                  )}
+                </span>
+              </div>
+            )
+          }
+        </div>
+        <p class="event-teaser">{blurb}</p>
+        {
+          ticketUrl && (
+            <a class="btn btn-solid" href={ticketUrl} target="_blank" rel="noopener noreferrer">
+              Get Tickets
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section event-about-section">
+    <div class="wrap">
+      <div class="event-about-wrap">
+        <h2 class="about-heading">About This Event</h2>
+        <div class="event-about-body">
+          {hasBody ? <Content /> : <p>{blurb}</p>}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    address && (
+      <section class="section event-map-section">
+        <div class="wrap">
+          <iframe
+            class="event-map-iframe"
+            src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title={`Map showing ${venue}`}
+          />
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .event-hero {
+    position: relative;
+    min-height: 28vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+  }
+
+  .event-hero :global(.event-hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .event-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.95) 20%, rgba(27, 21, 17, 0.55) 100%);
+  }
+
+  .event-hero-content {
+    position: relative;
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .back-link {
+    display: inline-block;
+    color: var(--chai-gold);
+    text-decoration: none;
+    margin-bottom: var(--space-1);
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .event-hero-content h1 {
+    color: var(--off-white);
+  }
+
+  .event-poster-section {
+    background: var(--stage-black);
+    color: var(--off-white);
+    padding: var(--space-4) 0;
+  }
+
+  .event-poster-grid {
+    display: grid;
+    grid-template-columns: 0.85fr 1fr;
+    gap: var(--space-5);
+    align-items: start;
+  }
+
+  .event-poster-frame {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .event-poster-frame :global(.event-poster-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: top;
+  }
+
+  .event-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .event-info-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border: 1px solid rgba(239, 239, 239, 0.18);
+  }
+
+  .info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .info-label {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--chai-gold);
+  }
+
+  .info-value {
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+
+  .info-address {
+    font-size: 0.85rem;
+    opacity: 0.75;
+  }
+
+  .event-teaser {
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .event-info .btn {
+    align-self: flex-start;
+  }
+
+  .event-about-section {
+    background: var(--stage-black);
+    color: var(--off-white);
+    padding: var(--space-4) 0;
+  }
+
+  .event-about-wrap {
+    max-width: 1000px;
+  }
+
+  .about-heading {
+    color: var(--off-white);
+    margin-bottom: var(--space-3);
+  }
+
+  .event-about-body :global(p) {
+    opacity: 0.85;
+    margin-bottom: 1em;
+    line-height: 1.6;
+  }
+
+  .event-about-body :global(h2) {
+    font-size: 1.3rem;
+    margin: 1.6em 0 0.6em;
+    color: var(--chai-gold);
+  }
+
+  .event-about-body :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .event-about-body :global(hr) {
+    border: none;
+    border-top: 1px solid rgba(239, 239, 239, 0.18);
+    margin: 1.6em 0;
+  }
+
+  .event-map-section {
+    background: var(--stage-black);
+    padding: var(--space-4) 0;
+  }
+
+  .event-map-iframe {
+    display: block;
+    width: 100%;
+    height: 460px;
+    border: 0;
+    filter: invert(94%) hue-rotate(180deg) brightness(0.95) contrast(0.92) saturate(0.55) sepia(0.12);
+  }
+
+  @media (max-width: 780px) {
+    .event-poster-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .event-poster-frame {
+      aspect-ratio: 4 / 3;
+    }
+
+    .event-map-iframe {
+      height: 320px;
+    }
+  }
+</style>

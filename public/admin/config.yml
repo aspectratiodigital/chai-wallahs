@@ -24,10 +24,10 @@ public_folder: "/uploads"
 publish_mode: simple
 
 collections:
-  - name: events
-    label: Events
-    label_singular: Event
-    folder: src/content/events
+  - name: gigs
+    label: Gigs
+    label_singular: Gig
+    folder: src/content/gigs
     create: true
     delete: true
     slug: "{{slug}}"
@@ -37,7 +37,30 @@ collections:
     fields:
       - { label: Title, name: title, widget: string }
       - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD" }
-      - { label: "Time (e.g. \"7:30pm – 1:00am\" or \"Fri 30 May – Sun 1 Jun\")", name: time, widget: string, required: false }
+      - { label: "Time (e.g. \"7:30pm – 1:00am\")", name: time, widget: string, required: false }
+      - { label: "Venue name", name: venue, widget: string, required: false }
+      - { label: "Full address (used for the map on the event page)", name: address, widget: string, required: false }
+      - { label: Short blurb (shown on cards), name: blurb, widget: text }
+      - { label: Ticket URL, name: ticketUrl, widget: string, required: false, hint: "Leave blank for events with no ticket link (e.g. past events)." }
+      - { label: Image, name: image, widget: image }
+      - { label: "Poster / lineup image (shown alongside the date, time & location)", name: poster, widget: image, required: false }
+      - { label: Draft (hide from the site), name: draft, widget: boolean, default: false }
+      - { label: Full description (shown on the event's own page), name: body, widget: markdown, required: false }
+
+  - name: festivals
+    label: Festivals
+    label_singular: Festival
+    folder: src/content/festivals
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{date}}"
+    media_folder: "/public/uploads/events"
+    public_folder: "/uploads/events"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD" }
+      - { label: "Time (e.g. \"Fri 30 May – Sun 1 Jun\")", name: time, widget: string, required: false }
       - { label: "Venue name", name: venue, widget: string, required: false }
       - { label: "Full address (used for the map on the event page)", name: address, widget: string, required: false }
       - { label: Short blurb (shown on cards), name: blurb, widget: text }
@@ -144,11 +167,17 @@ collections:
               - { label: Title, name: title, widget: string }
               - { label: Text, name: text, widget: text }
 
-      - name: events
-        label: Events Page
-        file: src/content/site/events.json
+      - name: gigs
+        label: Gigs Page
+        file: src/content/site/gigs.json
         fields:
-          - { label: "Hero note (under the Events heading)", name: heroNote, widget: string, required: false }
+          - { label: "Hero note (under the Gigs heading)", name: heroNote, widget: string, required: false }
+
+      - name: festivals
+        label: Festivals Page
+        file: src/content/site/festivals.json
+        fields:
+          - { label: "Hero note (under the Festivals heading)", name: heroNote, widget: string, required: false }
 
       - name: shop
         label: Shop Page

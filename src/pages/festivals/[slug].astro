@@ -1,0 +1,16 @@
+---
+import EventDetail from "../../components/EventDetail.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const festivals = await getCollection("festivals", ({ data }) => !data.draft);
+  return festivals.map((event) => ({
+    params: { slug: event.id },
+    props: { event },
+  }));
+}
+
+const { event } = Astro.props;
+---
+
+<EventDetail kind="festivals" event={event} />

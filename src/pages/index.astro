@@ -23,11 +23,15 @@ import ShambalaLogo from "../assets/images/festivals/shambala.svg";
 import KendalCallingRaw from "../assets/images/festivals/kendal-calling.svg?raw";
 
 const siteContent = await getEntry("site", "home");
-const allEvents = await getCollection("events", ({ data }) => !data.draft);
+const allGigs = await getCollection("gigs", ({ data }) => !data.draft);
+const allFestivals = await getCollection("festivals", ({ data }) => !data.draft);
 const now = new Date();
-const upcomingEvents = allEvents
-  .filter((e) => e.data.date >= now)
-  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf())
+const upcomingEvents = [
+  ...allGigs.map((e) => ({ event: e, basePath: "/gigs/" as const })),
+  ...allFestivals.map((e) => ({ event: e, basePath: "/festivals/" as const })),
+]
+  .filter((e) => e.event.data.date >= now)
+  .sort((a, b) => a.event.data.date.valueOf() - b.event.data.date.valueOf())
   .slice(0, 2);
 
 const allProducts = await getCollection("products");
@@ -43,7 +47,7 @@ const missionPoints = (siteContent?.data.missionPoints ?? []).map((point, i) => 
 // The 5 festival-logo marquee entries — kept here rather than in the CMS: Kendal
 // Calling needs its multi-colour artwork inlined raw (a mask-image would flatten
 // it to one silhouette), which content-collection image() fields can't express.
-const festivals = [
+const festivalLogos = [
   { name: "Greenman", logo: GreenmanLogo },
   { name: "Kendal Calling", inlineSvg: KendalCallingRaw, big: true },
   { name: "Secret Garden Party", logo: SgpLogo, big: true },
@@ -69,7 +73,7 @@ const stats = [
       <h1 class="hero-headline">Where all<br /><Highlight rotate={-1.2}>good things</Highlight><br />come together</h1>
       <p class="hero-tag">Independent since '99</p>
       <div class="hero-ctas">
-        <a href="/events/" class="btn btn-solid">Upcoming Events</a>
+        <a href="/gigs/" class="btn btn-solid">Upcoming Events</a>
         <a href="/contact/#artists" class="btn btn-outline">Apply to Play</a>
       </div>
     </div>
@@ -83,9 +87,9 @@ const stats = [
         <h2>Next up on the stage</h2>
       </div>
       <div class="events-grid">
-        {upcomingEvents.map((e) => <EventCard event={e} featured />)}
+        {upcomingEvents.map(({ event, basePath }) => <EventCard event={event} basePath={basePath} featured />)}
       </div>
-      <a href="/events/" class="btn btn-outline see-all">See All Events</a>
+      <a href="/gigs/" class="btn btn-outline see-all">See All Events</a>
     </div>
   </section>
 
@@ -231,7 +235,7 @@ const stats = [
           [0, 1].map((copy) => (
             <div class="festivals-set" aria-hidden={copy === 1 ? "true" : undefined}>
               {
-                festivals.map((f) =>
+                festivalLogos.map((f) =>
                   f.inlineSvg ? (
                     <span
                       class:list={["festival-logo", "festival-logo--inline", { "festival-logo--big": f.big }]}

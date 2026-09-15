@@ -3,11 +3,12 @@ import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
-  event: CollectionEntry<"events">;
+  event: CollectionEntry<"gigs"> | CollectionEntry<"festivals">;
+  basePath: "/gigs/" | "/festivals/";
   featured?: boolean;
 }
 
-const { event, featured = false } = Astro.props;
+const { event, basePath, featured = false } = Astro.props;
 const { title, date, venue, blurb, ticketUrl, image } = event.data;
 
 const formattedDate = date.toLocaleDateString("en-GB", {
@@ -18,7 +19,7 @@ const formattedDate = date.toLocaleDateString("en-GB", {
 });
 ---
 
-<a href={`/events/${event.id}/`} class:list={["event-card", { featured }]}>
+<a href={`${basePath}${event.id}/`} class:list={["event-card", { featured }]}>
   <div class="event-media">
     <Image src={image} alt={title} width={featured ? 900 : 600} height={featured ? 600 : 420} />
   </div>
