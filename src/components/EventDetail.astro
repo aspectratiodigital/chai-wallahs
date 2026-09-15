@@ -1,7 +1,9 @@
 ---
+import path from "node:path";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import { render, type CollectionEntry } from "astro:content";
+import sharp from "sharp";
 
 import HeroBg from "../assets/images/backgrounds/orange-4.png";
 
@@ -19,6 +21,30 @@ const { Content } = await render(event);
 
 const posterSrc = poster ?? image;
 const hasBody = (event.body ?? "").trim().length > 0;
+
+// Read the poster's real dimensions so the layout can adapt its column
+// split (and the image frame's aspect-ratio) to whatever shape was
+// uploaded, instead of forcing every poster into a fixed 4:5 box.
+let posterWidth = 1000;
+let posterHeight = 1250;
+try {
+  const filePath = path.join(process.cwd(), "public", posterSrc.replace(/^\//, ""));
+  const metadata = await sharp(filePath).metadata();
+  if (metadata.width && metadata.height) {
+    posterWidth = metadata.width;
+    posterHeight = metadata.height;
+  }
+} catch {
+  // Fall back to the default portrait ratio below if the file can't be read
+  // (e.g. a remote/CMS-hosted image outside public/).
+}
+
+const posterRatio = posterWidth / posterHeight;
+// Map the image's aspect ratio directly onto the float width: a square
+// image splits the page 50/50, a wide landscape poster claims up to ~2/3
+// of the width, a tall portrait poster settles closer to ~40%.
+const imageFr = Math.min(2.3, Math.max(0.62, posterRatio));
+const posterWidthPercent = Math.min(68, Math.max(34, (imageFr / (imageFr + 1)) * 100));
 
 const formattedDate = date.toLocaleDateString("en-GB", {
   weekday: "long",
@@ -38,61 +64,63 @@ const formattedDate = date.toLocaleDateString("en-GB", {
     </div>
   </section>
 
-  <section class="section event-poster-section">
-    <div class="wrap event-poster-grid">
-      <div class="event-poster-frame">
-        <Image src={posterSrc} alt={`${title} poster`} width={1000} height={1250} class="event-poster-img" />
+  <section class="section event-content-section">
+    <div class="wrap event-content-flow">
+      <div
+        class="event-poster-frame"
+        style={`--poster-w: ${posterWidthPercent}%; --poster-ratio: ${posterWidth} / ${posterHeight};`}
+      >
+        <Image
+          src={posterSrc}
+          alt={`${title} poster`}
+          width={posterWidth}
+          height={posterHeight}
+          class="event-poster-img"
+        />
       </div>
-      <div class="event-info">
-        <div class="event-info-card">
-          <div class="info-row">
-            <span class="info-label">Date</span>
-            <span class="info-value">{formattedDate}</span>
-          </div>
-          {
-            time && (
-              <div class="info-row">
-                <span class="info-label">Time</span>
-                <span class="info-value">{time}</span>
-              </div>
-            )
-          }
-          {
-            venue && (
-              <div class="info-row">
-                <span class="info-label">Location</span>
-                <span class="info-value">
-                  {venue}
-                  {address && (
-                    <>
-                      <br />
-                      <span class="info-address">{address}</span>
-                    </>
-                  )}
-                </span>
-              </div>
-            )
-          }
+
+      <div class="event-info-card">
+        <div class="info-row">
+          <span class="info-label">Date</span>
+          <span class="info-value">{formattedDate}</span>
         </div>
-        <p class="event-teaser">{blurb}</p>
         {
-          ticketUrl && (
-            <a class="btn btn-solid" href={ticketUrl} target="_blank" rel="noopener noreferrer">
-              Get Tickets
-            </a>
+          time && (
+            <div class="info-row">
+              <span class="info-label">Time</span>
+              <span class="info-value">{time}</span>
+            </div>
+          )
+        }
+        {
+          venue && (
+            <div class="info-row">
+              <span class="info-label">Location</span>
+              <span class="info-value">
+                {venue}
+                {address && (
+                  <>
+                    <br />
+                    <span class="info-address">{address}</span>
+                  </>
+                )}
+              </span>
+            </div>
           )
         }
       </div>
-    </div>
-  </section>
+      <p class="event-teaser">{blurb}</p>
+      {
+        ticketUrl && (
+          <a class="btn btn-solid event-ticket-btn" href={ticketUrl} target="_blank" rel="noopener noreferrer">
+            Get Tickets
+          </a>
+        )
+      }
 
-  <section class="section event-about-section">
-    <div class="wrap">
-      <div class="event-about-wrap">
-        <h2 class="about-heading">About This Event</h2>
-        <div class="event-about-body">
-          {hasBody ? <Content /> : <p>{blurb}</p>}
-        </div>
+      <h2 class="about-heading">About This Event</h2>
+      <div class="event-about-body">
+        {hasBody ? <Content /> : <p>{blurb}</p>}
       </div>
     </div>
   </section>
@@ -158,35 +186,35 @@ const formattedDate = date.toLocaleDateString("en-GB", {
     color: var(--off-white);
   }
 
-  .event-poster-section {
+  .event-content-section {
     background: var(--stage-black);
     color: var(--off-white);
     padding: var(--space-4) 0;
   }
 
-  .event-poster-grid {
-    display: grid;
-    grid-template-columns: 0.85fr 1fr;
-    gap: var(--space-5);
-    align-items: start;
+  /* The poster is a float, not a grid column: normal document flow (the
+     info card, blurb, ticket button, and About This Event heading/body)
+     wraps in the space beside it using the browser's own float-wrap
+     layout, and continues at full width once it clears the float's
+     bottom edge. This is what makes "About This Event" slot into any
+     leftover space beside a tall poster, or drop below a short/square
+     one, without any manual height math. */
+  .event-content-flow {
+    overflow: hidden; /* clearfix: contains the float's height */
   }
 
   .event-poster-frame {
-    aspect-ratio: 4 / 5;
+    float: left;
+    width: var(--poster-w, 45%);
+    aspect-ratio: var(--poster-ratio, 4 / 5);
+    margin: 0 var(--space-5) var(--space-4) 0;
     overflow: hidden;
   }
 
   .event-poster-frame :global(.event-poster-img) {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    object-position: top;
-  }
-
-  .event-info {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
+    object-fit: cover;
   }
 
   .event-info-card {
@@ -195,6 +223,7 @@ const formattedDate = date.toLocaleDateString("en-GB", {
     gap: var(--space-2);
     padding: var(--space-3);
     border: 1px solid rgba(239, 239, 239, 0.18);
+    margin-bottom: var(--space-3);
   }
 
   .info-row {
@@ -224,20 +253,11 @@ const formattedDate = date.toLocaleDateString("en-GB", {
   .event-teaser {
     font-size: 1.1rem;
     opacity: 0.9;
+    margin-bottom: var(--space-3);
   }
 
-  .event-info .btn {
-    align-self: flex-start;
-  }
-
-  .event-about-section {
-    background: var(--stage-black);
-    color: var(--off-white);
-    padding: var(--space-4) 0;
-  }
-
-  .event-about-wrap {
-    max-width: 1000px;
+  .event-ticket-btn {
+    margin-bottom: var(--space-4);
   }
 
   .about-heading {
@@ -281,12 +301,10 @@ const formattedDate = date.toLocaleDateString("en-GB", {
   }
 
   @media (max-width: 780px) {
-    .event-poster-grid {
-      grid-template-columns: 1fr;
-    }
-
     .event-poster-frame {
-      aspect-ratio: 4 / 3;
+      float: none;
+      width: 100%;
+      margin-right: 0;
     }
 
     .event-map-iframe {
