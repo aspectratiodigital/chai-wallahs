@@ -5,6 +5,8 @@ import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 
 import HeroBg from "../assets/images/backgrounds/plum-1.png";
+import whiteBox from "../assets/images/boxes/white-2.png";
+import goldBox from "../assets/images/boxes/gold.png";
 
 interface Props {
   year: number;
@@ -41,7 +43,11 @@ const YEARS = [2026, 2025, 2024, 2023];
       <div class="year-switcher">
         {
           YEARS.map((y) => (
-            <a href={y === 2026 ? "/artists/" : `/artists/${y}/`} class:list={["year-pill", { active: y === year }]}>
+            <a
+              href={y === 2026 ? "/artists/" : `/artists/${y}/`}
+              class:list={["year-pill", { active: y === year }]}
+              style={`background-image:url("${(y === year ? goldBox : whiteBox).src}");`}
+            >
               {y}
             </a>
           ))
@@ -53,17 +59,27 @@ const YEARS = [2026, 2025, 2024, 2023];
   <section class="section artists-controls-section">
     <div class="wrap">
       <div class="artists-controls">
-        <input
-          type="search"
-          class="artist-search"
-          placeholder="Search artists…"
-          data-artist-search
-          aria-label="Search artists by name"
-        />
+        <div class="artist-search-wrap" style={`background-image:url("${whiteBox.src}");`}>
+          <input
+            type="search"
+            class="artist-search"
+            placeholder="Search artists…"
+            data-artist-search
+            aria-label="Search artists by name"
+          />
+          <button type="button" class="search-clear" data-search-clear aria-label="Clear search">&times;</button>
+        </div>
         <div class="genre-pills" data-genre-pills>
           {
             genres.map(([key, label]) => (
-              <button type="button" class="genre-pill" data-genre-pill={key}>
+              <button
+                type="button"
+                class="genre-pill"
+                data-genre-pill={key}
+                style={`background-image:url("${whiteBox.src}");`}
+                data-default-box={whiteBox.src}
+                data-active-box={goldBox.src}
+              >
                 {label}
               </button>
             ))
@@ -84,12 +100,18 @@ const YEARS = [2026, 2025, 2024, 2023];
   function initArtistFilters() {
     const grid = document.querySelector("[data-artist-grid]");
     const searchInput = document.querySelector<HTMLInputElement>("[data-artist-search]");
+    const clearBtn = document.querySelector<HTMLButtonElement>("[data-search-clear]");
     const genrePills = [...document.querySelectorAll<HTMLButtonElement>("[data-genre-pill]")];
     const noResults = document.querySelector<HTMLElement>("[data-no-results]");
     if (!grid) return;
 
     const cards = [...grid.querySelectorAll<HTMLElement>("[data-artist-card]")];
     const activeGenres = new Set<string>();
+
+    function updateClearButton() {
+      if (!clearBtn || !searchInput) return;
+      clearBtn.classList.toggle("visible", searchInput.value.length > 0);
+    }
 
     function applyFilters() {
       const q = (searchInput?.value ?? "").trim().toLowerCase();
@@ -104,19 +126,31 @@ const YEARS = [2026, 2025, 2024, 2023];
         if (visible) visibleCount++;
       });
       if (noResults) noResults.hidden = visibleCount !== 0;
+      updateClearButton();
     }
 
     searchInput?.addEventListener("input", applyFilters);
 
+    clearBtn?.addEventListener("click", () => {
+      if (!searchInput) return;
+      searchInput.value = "";
+      searchInput.focus();
+      applyFilters();
+    });
+
     genrePills.forEach((pill) => {
       pill.addEventListener("click", () => {
         const key = pill.dataset.genrePill ?? "";
+        const defaultBox = pill.dataset.defaultBox ?? "";
+        const activeBox = pill.dataset.activeBox ?? "";
         if (activeGenres.has(key)) {
           activeGenres.delete(key);
           pill.classList.remove("active");
+          pill.style.backgroundImage = `url("${defaultBox}")`;
         } else {
           activeGenres.add(key);
           pill.classList.add("active");
+          pill.style.backgroundImage = `url("${activeBox}")`;
         }
         applyFilters();
       });
@@ -175,23 +209,23 @@ const YEARS = [2026, 2025, 2024, 2023];
     font-size: 0.85rem;
     letter-spacing: 0.06em;
     text-decoration: none;
-    color: var(--off-white);
-    opacity: 0.7;
-    padding: 0.5em 1em;
-    border: 1px solid rgba(239, 239, 239, 0.3);
-    transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    color: var(--stage-black);
+    font-weight: 600;
+    padding: 0.5em 1.1em;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.85;
+    transition: opacity 0.15s ease, transform 0.15s ease;
   }
 
   .year-pill:hover {
     opacity: 1;
-    color: var(--chai-gold);
+    transform: translateY(-1px);
   }
 
   .year-pill.active {
     opacity: 1;
-    color: var(--stage-black);
-    background: var(--chai-gold);
-    border-color: var(--chai-gold);
   }
 
   .artists-controls-section {
@@ -206,29 +240,63 @@ const YEARS = [2026, 2025, 2024, 2023];
     margin-bottom: var(--space-3);
   }
 
+  .artist-search-wrap {
+    position: relative;
+    display: inline-block;
+    max-width: 360px;
+    width: 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
   .artist-search {
     font-family: var(--font-body, inherit);
     font-size: 1rem;
-    padding: 0.8em 1em;
+    width: 100%;
+    padding: 0.8em 2.6em 0.8em 1.1em;
     background: transparent;
-    border: 1px solid rgba(239, 239, 239, 0.3);
-    color: var(--off-white);
-    max-width: 360px;
+    border: none;
+    color: var(--stage-black);
   }
 
   .artist-search::placeholder {
-    color: rgba(239, 239, 239, 0.5);
+    color: rgba(27, 21, 17, 0.5);
   }
 
   .artist-search:focus {
     outline: none;
-    border-color: var(--chai-gold);
+  }
+
+  .artist-search::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
+
+  .search-clear {
+    display: none;
+    position: absolute;
+    right: 0.6em;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--chai-gold);
+    font-size: 1.4rem;
+    line-height: 1;
+    padding: 0.2em 0.3em;
+  }
+
+  .search-clear.visible {
+    display: block;
   }
 
   .genre-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5em;
+    gap: 0.6em;
   }
 
   .genre-pill {
@@ -236,25 +304,25 @@ const YEARS = [2026, 2025, 2024, 2023];
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--off-white);
-    opacity: 0.75;
-    background: transparent;
-    border: 1px solid rgba(239, 239, 239, 0.25);
-    padding: 0.45em 0.9em;
+    color: var(--stage-black);
+    font-weight: 600;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    padding: 0.5em 1em;
     cursor: pointer;
-    transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    opacity: 0.85;
+    transition: opacity 0.15s ease, transform 0.15s ease;
   }
 
   .genre-pill:hover {
     opacity: 1;
-    border-color: var(--chai-gold);
+    transform: translateY(-1px);
   }
 
   .genre-pill.active {
     opacity: 1;
-    color: var(--stage-black);
-    background: var(--chai-gold);
-    border-color: var(--chai-gold);
   }
 
   .no-results {
