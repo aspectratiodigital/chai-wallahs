@@ -5,8 +5,6 @@ import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 
 import HeroBg from "../assets/images/backgrounds/plum-1.png";
-import whiteBox from "../assets/images/boxes/white-2.png";
-import goldBox from "../assets/images/boxes/gold.png";
 
 interface Props {
   year: number;
@@ -43,11 +41,7 @@ const YEARS = [2026, 2025, 2024, 2023];
       <div class="year-switcher">
         {
           YEARS.map((y) => (
-            <a
-              href={y === 2026 ? "/artists/" : `/artists/${y}/`}
-              class:list={["year-pill", { active: y === year }]}
-              style={`background-image:url("${(y === year ? goldBox : whiteBox).src}");`}
-            >
+            <a href={y === 2026 ? "/artists/" : `/artists/${y}/`} class:list={["year-pill", { active: y === year }]}>
               {y}
             </a>
           ))
@@ -59,7 +53,7 @@ const YEARS = [2026, 2025, 2024, 2023];
   <section class="section artists-controls-section">
     <div class="wrap">
       <div class="artists-controls">
-        <div class="artist-search-wrap" style={`background-image:url("${whiteBox.src}");`}>
+        <div class="artist-search-wrap">
           <input
             type="search"
             class="artist-search"
@@ -72,14 +66,7 @@ const YEARS = [2026, 2025, 2024, 2023];
         <div class="genre-pills" data-genre-pills>
           {
             genres.map(([key, label]) => (
-              <button
-                type="button"
-                class="genre-pill"
-                data-genre-pill={key}
-                style={`background-image:url("${whiteBox.src}");`}
-                data-default-box={whiteBox.src}
-                data-active-box={goldBox.src}
-              >
+              <button type="button" class="genre-pill" data-genre-pill={key}>
                 {label}
               </button>
             ))
@@ -122,7 +109,12 @@ const YEARS = [2026, 2025, 2024, 2023];
         const matchesSearch = !q || name.includes(q);
         const matchesGenre = activeGenres.size === 0 || cardGenres.some((g) => activeGenres.has(g));
         const visible = matchesSearch && matchesGenre;
-        card.hidden = !visible;
+        // Set inline display directly rather than the `hidden` attribute/property -
+        // .artist-card has its own `display: block` rule which (being an author
+        // style) beats the UA stylesheet's [hidden] { display: none }, so toggling
+        // .hidden alone silently did nothing visually while still "looking" correct
+        // in JS state.
+        card.style.display = visible ? "" : "none";
         if (visible) visibleCount++;
       });
       if (noResults) noResults.hidden = visibleCount !== 0;
@@ -141,16 +133,12 @@ const YEARS = [2026, 2025, 2024, 2023];
     genrePills.forEach((pill) => {
       pill.addEventListener("click", () => {
         const key = pill.dataset.genrePill ?? "";
-        const defaultBox = pill.dataset.defaultBox ?? "";
-        const activeBox = pill.dataset.activeBox ?? "";
         if (activeGenres.has(key)) {
           activeGenres.delete(key);
           pill.classList.remove("active");
-          pill.style.backgroundImage = `url("${defaultBox}")`;
         } else {
           activeGenres.add(key);
           pill.classList.add("active");
-          pill.style.backgroundImage = `url("${activeBox}")`;
         }
         applyFilters();
       });
@@ -204,28 +192,41 @@ const YEARS = [2026, 2025, 2024, 2023];
     gap: var(--space-2);
   }
 
+  /* Same wobbly-rectangle shape as the site's .btn buttons (see the homepage's
+     "See All Events" / "Apply to Play" buttons), reused here instead of the
+     site's other box motif (the torn-paper texture) per explicit direction. */
+  .year-pill,
+  .genre-pill,
+  .artist-search-wrap {
+    border: 2px solid currentColor;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  }
+
   .year-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 4.2em;
     font-family: var(--font-mono);
+    font-weight: 700;
     font-size: 0.85rem;
     letter-spacing: 0.06em;
     text-decoration: none;
-    color: var(--stage-black);
-    font-weight: 600;
-    padding: 0.5em 1.1em;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.85;
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    text-align: center;
+    color: var(--off-white);
+    background: transparent;
+    padding: 0.55em 1em;
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
 
   .year-pill:hover {
-    opacity: 1;
-    transform: translateY(-1px);
+    transform: translate(-1px, -1px);
   }
 
   .year-pill.active {
-    opacity: 1;
+    color: var(--stage-black);
+    background: var(--chai-gold);
+    border-color: var(--chai-gold);
   }
 
   .artists-controls-section {
@@ -245,23 +246,21 @@ const YEARS = [2026, 2025, 2024, 2023];
     display: inline-block;
     max-width: 360px;
     width: 100%;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
+    color: var(--off-white);
   }
 
   .artist-search {
     font-family: var(--font-body, inherit);
     font-size: 1rem;
     width: 100%;
-    padding: 0.8em 2.6em 0.8em 1.1em;
+    padding: 0.75em 2.6em 0.75em 1.1em;
     background: transparent;
     border: none;
-    color: var(--stage-black);
+    color: var(--off-white);
   }
 
   .artist-search::placeholder {
-    color: rgba(27, 21, 17, 0.5);
+    color: rgba(239, 239, 239, 0.5);
   }
 
   .artist-search:focus {
@@ -304,25 +303,22 @@ const YEARS = [2026, 2025, 2024, 2023];
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--stage-black);
-    font-weight: 600;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    border: none;
+    color: var(--off-white);
+    font-weight: 700;
+    background: transparent;
     padding: 0.5em 1em;
     cursor: pointer;
-    opacity: 0.85;
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
 
   .genre-pill:hover {
-    opacity: 1;
-    transform: translateY(-1px);
+    transform: translate(-1px, -1px);
   }
 
   .genre-pill.active {
-    opacity: 1;
+    color: var(--stage-black);
+    background: var(--chai-gold);
+    border-color: var(--chai-gold);
   }
 
   .no-results {

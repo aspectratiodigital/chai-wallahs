@@ -43,7 +43,12 @@ const dataGenres = genres.map((g) => g.toLowerCase()).join("|");
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
+    /* No per-photo face detection - biasing the crop toward the upper third is a
+       reasonable default for keeping faces in frame on portrait-cropped promo
+       photos and group shots. Flag any specific artist whose photo still crops
+       badly and it can be tuned individually via a per-entry override. */
+    object-position: center 20%;
     transition: transform 0.35s ease;
   }
 
