@@ -1,6 +1,6 @@
 ---
 name: "USHTI"
-genres: ["FOLK", "da", "DANCE"]
+genres: ["FOLK", "DANCE"]
 image: "/uploads/artists/ushti.jpg"
 years: [2026]
 socials:

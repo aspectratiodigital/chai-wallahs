@@ -11,6 +11,9 @@ const { name, genres, image } = artist.data;
 
 const dataName = name.toLowerCase();
 const dataGenres = genres.map((g) => g.toLowerCase()).join("|");
+// A non-breaking space after the comma keeps the gap visually intact even if
+// the genre line wraps right after a comma.
+const genreDisplay = genres.join(", ");
 ---
 
 <a
@@ -24,7 +27,7 @@ const dataGenres = genres.map((g) => g.toLowerCase()).join("|");
   <div class="artist-card-scrim"></div>
   <div class="artist-card-info">
     <p class="artist-card-name">{name}</p>
-    {genres.length > 0 && <p class="artist-card-genre">{genres.join(", ")}</p>}
+    {genres.length > 0 && <p class="artist-card-genre">{genreDisplay}</p>}
   </div>
 </a>
 
@@ -74,8 +77,8 @@ const dataGenres = genres.map((g) => g.toLowerCase()).join("|");
   .artist-card-name {
     color: var(--off-white);
     font-weight: 700;
-    font-size: 1.125rem;
-    line-height: 1.2;
+    font-size: 1.6875rem;
+    line-height: 1.15;
     text-transform: uppercase;
     letter-spacing: 0.01em;
   }
@@ -88,6 +91,6 @@ const dataGenres = genres.map((g) => g.toLowerCase()).join("|");
     text-transform: uppercase;
     letter-spacing: 0.02em;
     opacity: 0.9;
-    margin-top: 0.25rem;
+    margin-top: 0.05rem;
   }
 </style>

@@ -37,6 +37,21 @@ const { artist } = Astro.props;
 const { name, genres, image, socials } = artist.data;
 const { Content } = await render(artist);
 const hasBody = (artist.body ?? "").trim().length > 0;
+
+// The name runs as a single line of vertical text straddling the photo's
+// right edge. At a flat 3x size that's fine for short names but runs
+// wildly long for something like "HANNABIELL & THE MIDNIGHT BLUE
+// COLLECTIVE" (41 chars would render ~3600px tall - well past the photo
+// and off the top of the viewport). Cap the total vertical run length
+// instead of the font size directly: short names still get the full 3x
+// treatment, longer ones scale down just enough to stay within a
+// reasonable overhang of the photo itself.
+const NAME_RUN_BUDGET_PX = 1600;
+const NAME_MAX_PX = 153.6; // 9.6rem - the literal 3x target
+const NAME_MIN_PX = 20; // floor for readability on very long names
+const rawNameFontPx = NAME_RUN_BUDGET_PX / Math.max(name.length, 1);
+const nameFontMaxRem = +(Math.min(NAME_MAX_PX, Math.max(NAME_MIN_PX, rawNameFontPx)) / 16).toFixed(3);
+const nameFontMinRem = Math.min(6, nameFontMaxRem);
 ---
 
 <BaseLayout title={name} description={genres.length ? `${name} — ${genres.join(", ")}` : name}>
@@ -50,7 +65,7 @@ const hasBody = (artist.body ?? "").trim().length > 0;
         <Image src={image} alt={name} width={900} height={1080} class="artist-photo" />
 
         <div class="artist-name-strip">
-          <h1 class="artist-name">{name}</h1>
+          <h1 class="artist-name" style={`font-size: clamp(${nameFontMinRem}rem, 27vw, ${nameFontMaxRem}rem);`}>{name}</h1>
         </div>
 
         {
@@ -77,7 +92,7 @@ const hasBody = (artist.body ?? "").trim().length > 0;
           )
         }
 
-        {genres.length > 0 && <p class="artist-genre-strip">{genres.join(", ")}</p>}
+        {genres.length > 0 && <p class="artist-genre-strip">{genres.join(", ")}</p>}
       </div>
     </div>
 
@@ -131,7 +146,8 @@ const hasBody = (artist.body ?? "").trim().length > 0;
   .artist-photo-frame :global(.artist-photo) {
     display: block;
     width: 100%;
-    aspect-ratio: 4 / 5;
+    height: auto;
+    aspect-ratio: 9 / 16;
     object-fit: cover;
   }
 
@@ -150,9 +166,9 @@ const hasBody = (artist.body ?? "").trim().length > 0;
 
   .artist-name {
     margin: 0;
-    font-size: clamp(2rem, 9vw, 3.2rem);
+    font-size: clamp(6rem, 27vw, 9.6rem);
     line-height: 1;
-    color: var(--off-white);
+    color: var(--chai-gold);
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -166,7 +182,7 @@ const hasBody = (artist.body ?? "").trim().length > 0;
     translate: -50% 0;
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
+    gap: 1.4rem;
   }
 
   .artist-socials-strip a {
@@ -181,8 +197,8 @@ const hasBody = (artist.body ?? "").trim().length > 0;
 
   .social-icon {
     display: block;
-    width: 34px;
-    height: 34px;
+    width: 102px;
+    height: 102px;
     background-color: var(--off-white);
     -webkit-mask-size: contain;
     mask-size: contain;
@@ -214,9 +230,10 @@ const hasBody = (artist.body ?? "").trim().length > 0;
     font-style: italic;
     font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.06em;
     color: var(--off-white);
     white-space: nowrap;
-    font-size: clamp(1rem, 3.2vw, 1.6rem);
+    font-size: clamp(2rem, 6.4vw, 3.2rem);
   }
 
   .artist-about-wrap {
@@ -227,6 +244,7 @@ const hasBody = (artist.body ?? "").trim().length > 0;
   .artist-about-body :global(p) {
     opacity: 0.85;
     line-height: 1.7;
+    font-size: 1.6rem;
     margin-bottom: 1em;
   }
 
@@ -236,16 +254,20 @@ const hasBody = (artist.body ?? "").trim().length > 0;
     }
 
     .artist-name {
-      font-size: 1.8rem;
+      font-size: 3.2rem;
     }
 
     .artist-genre-strip {
-      font-size: 1rem;
+      font-size: 1.3rem;
     }
 
     .social-icon {
-      width: 28px;
-      height: 28px;
+      width: 64px;
+      height: 64px;
+    }
+
+    .artist-about-body :global(p) {
+      font-size: 1.2rem;
     }
   }
 </style>
