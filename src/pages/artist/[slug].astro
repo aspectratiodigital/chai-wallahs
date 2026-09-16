@@ -41,15 +41,16 @@ const { Content } = await render(artist);
 const hasBody = (artist.body ?? "").trim().length > 0;
 
 // The name runs as a single line of vertical text straddling the photo's
-// right edge. Cap the total vertical run length instead of the font size
-// directly: short names still get the full treatment, longer ones scale
-// down just enough to stay within a reasonable overhang of the photo.
+// right edge, sized in JS (below) to exactly fill the real run length
+// between 20px below the photo's top and 40px above the genre text -
+// short names like "Birty" hit NAME_MAX_PX (the ceiling), longer ones
+// scale down just enough to fit. This SSR value is only the pre-JS
+// fallback (same budget heuristic as before), refined precisely on load.
+const NAME_MAX_PX = 115.2; // 7.2rem - the hard ceiling, per short names like "Birty"
 const NAME_RUN_BUDGET_PX = 1200;
-const NAME_MAX_PX = 115.2; // 7.2rem
-const NAME_MIN_PX = 17; // floor for readability on very long names
+const NAME_MIN_PX = 17;
 const rawNameFontPx = NAME_RUN_BUDGET_PX / Math.max(name.length, 1);
-const nameFontMaxRem = +(Math.min(NAME_MAX_PX, Math.max(NAME_MIN_PX, rawNameFontPx)) / 16).toFixed(3);
-const nameFontMinRem = Math.min(4.5, nameFontMaxRem);
+const nameFontMaxPx = Math.min(NAME_MAX_PX, Math.max(NAME_MIN_PX, rawNameFontPx));
 
 // Pick a name colour that reads clearly against whatever photo is behind
 // it: black on a mostly-light photo, white on a mostly-dark one, and gold
@@ -84,10 +85,12 @@ try {
       <div class="artist-photo-frame">
         <Image src={image} alt={name} width={900} height={1125} class="artist-photo" />
 
-        <div class="artist-name-strip">
+        <div class="artist-name-strip" id="artist-name-strip">
           <h1
             class="artist-name"
-            style={`font-size: clamp(${nameFontMinRem}rem, 20vw, ${nameFontMaxRem}rem); color: ${nameColor};`}
+            id="artist-name"
+            data-max-font-px={NAME_MAX_PX}
+            style={`font-size: ${nameFontMaxPx}px; color: ${nameColor};`}
           >
             {name}
           </h1>
@@ -178,21 +181,22 @@ try {
   }
 
   /* Name runs vertically along the photo's right edge, the edge itself
-     bisecting the text - half over the image, half hanging into the black
-     background - matching the layout on the original site. */
+     bisecting the text horizontally - half over the image, half hanging
+     into the black background. Vertically it runs from 20px below the
+     photo's top to 40px above the genre text; top/bottom here are only
+     the pre-JS fallback, refined precisely by the script below. */
   .artist-name-strip {
     position: absolute;
-    top: 50%;
+    top: 20px;
     right: 0;
     writing-mode: vertical-rl;
-    translate: 50% -50%;
+    translate: 50% 0;
     rotate: 180deg;
     pointer-events: none;
   }
 
   .artist-name {
     margin: 0;
-    font-size: clamp(4.5rem, 20vw, 7.2rem);
     line-height: 1;
     text-transform: uppercase;
     white-space: nowrap;
@@ -225,8 +229,8 @@ try {
 
   .social-icon {
     display: block;
-    width: 72px;
-    height: 72px;
+    width: 83px;
+    height: 83px;
     background-color: var(--off-white);
     -webkit-mask-size: contain;
     mask-size: contain;
@@ -251,7 +255,7 @@ try {
   }
 
   .artist-socials-strip a[data-platform="youtube"] .social-icon {
-    width: 108px;
+    width: 149px;
   }
 
   .artist-socials-strip a:hover .social-icon {
@@ -264,12 +268,15 @@ try {
     color: var(--off-white);
   }
 
-  /* Genre sits inside the photo's bottom-right corner, its trailing edge a
-     fixed 16px in from the photo's right edge. */
+  /* Genre sits at the bottom-right corner, its trailing edge a fixed 16px
+     in from the photo's right edge, and the photo's bottom edge bisecting
+     it vertically through its centre - matching how the name and socials
+     straddle their own edges. */
   .artist-genre-strip {
     position: absolute;
-    bottom: 16px;
+    bottom: 0;
     right: 16px;
+    translate: 0 50%;
     margin: 0;
     font-style: italic;
     font-weight: 700;
@@ -297,23 +304,18 @@ try {
       max-width: 380px;
     }
 
-    .artist-name {
-      font-size: 2.5rem;
-    }
-
     .artist-genre-strip {
       font-size: 1rem;
-      bottom: 10px;
       right: 10px;
     }
 
     .social-icon {
-      width: 48px;
-      height: 48px;
+      width: 55px;
+      height: 55px;
     }
 
     .artist-socials-strip a[data-platform="youtube"] .social-icon {
-      width: 72px;
+      width: 99px;
     }
 
     .artist-about-body :global(p) {
@@ -321,3 +323,50 @@ try {
     }
   }
 </style>
+
+<script>
+  // Position the vertical name run to span exactly from 20px below the
+  // photo's top to 40px above the genre text, then size the name to fill
+  // that real (viewport-dependent) run length as closely as possible -
+  // capped at NAME_MAX_PX, so short names like "Birty" sit at that ceiling
+  // and longer names are only shrunk as much as they actually need to be.
+  function layoutArtistName() {
+    const frame = document.querySelector<HTMLElement>(".artist-photo-frame");
+    const strip = document.querySelector<HTMLElement>("#artist-name-strip");
+    const nameEl = document.querySelector<HTMLElement>("#artist-name");
+    const genre = document.querySelector<HTMLElement>(".artist-genre-strip");
+    if (!frame || !strip || !nameEl) return;
+
+    const TOP_OFFSET = 20;
+    const GENRE_CLEARANCE = 40;
+    const FALLBACK_BOTTOM = 88;
+
+    const frameRect = frame.getBoundingClientRect();
+    let bottomOffset = FALLBACK_BOTTOM;
+    if (genre) {
+      const genreRect = genre.getBoundingClientRect();
+      bottomOffset = frameRect.bottom - genreRect.top + GENRE_CLEARANCE;
+    }
+
+    // Position where the run starts. Its length is computed arithmetically
+    // below rather than read back from the strip's own box: under
+    // writing-mode: vertical-rl the block/inline axes swap, so an abspos
+    // element with only top+bottom set (no explicit height) doesn't
+    // stretch to fill that span the way it would in horizontal writing
+    // mode - its auto size shrink-fits content instead, so measuring it
+    // directly would just measure the text, not the space available.
+    strip.style.top = `${TOP_OFFSET}px`;
+    const availableLength = frameRect.height - TOP_OFFSET - bottomOffset;
+
+    const maxFontPx = parseFloat(nameEl.dataset.maxFontPx || "115.2");
+    nameEl.style.fontSize = `${maxFontPx}px`;
+
+    const naturalLength = nameEl.getBoundingClientRect().height;
+    const scale = naturalLength > 0 ? Math.min(1, availableLength / naturalLength) : 1;
+    nameEl.style.fontSize = `${Math.max(0, maxFontPx * scale)}px`;
+  }
+
+  layoutArtistName();
+  window.addEventListener("resize", layoutArtistName);
+  document.fonts?.ready?.then(layoutArtistName);
+</script>
