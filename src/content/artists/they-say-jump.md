@@ -7,6 +7,7 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/TheySayJumpMusic" }
   - { platform: "instagram", url: "https://www.instagram.com/theysayjump" }
   - { platform: "youtube", url: "https://www.youtube.com/watch?v=UizoKDOrshU" }
+spotifyTrackUrl: "https://open.spotify.com/track/4hHVT2LEfJ1hojQPIFOIFx"
 ---
 
 ​Boasting band members that have performed with Bastille, Paloma Faith, Kwabs, Gentleman's Dub Club, Hollie Cook and Prince Fatty, They Say Jump are an unstoppable force united by a love of Reggae and Ska music.

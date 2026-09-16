@@ -7,5 +7,6 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/HighFadeBand/" }
   - { platform: "instagram", url: "https://www.instagram.com/highfademusic/" }
   - { platform: "youtube", url: "https://www.youtube.com/channel/UC0qHVjsWV9gk4FPm65pwjMA" }
+spotifyTrackUrl: "https://open.spotify.com/track/2lnXiFWGvgZLtjREZhVAni"
 ---
 

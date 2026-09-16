@@ -8,6 +8,7 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/mrbrucemusic/" }
   - { platform: "youtube", url: "https://www.youtube.com/@mrbrucemusic/about" }
   - { platform: "twitter", url: "https://twitter.com/mrbrucemusic" }
+spotifyTrackUrl: "https://open.spotify.com/track/3uAPwgIoQjDtTpDSOrqTzy"
 ---
 
 The former frontman of The Correspondents, one of Britain’s most in-demand festival acts for a decade, went solo in spectacular style last year, unveiling a new sound which draws on decades of UK dance music, from tech house and jungle to garage and house. This summer Mr Bruce lets loose as never before.

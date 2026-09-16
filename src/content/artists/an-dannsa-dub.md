@@ -7,6 +7,7 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/andannsadub/" }
   - { platform: "instagram", url: "https://www.instagram.com/andannsadub/?hl=en" }
   - { platform: "youtube", url: "https://www.youtube.com/playlist?list=PLrjgvOJgwEnFEIDfMhW9VsswdTPbwpeLE" }
+spotifyTrackUrl: "https://open.spotify.com/track/28xpGrg3E8YzEMFhN8XE4Y"
 ---
 
 The 6 piece live band fuses the mystical energy and instruments of traditional Scottish music and Gaelic song with the heavy, meditative, driving basslines digital dub music. The band is a unique mix of experienced traditional folk musicians and Dub Reggae specialists, using acoustic and digital instruments. The result is an explosive heavyweight blend of what the band call ‘Future Dub from Ancient Scotland'.​​

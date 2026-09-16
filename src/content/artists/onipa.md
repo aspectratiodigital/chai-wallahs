@@ -7,6 +7,7 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/onipamusic/" }
   - { platform: "instagram", url: "https://www.instagram.com/onipamusic/" }
   - { platform: "youtube", url: "https://youtube.com/playlist?list=PLrjgvOJgwEnEr9I3jJKuRP6crG_2qeoNn" }
+spotifyTrackUrl: "https://open.spotify.com/track/6qRIKbszcJDyFisxnF7nIT"
 ---
 
 Afro-futurist band ONIPA is the collaboration between multi-instrumentalist artist and rapper K.O.G (Kweku Sackey) and Tom Excell, which fuses music from Ghana and London, alongside bandmates Finn Booth (Nubiyan Twist) and Wonky Logic (Steam Down).

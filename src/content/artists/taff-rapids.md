@@ -7,6 +7,7 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/taffrapids" }
   - { platform: "instagram", url: "https://www.instagram.com/taffrapids" }
   - { platform: "youtube", url: "https://www.youtube.com/channel/UCL72iH1Uu2qY7BQsC-J8YZA" }
+spotifyTrackUrl: "https://open.spotify.com/track/6EMK9f3p4BO3PyNbDECUX7"
 ---
 
 Taff Rapids, Cardiff's bluegrass sensation, is taking the international stage by storm with a unique blend of original bluegrass compositions and their own take on traditional American and Welsh tunes. The band infuses their music with Welsh-language elements, bringing a fresh perspective to the bluegrass genre that resonates worldwide.

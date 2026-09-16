@@ -7,5 +7,6 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/LosDedosBand/" }
   - { platform: "instagram", url: "https://www.instagram.com/losdedosband/" }
   - { platform: "youtube", url: "https://www.youtube.com/playlist?list=PLrjgvOJgwEnECbrymSMmKK_jmgJBwjd_O" }
+spotifyTrackUrl: "https://open.spotify.com/track/7aMe3ZaVotq7kbuCO3dbXo"
 ---
 

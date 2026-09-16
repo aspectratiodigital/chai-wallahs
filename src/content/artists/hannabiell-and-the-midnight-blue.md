@@ -8,6 +8,7 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/hannabiellandmidnightblue/" }
   - { platform: "youtube", url: "https://youtube.com/playlist?list=PLrjgvOJgwEnHM0CcIb_yXv7c1W4MhH5l-" }
   - { platform: "twitter", url: "https://twitter.com/Hannabiell" }
+spotifyTrackUrl: "https://open.spotify.com/track/6r0XotBTME3kf4jA04uvs2"
 ---
 
 A high energy Afro Fusion Collective fusing powerful and upbeat Latin & African percussion, brass, vocal chants, Blues, Jazz, Afro-beat, and Funk, to create a unique sound and an invigorating party atmosphere that will get you up on your feet.

@@ -8,6 +8,7 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/ceitidh_mac/" }
   - { platform: "youtube", url: "https://youtube.com/playlist?list=PLrjgvOJgwEnFQFAfvSQhzqFHlC1vF7Bm9" }
   - { platform: "twitter", url: "https://twitter.com/Ceitidh_Mac" }
+spotifyTrackUrl: "https://open.spotify.com/track/4j3UVwEKOtaTKzJxlZ0HpI"
 ---
 
 Welsh born , Newcastle based, Ceitidh blends warming cello tones and soaring vocals to create a transformative sound that puts a progressive twist on the alt.folk genre. Her live show is an innovative take on traditional and alternative folk songs, sitting alongside her own original material

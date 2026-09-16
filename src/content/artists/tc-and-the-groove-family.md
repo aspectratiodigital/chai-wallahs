@@ -7,6 +7,7 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/TCandtheGrooveFamily" }
   - { platform: "instagram", url: "https://www.instagram.com/tcandthegroovefamily" }
   - { platform: "youtube", url: "https://www.youtube.com/channel/UC0lp4zhdabAyrduIwiebdBg" }
+spotifyTrackUrl: "https://open.spotify.com/track/24ZAd38hq1QWkbvu5UMfbW"
 ---
 
 An exploration of global styles and genres, including Afrobeat, Breakbeat, Jungle, Jazz and Highlife.

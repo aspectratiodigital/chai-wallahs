@@ -7,6 +7,7 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/MarlaKetherMusic/" }
   - { platform: "instagram", url: "https://www.instagram.com/marla_kether/?hl=en" }
   - { platform: "youtube", url: "https://www.youtube.com/channel/UCdXzar0vRWabOvhnLqkopCQ" }
+spotifyTrackUrl: "https://open.spotify.com/track/24ZAd38hq1QWkbvu5UMfbW"
 ---
 
 Born in London to Congolese parents, Marla Kether is a bassist, producer and DJ. The different strands of her musical career are almost as diverse as her selections, which commonly feature a bass-led blend of Kuduro, Dembow, Afro House and Global Bass.

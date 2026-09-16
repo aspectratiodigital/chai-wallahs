@@ -8,6 +8,7 @@ socials:
   - { platform: "instagram", url: "https://instagram.com/aflasackey1/" }
   - { platform: "youtube", url: "https://youtube.com/user/afrikbawantu" }
   - { platform: "twitter", url: "https://twitter.com/Afrik_Bawantu" }
+spotifyTrackUrl: "https://open.spotify.com/track/29VShhyUKvoqD9FgX0IpOc"
 ---
 
 Critically Acclaimed, Internationally Diverse, 10-Piece, Afro-Orchestra led by Ghanaian Djembe master and vocalist Afla Sackey. Blending High-Life, Afrobeat, Traditional Ghanaian Rhythms, Tight Funk and Roots Music this ensemble is a true spectacle.

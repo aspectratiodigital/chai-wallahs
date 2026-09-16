@@ -8,6 +8,7 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/nualahonan/" }
   - { platform: "youtube", url: "https://youtube.com/playlist?list=PLrjgvOJgwEnFtrN-zTdUmGQGqOb0wvoVE" }
   - { platform: "twitter", url: "https://twitter.com/nualahonan?lang=en-GB" }
+spotifyTrackUrl: "https://open.spotify.com/track/0NG9QE4ChbAxEgi3uiWqsV"
 ---
 
 Driven by post-punk rawness, yet still letting fly with moments of audacious, operatic singing over the tumultuous drums, Nuala Honan leads a killer band through a hopeful pop-dream with her skill for timeless song writing.

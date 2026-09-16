@@ -7,6 +7,7 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/lazyhabits" }
   - { platform: "instagram", url: "https://www.instagram.com/lazyhabits/" }
   - { platform: "youtube", url: "https://www.youtube.com/playlist?list=PLrjgvOJgwEnFWZ7NBieBFaaO9uR0vkRQY" }
+spotifyTrackUrl: "https://open.spotify.com/track/1OQSPgMkrel0s0NemRDK69"
 ---
 
 ​Influenced by New Orleans Jazz, Soul and Hip Hop, Lazy Habits blast their sound into the 21st Century with hard hitting beats and slick lyrics about modern British culture and urban life. The band describes their sound as: "Beats, Rhymes and Brass of the highest calibre.”

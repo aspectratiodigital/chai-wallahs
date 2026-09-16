@@ -7,6 +7,7 @@ socials:
   - { platform: "facebook", url: "https://www.facebook.com/watch/awenensemble/" }
   - { platform: "instagram", url: "https://www.instagram.com/awenensemble/" }
   - { platform: "youtube", url: "https://www.youtube.com/playlist?list=PLrjgvOJgwEnGztr16mzDq6_UULUlOdm-C" }
+spotifyTrackUrl: "https://open.spotify.com/track/3ZHG3kzwvpVkT84lgvyrc5"
 ---
 
 Awen Ensemble are a Leeds based Contemporary Jazz Collective. Taking inspiration from global folk music, the band are melodically driven with a modal and groove based focus. Incredible virtuosic performances from all members……These guys are properly listening to each other which means you should too!​​

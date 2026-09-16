@@ -8,6 +8,7 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/theassistband/" }
   - { platform: "youtube", url: "https://www.youtube.com/channel/UCYHkgPmzxPLbZkiIQl3KzIQ" }
   - { platform: "twitter", url: "https://twitter.com/TheAssistBand" }
+spotifyTrackUrl: "https://open.spotify.com/track/7AbXWfBGGii6DRspqIiUh2"
 ---
 
 Soaring indie anthems for the modern generation. Hip-hop-inflected beats, dance-tinged rhythms and blistering breakdowns. This is pure, eclectic adventurism from Walsalls finest.

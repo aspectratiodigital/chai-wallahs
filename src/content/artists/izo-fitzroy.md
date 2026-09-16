@@ -8,6 +8,7 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/izofitzroy/" }
   - { platform: "youtube", url: "https://youtube.com/playlist?list=PLrjgvOJgwEnFHuDoganYn6CVEecPBMAow" }
   - { platform: "twitter", url: "https://twitter.com/izofitzroymusic" }
+spotifyTrackUrl: "https://open.spotify.com/track/6GpOqwcMgzxUsmQjD0nusW"
 ---
 
 Reaching into the worlds of Soul, Blues, Gospel, Funk and Disco; Izo’s powerful vocals, uplifting melodies, rich harmonies and deft, Jazz influenced keyboards set her apart from her contemporaries. Her songs are built for Live; sincere and compelling lyrics delivered over tight and melodic grooves. A unique setup featuring up to 9 gospel vocalists.
