@@ -44,35 +44,29 @@ const hasBody = (artist.body ?? "").trim().length > 0;
 // one fixed size (NAME_MAX_PX) for every artist - short names like
 // "Birty" fit on one line; longer ones wrap onto additional lines rather
 // than shrinking, so the font size never has to vary by name length.
-// writing-mode: vertical-lr (not -rl) stacks wrapped lines left-to-right,
-// so the *last* line - not the first - lands on the photo's right edge:
-// for a two-line name that's the one that ends up straddling it, per the
-// original single-line design, while the first line sits fully on the
-// photo. JS (below) sets the height that triggers wrapping, since that
-// depends on the genre text's real rendered position.
+// writing-mode: vertical-rl stacks wrapped lines right-to-left, so the
+// *first* line of the name (in reading order) lands on the photo's right
+// edge and straddles it, with later lines continuing further left, fully
+// on the photo - e.g. "TC & The Groove Family" wraps to "TC & THE" at
+// the edge, "GROOVE FAMILY" to its left. JS (below) sets the height that
+// triggers wrapping, since that depends on the genre text's real
+// rendered position.
 const NAME_MAX_PX = 88.32; // the hard ceiling - same size for every name
 const NAME_HALF_PX = NAME_MAX_PX / 2;
 
-// Pick a name colour that reads clearly against whatever photo is behind
-// it: black on a mostly-light photo, white on a mostly-dark one, and gold
-// when the photo's tones are too mixed/contrasty for either to reliably
-// read well against all of it.
-let nameColor = "var(--chai-gold)";
+// White by default. Only switch to gold when the photo is light enough
+// that white would clash against it - never black.
+let nameColor = "var(--off-white)";
 try {
   const filePath = path.join(process.cwd(), "public", image.replace(/^\//, ""));
   const { channels } = await sharp(filePath).stats();
   const [r, g, b] = channels;
   const meanLuma = 0.299 * r.mean + 0.587 * g.mean + 0.114 * b.mean;
-  const avgStdev = (r.stdev + g.stdev + b.stdev) / 3;
-  if (avgStdev > 72) {
+  if (meanLuma > 150) {
     nameColor = "var(--chai-gold)";
-  } else if (meanLuma > 150) {
-    nameColor = "var(--stage-black)";
-  } else {
-    nameColor = "var(--off-white)";
   }
 } catch {
-  // Fall back to gold above if the file can't be read.
+  // Fall back to white above if the file can't be read.
 }
 ---
 
@@ -185,16 +179,16 @@ try {
      (set inline, = half the fixed font size) shifts it right by exactly
      half of one line's own width, so that line straddles the edge - half
      over the image, half hanging into the black background - regardless
-     of how many lines the name wraps onto, since only the last (vertical-
-     lr-rightmost) line's position depends on this. Vertically it runs
-     from just below the photo's top to just above the genre text (see
-     TOP_OFFSET/GENRE_CLEARANCE in the script below); top here is only
-     the pre-JS fallback, refined precisely by that script. */
+     of how many lines the name wraps onto, since only the first
+     (vertical-rl-rightmost) line's position depends on this. Vertically
+     it runs from just below the photo's top to just above the genre text
+     (see TOP_OFFSET/GENRE_CLEARANCE in the script below); top here is
+     only the pre-JS fallback, refined precisely by that script. */
   .artist-name-strip {
     position: absolute;
     top: 15px;
     right: 0;
-    writing-mode: vertical-lr;
+    writing-mode: vertical-rl;
     pointer-events: none;
   }
 
@@ -268,7 +262,7 @@ try {
   }
 
   .artist-socials-strip a[data-platform="youtube"] .social-icon {
-    width: 131px;
+    width: 151px;
   }
 
   .artist-socials-strip a:hover .social-icon {
@@ -328,7 +322,7 @@ try {
     }
 
     .artist-socials-strip a[data-platform="youtube"] .social-icon {
-      width: 131px;
+      width: 151px;
     }
 
     .artist-about-body :global(p) {
@@ -403,7 +397,7 @@ try {
     strip.style.top = `${TOP_OFFSET}px`;
 
     // height, not width, is what constrains wrapping here: under
-    // writing-mode: vertical-lr the block/inline axes swap, so the
+    // writing-mode: vertical-rl the block/inline axes swap, so the
     // physical `height` property is what the browser treats as the
     // per-line length before it wraps onto a new (physically wider)
     // line, the vertical equivalent of `width` constraining wrapping in
