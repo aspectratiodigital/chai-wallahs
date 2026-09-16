@@ -81,6 +81,11 @@ const artists = defineCollection({
     image: z.string(),
     socials: z.array(z.object({ platform: z.string(), url: z.string().url() })).default([]),
     years: z.array(z.number()),
+    // The Spotify Artist ID (found in their Spotify URL: open.spotify.com/artist/<this>).
+    // Set once per artist - the actual featured track is looked up fresh from Spotify's
+    // API at build time (see src/lib/spotify.ts), so it stays current as artists release
+    // new music without ever needing to be updated by hand.
+    spotifyArtistId: z.string().optional(),
   }),
 });
 
