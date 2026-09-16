@@ -40,20 +40,18 @@ const { name, genres, image, socials } = artist.data;
 const { Content } = await render(artist);
 const hasBody = (artist.body ?? "").trim().length > 0;
 
-// The name runs as a single line of vertical text straddling the photo's
-// right edge, sized in JS (below) to exactly fill the real run length
-// between TOP_OFFSET below the photo's top and GENRE_CLEARANCE above the
-// genre text (see the script below) - short names like "Birty" hit
-// NAME_MAX_PX (the ceiling), longer ones scale down just enough to fit.
-// This SSR value is only the pre-JS fallback (same budget heuristic as
-// before), refined precisely on load. All the pixel values on this page
-// (frame size, offsets, icon/text sizes) are kept in the same proportion
-// to each other as they're resized together.
-const NAME_MAX_PX = 88.32; // the hard ceiling, per short names like "Birty"
-const NAME_RUN_BUDGET_PX = 920;
-const NAME_MIN_PX = 14;
-const rawNameFontPx = NAME_RUN_BUDGET_PX / Math.max(name.length, 1);
-const nameFontMaxPx = Math.min(NAME_MAX_PX, Math.max(NAME_MIN_PX, rawNameFontPx));
+// The name runs as vertical text straddling the photo's right edge, at
+// one fixed size (NAME_MAX_PX) for every artist - short names like
+// "Birty" fit on one line; longer ones wrap onto additional lines rather
+// than shrinking, so the font size never has to vary by name length.
+// writing-mode: vertical-lr (not -rl) stacks wrapped lines left-to-right,
+// so the *last* line - not the first - lands on the photo's right edge:
+// for a two-line name that's the one that ends up straddling it, per the
+// original single-line design, while the first line sits fully on the
+// photo. JS (below) sets the height that triggers wrapping, since that
+// depends on the genre text's real rendered position.
+const NAME_MAX_PX = 88.32; // the hard ceiling - same size for every name
+const NAME_HALF_PX = NAME_MAX_PX / 2;
 
 // Pick a name colour that reads clearly against whatever photo is behind
 // it: black on a mostly-light photo, white on a mostly-dark one, and gold
@@ -88,12 +86,12 @@ try {
       <div class="artist-photo-frame">
         <Image src={image} alt={name} width={690} height={863} class="artist-photo" />
 
-        <div class="artist-name-strip" id="artist-name-strip">
+        <div class="artist-name-strip" id="artist-name-strip" style={`translate: ${NAME_HALF_PX}px 0;`}>
           <h1
             class="artist-name"
             id="artist-name"
             data-max-font-px={NAME_MAX_PX}
-            style={`font-size: ${nameFontMaxPx}px; color: ${nameColor};`}
+            style={`font-size: ${NAME_MAX_PX}px; color: ${nameColor};`}
           >
             {name}
           </h1>
@@ -183,18 +181,20 @@ try {
     object-fit: cover;
   }
 
-  /* Name runs vertically along the photo's right edge, the edge itself
-     bisecting the text horizontally - half over the image, half hanging
-     into the black background. Vertically it runs from just below the
-     photo's top to just above the genre text (see TOP_OFFSET/
-     GENRE_CLEARANCE in the script below); top here is only the pre-JS
-     fallback, refined precisely by that script. */
+  /* Name runs vertically along the photo's right edge. The translate here
+     (set inline, = half the fixed font size) shifts it right by exactly
+     half of one line's own width, so that line straddles the edge - half
+     over the image, half hanging into the black background - regardless
+     of how many lines the name wraps onto, since only the last (vertical-
+     lr-rightmost) line's position depends on this. Vertically it runs
+     from just below the photo's top to just above the genre text (see
+     TOP_OFFSET/GENRE_CLEARANCE in the script below); top here is only
+     the pre-JS fallback, refined precisely by that script. */
   .artist-name-strip {
     position: absolute;
     top: 15px;
     right: 0;
-    writing-mode: vertical-rl;
-    translate: 50% 0;
+    writing-mode: vertical-lr;
     pointer-events: none;
   }
 
@@ -202,7 +202,7 @@ try {
     margin: 0;
     line-height: 1;
     text-transform: uppercase;
-    white-space: nowrap;
+    white-space: normal;
   }
 
   /* Social icons stack along the photo's left edge toward the bottom, the
@@ -257,8 +257,18 @@ try {
     mask-size: 78%;
   }
 
+  /* YouTube's source canvas has a lot of empty vertical padding around
+     the badge itself (unlike Facebook/Instagram, whose ink runs close to
+     the canvas edge), so at an equal box gap it visually reads as
+     further from Instagram than Instagram is from Facebook. Pulled up
+     with a negative margin so the visible icons - not just their boxes -
+     end up evenly spaced. */
+  .artist-socials-strip a[data-platform="youtube"] {
+    margin-top: -16px;
+  }
+
   .artist-socials-strip a[data-platform="youtube"] .social-icon {
-    width: 114px;
+    width: 131px;
   }
 
   .artist-socials-strip a:hover .social-icon {
@@ -318,7 +328,7 @@ try {
     }
 
     .artist-socials-strip a[data-platform="youtube"] .social-icon {
-      width: 114px;
+      width: 131px;
     }
 
     .artist-about-body :global(p) {
@@ -328,12 +338,50 @@ try {
 </style>
 
 <script>
-  // Position the vertical name run to span exactly from TOP_OFFSET below
-  // the photo's top to GENRE_CLEARANCE above the genre text, then size
-  // the name to fill that real (viewport-dependent) run length as
-  // closely as possible -
-  // capped at NAME_MAX_PX, so short names like "Birty" sit at that ceiling
-  // and longer names are only shrunk as much as they actually need to be.
+  // Roughly how many lines (columns, under vertical-lr) the name is
+  // currently wrapped onto at the given font size: each column's width
+  // is close to the font size (line-height: 1), so width/fontSize
+  // clusters near an integer line count.
+  function columnCount(nameEl: HTMLElement, fontPx: number): number {
+    nameEl.style.fontSize = `${fontPx}px`;
+    const width = nameEl.getBoundingClientRect().width;
+    return Math.max(1, Math.round(width / fontPx));
+  }
+
+  // Most names fit in <= 2 lines at the shared max size and are left
+  // there untouched. The rare outlier that would need 3+ lines at that
+  // size is shrunk - via binary search, since re-wrapping at each
+  // candidate size has to be measured, not computed - down to the
+  // largest size that still keeps it within 2 lines, rather than
+  // dragging every artist's font size down to accommodate a handful of
+  // long names.
+  function fitNameWithinTwoLines(nameEl: HTMLElement, maxFontPx: number): number {
+    if (columnCount(nameEl, maxFontPx) <= 2) {
+      nameEl.style.fontSize = `${maxFontPx}px`;
+      return maxFontPx;
+    }
+    let lo = 10;
+    let hi = maxFontPx;
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2;
+      if (columnCount(nameEl, mid) <= 2) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+    nameEl.style.fontSize = `${lo}px`;
+    return lo;
+  }
+
+  // Constrain the name to the real run length between TOP_OFFSET below
+  // the photo's top and GENRE_CLEARANCE above the genre text, so the
+  // browser wraps the name onto as many lines as it needs within that
+  // space (instead of shrinking one line's font size for every name),
+  // then cap it at 2 lines - shrinking only the names that actually
+  // need it to get there. The strip's edge-straddling translate is
+  // re-set to match whatever font size the name ends up at, since a
+  // shrunk name's column is narrower than the SSR default assumed.
   function layoutArtistName() {
     const frame = document.querySelector<HTMLElement>(".artist-photo-frame");
     const strip = document.querySelector<HTMLElement>("#artist-name-strip");
@@ -352,22 +400,20 @@ try {
       bottomOffset = frameRect.bottom - genreRect.top + GENRE_CLEARANCE;
     }
 
-    // Position where the run starts. Its length is computed arithmetically
-    // below rather than read back from the strip's own box: under
-    // writing-mode: vertical-rl the block/inline axes swap, so an abspos
-    // element with only top+bottom set (no explicit height) doesn't
-    // stretch to fill that span the way it would in horizontal writing
-    // mode - its auto size shrink-fits content instead, so measuring it
-    // directly would just measure the text, not the space available.
     strip.style.top = `${TOP_OFFSET}px`;
-    const availableLength = frameRect.height - TOP_OFFSET - bottomOffset;
+
+    // height, not width, is what constrains wrapping here: under
+    // writing-mode: vertical-lr the block/inline axes swap, so the
+    // physical `height` property is what the browser treats as the
+    // per-line length before it wraps onto a new (physically wider)
+    // line, the vertical equivalent of `width` constraining wrapping in
+    // horizontal writing mode.
+    const availableLength = Math.max(0, frameRect.height - TOP_OFFSET - bottomOffset);
+    nameEl.style.height = `${availableLength}px`;
 
     const maxFontPx = parseFloat(nameEl.dataset.maxFontPx || "88.32");
-    nameEl.style.fontSize = `${maxFontPx}px`;
-
-    const naturalLength = nameEl.getBoundingClientRect().height;
-    const scale = naturalLength > 0 ? Math.min(1, availableLength / naturalLength) : 1;
-    nameEl.style.fontSize = `${Math.max(0, maxFontPx * scale)}px`;
+    const finalFontPx = fitNameWithinTwoLines(nameEl, maxFontPx);
+    strip.style.translate = `${finalFontPx / 2}px 0`;
   }
 
   layoutArtistName();
