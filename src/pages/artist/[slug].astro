@@ -1,7 +1,9 @@
 ---
+import path from "node:path";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
+import sharp from "sharp";
 
 import FacebookIcon from "../../assets/images/social/facebook.png";
 import InstagramIcon from "../../assets/images/social/instagram.png";
@@ -39,19 +41,37 @@ const { Content } = await render(artist);
 const hasBody = (artist.body ?? "").trim().length > 0;
 
 // The name runs as a single line of vertical text straddling the photo's
-// right edge. At a flat 3x size that's fine for short names but runs
-// wildly long for something like "HANNABIELL & THE MIDNIGHT BLUE
-// COLLECTIVE" (41 chars would render ~3600px tall - well past the photo
-// and off the top of the viewport). Cap the total vertical run length
-// instead of the font size directly: short names still get the full 3x
-// treatment, longer ones scale down just enough to stay within a
-// reasonable overhang of the photo itself.
-const NAME_RUN_BUDGET_PX = 1600;
-const NAME_MAX_PX = 153.6; // 9.6rem - the literal 3x target
-const NAME_MIN_PX = 20; // floor for readability on very long names
+// right edge. Cap the total vertical run length instead of the font size
+// directly: short names still get the full treatment, longer ones scale
+// down just enough to stay within a reasonable overhang of the photo.
+const NAME_RUN_BUDGET_PX = 800;
+const NAME_MAX_PX = 76.8; // 4.8rem
+const NAME_MIN_PX = 14; // floor for readability on very long names
 const rawNameFontPx = NAME_RUN_BUDGET_PX / Math.max(name.length, 1);
 const nameFontMaxRem = +(Math.min(NAME_MAX_PX, Math.max(NAME_MIN_PX, rawNameFontPx)) / 16).toFixed(3);
-const nameFontMinRem = Math.min(6, nameFontMaxRem);
+const nameFontMinRem = Math.min(3, nameFontMaxRem);
+
+// Pick a name colour that reads clearly against whatever photo is behind
+// it: black on a mostly-light photo, white on a mostly-dark one, and gold
+// when the photo's tones are too mixed/contrasty for either to reliably
+// read well against all of it.
+let nameColor = "var(--chai-gold)";
+try {
+  const filePath = path.join(process.cwd(), "public", image.replace(/^\//, ""));
+  const { channels } = await sharp(filePath).stats();
+  const [r, g, b] = channels;
+  const meanLuma = 0.299 * r.mean + 0.587 * g.mean + 0.114 * b.mean;
+  const avgStdev = (r.stdev + g.stdev + b.stdev) / 3;
+  if (avgStdev > 72) {
+    nameColor = "var(--chai-gold)";
+  } else if (meanLuma > 150) {
+    nameColor = "var(--stage-black)";
+  } else {
+    nameColor = "var(--off-white)";
+  }
+} catch {
+  // Fall back to gold above if the file can't be read.
+}
 ---
 
 <BaseLayout title={name} description={genres.length ? `${name} — ${genres.join(", ")}` : name}>
@@ -62,10 +82,15 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
 
     <div class="wrap photo-wrap">
       <div class="artist-photo-frame">
-        <Image src={image} alt={name} width={900} height={1080} class="artist-photo" />
+        <Image src={image} alt={name} width={1120} height={995} class="artist-photo" />
 
         <div class="artist-name-strip">
-          <h1 class="artist-name" style={`font-size: clamp(${nameFontMinRem}rem, 27vw, ${nameFontMaxRem}rem);`}>{name}</h1>
+          <h1
+            class="artist-name"
+            style={`font-size: clamp(${nameFontMinRem}rem, 12vw, ${nameFontMaxRem}rem); color: ${nameColor};`}
+          >
+            {name}
+          </h1>
         </div>
 
         {
@@ -77,6 +102,7 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${name} on ${PLATFORM_LABEL[s.platform] ?? s.platform}`}
+                  data-platform={s.platform}
                 >
                   {PLATFORM_ICON[s.platform] ? (
                     <span
@@ -140,14 +166,14 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
   .artist-photo-frame {
     position: relative;
     width: 100%;
-    max-width: 560px;
+    max-width: 1120px;
   }
 
   .artist-photo-frame :global(.artist-photo) {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 9 / 16;
+    aspect-ratio: 9 / 8;
     object-fit: cover;
   }
 
@@ -166,9 +192,8 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
 
   .artist-name {
     margin: 0;
-    font-size: clamp(6rem, 27vw, 9.6rem);
+    font-size: clamp(3rem, 12vw, 4.8rem);
     line-height: 1;
-    color: var(--chai-gold);
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -182,7 +207,7 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
     translate: -50% 0;
     display: flex;
     flex-direction: column;
-    gap: 1.4rem;
+    gap: 0.8rem;
   }
 
   .artist-socials-strip a {
@@ -197,8 +222,8 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
 
   .social-icon {
     display: block;
-    width: 102px;
-    height: 102px;
+    width: 48px;
+    height: 48px;
     background-color: var(--off-white);
     -webkit-mask-size: contain;
     mask-size: contain;
@@ -207,6 +232,21 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
     -webkit-mask-position: center;
     mask-position: center;
     transition: background-color 0.15s ease;
+  }
+
+  /* The source icon glyphs don't share the same amount of internal padding
+     (Instagram's fills almost the whole canvas, YouTube's leaves a lot of
+     margin), so at a shared mask-size they don't read as the same size.
+     Facebook is the visual reference point; Instagram is scaled down and
+     YouTube scaled up to match it. */
+  .artist-socials-strip a[data-platform="instagram"] .social-icon {
+    -webkit-mask-size: 78%;
+    mask-size: 78%;
+  }
+
+  .artist-socials-strip a[data-platform="youtube"] .social-icon {
+    -webkit-mask-size: 165%;
+    mask-size: 165%;
   }
 
   .artist-socials-strip a:hover .social-icon {
@@ -219,13 +259,12 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
     color: var(--off-white);
   }
 
-  /* Genre sits at the bottom-right corner, the bottom edge bisecting it the
-     same way as the other two straddling elements. */
+  /* Genre sits inside the photo's bottom-right corner, its trailing edge a
+     fixed 16px in from the photo's right edge. */
   .artist-genre-strip {
     position: absolute;
-    bottom: 0;
-    right: 6%;
-    translate: 0 50%;
+    bottom: 16px;
+    right: 16px;
     margin: 0;
     font-style: italic;
     font-weight: 700;
@@ -233,18 +272,18 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
     letter-spacing: 0.06em;
     color: var(--off-white);
     white-space: nowrap;
-    font-size: clamp(2rem, 6.4vw, 3.2rem);
+    font-size: clamp(0.85rem, 1.6vw, 1.1rem);
   }
 
   .artist-about-wrap {
-    max-width: 700px;
+    max-width: 1120px;
     text-align: center;
   }
 
   .artist-about-body :global(p) {
     opacity: 0.85;
     line-height: 1.7;
-    font-size: 1.6rem;
+    font-size: 1.35rem;
     margin-bottom: 1em;
   }
 
@@ -254,20 +293,22 @@ const nameFontMinRem = Math.min(6, nameFontMaxRem);
     }
 
     .artist-name {
-      font-size: 3.2rem;
+      font-size: 1.8rem;
     }
 
     .artist-genre-strip {
-      font-size: 1.3rem;
+      font-size: 0.7rem;
+      bottom: 10px;
+      right: 10px;
     }
 
     .social-icon {
-      width: 64px;
-      height: 64px;
+      width: 32px;
+      height: 32px;
     }
 
     .artist-about-body :global(p) {
-      font-size: 1.2rem;
+      font-size: 1.05rem;
     }
   }
 </style>
