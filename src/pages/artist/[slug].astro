@@ -42,13 +42,17 @@ const hasBody = (artist.body ?? "").trim().length > 0;
 
 // The name runs as a single line of vertical text straddling the photo's
 // right edge, sized in JS (below) to exactly fill the real run length
-// between 20px below the photo's top and 40px above the genre text -
-// short names like "Birty" hit NAME_MAX_PX (the ceiling), longer ones
-// scale down just enough to fit. This SSR value is only the pre-JS
-// fallback (same budget heuristic as before), refined precisely on load.
-const NAME_MAX_PX = 115.2; // 7.2rem - the hard ceiling, per short names like "Birty"
-const NAME_RUN_BUDGET_PX = 1200;
-const NAME_MIN_PX = 17;
+// between TOP_OFFSET below the photo's top and GENRE_CLEARANCE above the
+// genre text (see the script below) - short names like "Birty" hit
+// NAME_MAX_PX (the ceiling), longer ones scale down just enough to fit.
+// This SSR value is only the pre-JS fallback (same budget heuristic as
+// before), refined precisely on load. All the pixel values on this page
+// (frame size, offsets, icon/text sizes) share one scale factor (2/3 of
+// the values first shipped) so the whole photo block - proportioned the
+// same throughout - fits on a normal 1920x1080 desktop screen.
+const NAME_MAX_PX = 76.8; // 4.8rem - the hard ceiling, per short names like "Birty"
+const NAME_RUN_BUDGET_PX = 800;
+const NAME_MIN_PX = 12;
 const rawNameFontPx = NAME_RUN_BUDGET_PX / Math.max(name.length, 1);
 const nameFontMaxPx = Math.min(NAME_MAX_PX, Math.max(NAME_MIN_PX, rawNameFontPx));
 
@@ -83,7 +87,7 @@ try {
 
     <div class="wrap photo-wrap">
       <div class="artist-photo-frame">
-        <Image src={image} alt={name} width={900} height={1125} class="artist-photo" />
+        <Image src={image} alt={name} width={600} height={750} class="artist-photo" />
 
         <div class="artist-name-strip" id="artist-name-strip">
           <h1
@@ -169,7 +173,7 @@ try {
   .artist-photo-frame {
     position: relative;
     width: 100%;
-    max-width: 840px;
+    max-width: 560px;
   }
 
   .artist-photo-frame :global(.artist-photo) {
@@ -182,12 +186,13 @@ try {
 
   /* Name runs vertically along the photo's right edge, the edge itself
      bisecting the text horizontally - half over the image, half hanging
-     into the black background. Vertically it runs from 20px below the
-     photo's top to 40px above the genre text; top/bottom here are only
-     the pre-JS fallback, refined precisely by the script below. */
+     into the black background. Vertically it runs from just below the
+     photo's top to just above the genre text (see TOP_OFFSET/
+     GENRE_CLEARANCE in the script below); top here is only the pre-JS
+     fallback, refined precisely by that script. */
   .artist-name-strip {
     position: absolute;
-    top: 20px;
+    top: 13px;
     right: 0;
     writing-mode: vertical-rl;
     translate: 50% 0;
@@ -213,7 +218,7 @@ try {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.1rem;
+    gap: 0.73rem;
   }
 
   .artist-socials-strip a {
@@ -229,8 +234,8 @@ try {
 
   .social-icon {
     display: block;
-    width: 83px;
-    height: 83px;
+    width: 55px;
+    height: 55px;
     background-color: var(--off-white);
     -webkit-mask-size: contain;
     mask-size: contain;
@@ -255,7 +260,7 @@ try {
   }
 
   .artist-socials-strip a[data-platform="youtube"] .social-icon {
-    width: 149px;
+    width: 99px;
   }
 
   .artist-socials-strip a:hover .social-icon {
@@ -275,7 +280,7 @@ try {
   .artist-genre-strip {
     position: absolute;
     bottom: 0;
-    right: 16px;
+    right: 11px;
     translate: 0 50%;
     margin: 0;
     font-style: italic;
@@ -284,7 +289,7 @@ try {
     letter-spacing: 0.06em;
     color: var(--off-white);
     white-space: nowrap;
-    font-size: clamp(1.4rem, 4vw, 2.15rem);
+    font-size: clamp(0.93rem, 2.7vw, 1.43rem);
   }
 
   .artist-about-wrap {
@@ -325,9 +330,10 @@ try {
 </style>
 
 <script>
-  // Position the vertical name run to span exactly from 20px below the
-  // photo's top to 40px above the genre text, then size the name to fill
-  // that real (viewport-dependent) run length as closely as possible -
+  // Position the vertical name run to span exactly from TOP_OFFSET below
+  // the photo's top to GENRE_CLEARANCE above the genre text, then size
+  // the name to fill that real (viewport-dependent) run length as
+  // closely as possible -
   // capped at NAME_MAX_PX, so short names like "Birty" sit at that ceiling
   // and longer names are only shrunk as much as they actually need to be.
   function layoutArtistName() {
@@ -337,9 +343,9 @@ try {
     const genre = document.querySelector<HTMLElement>(".artist-genre-strip");
     if (!frame || !strip || !nameEl) return;
 
-    const TOP_OFFSET = 20;
-    const GENRE_CLEARANCE = 40;
-    const FALLBACK_BOTTOM = 88;
+    const TOP_OFFSET = 13;
+    const GENRE_CLEARANCE = 27;
+    const FALLBACK_BOTTOM = 59;
 
     const frameRect = frame.getBoundingClientRect();
     let bottomOffset = FALLBACK_BOTTOM;
@@ -358,7 +364,7 @@ try {
     strip.style.top = `${TOP_OFFSET}px`;
     const availableLength = frameRect.height - TOP_OFFSET - bottomOffset;
 
-    const maxFontPx = parseFloat(nameEl.dataset.maxFontPx || "115.2");
+    const maxFontPx = parseFloat(nameEl.dataset.maxFontPx || "76.8");
     nameEl.style.fontSize = `${maxFontPx}px`;
 
     const naturalLength = nameEl.getBoundingClientRect().height;
