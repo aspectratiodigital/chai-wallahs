@@ -44,12 +44,12 @@ const hasBody = (artist.body ?? "").trim().length > 0;
 // right edge. Cap the total vertical run length instead of the font size
 // directly: short names still get the full treatment, longer ones scale
 // down just enough to stay within a reasonable overhang of the photo.
-const NAME_RUN_BUDGET_PX = 800;
-const NAME_MAX_PX = 76.8; // 4.8rem
-const NAME_MIN_PX = 14; // floor for readability on very long names
+const NAME_RUN_BUDGET_PX = 1200;
+const NAME_MAX_PX = 115.2; // 7.2rem
+const NAME_MIN_PX = 17; // floor for readability on very long names
 const rawNameFontPx = NAME_RUN_BUDGET_PX / Math.max(name.length, 1);
 const nameFontMaxRem = +(Math.min(NAME_MAX_PX, Math.max(NAME_MIN_PX, rawNameFontPx)) / 16).toFixed(3);
-const nameFontMinRem = Math.min(3, nameFontMaxRem);
+const nameFontMinRem = Math.min(4.5, nameFontMaxRem);
 
 // Pick a name colour that reads clearly against whatever photo is behind
 // it: black on a mostly-light photo, white on a mostly-dark one, and gold
@@ -82,12 +82,12 @@ try {
 
     <div class="wrap photo-wrap">
       <div class="artist-photo-frame">
-        <Image src={image} alt={name} width={1120} height={995} class="artist-photo" />
+        <Image src={image} alt={name} width={900} height={1125} class="artist-photo" />
 
         <div class="artist-name-strip">
           <h1
             class="artist-name"
-            style={`font-size: clamp(${nameFontMinRem}rem, 12vw, ${nameFontMaxRem}rem); color: ${nameColor};`}
+            style={`font-size: clamp(${nameFontMinRem}rem, 20vw, ${nameFontMaxRem}rem); color: ${nameColor};`}
           >
             {name}
           </h1>
@@ -166,14 +166,14 @@ try {
   .artist-photo-frame {
     position: relative;
     width: 100%;
-    max-width: 1120px;
+    max-width: 840px;
   }
 
   .artist-photo-frame :global(.artist-photo) {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 9 / 8;
+    aspect-ratio: 4 / 5;
     object-fit: cover;
   }
 
@@ -192,26 +192,29 @@ try {
 
   .artist-name {
     margin: 0;
-    font-size: clamp(3rem, 12vw, 4.8rem);
+    font-size: clamp(4.5rem, 20vw, 7.2rem);
     line-height: 1;
     text-transform: uppercase;
     white-space: nowrap;
   }
 
   /* Social icons stack along the photo's left edge toward the bottom, the
-     edge bisecting each icon the same way. */
+     edge bisecting each icon the same way. Centering happens per-icon
+     (not on the shared strip) so YouTube's wider box doesn't throw off
+     where the narrower square icons land on that edge. */
   .artist-socials-strip {
     position: absolute;
     left: 0;
     bottom: 14%;
-    translate: -50% 0;
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    align-items: flex-start;
+    gap: 1.1rem;
   }
 
   .artist-socials-strip a {
     display: block;
+    translate: -50% 0;
     opacity: 0.9;
     transition: opacity 0.15s ease, background-color 0.15s ease;
   }
@@ -222,8 +225,8 @@ try {
 
   .social-icon {
     display: block;
-    width: 48px;
-    height: 48px;
+    width: 72px;
+    height: 72px;
     background-color: var(--off-white);
     -webkit-mask-size: contain;
     mask-size: contain;
@@ -237,16 +240,18 @@ try {
   /* The source icon glyphs don't share the same amount of internal padding
      (Instagram's fills almost the whole canvas, YouTube's leaves a lot of
      margin), so at a shared mask-size they don't read as the same size.
-     Facebook is the visual reference point; Instagram is scaled down and
-     YouTube scaled up to match it. */
+     Facebook is the visual reference point; Instagram is scaled down to
+     match it. YouTube's badge is naturally wide rather than square, so
+     instead of overscaling it inside a square box (which just clips the
+     sides), its box is widened and left at mask-size: contain so the
+     whole glyph shows at a comparable visual size with nothing cut off. */
   .artist-socials-strip a[data-platform="instagram"] .social-icon {
     -webkit-mask-size: 78%;
     mask-size: 78%;
   }
 
   .artist-socials-strip a[data-platform="youtube"] .social-icon {
-    -webkit-mask-size: 165%;
-    mask-size: 165%;
+    width: 108px;
   }
 
   .artist-socials-strip a:hover .social-icon {
@@ -272,7 +277,7 @@ try {
     letter-spacing: 0.06em;
     color: var(--off-white);
     white-space: nowrap;
-    font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+    font-size: clamp(1.4rem, 4vw, 2.15rem);
   }
 
   .artist-about-wrap {
@@ -293,18 +298,22 @@ try {
     }
 
     .artist-name {
-      font-size: 1.8rem;
+      font-size: 2.5rem;
     }
 
     .artist-genre-strip {
-      font-size: 0.7rem;
+      font-size: 1rem;
       bottom: 10px;
       right: 10px;
     }
 
     .social-icon {
-      width: 32px;
-      height: 32px;
+      width: 48px;
+      height: 48px;
+    }
+
+    .artist-socials-strip a[data-platform="youtube"] .social-icon {
+      width: 72px;
     }
 
     .artist-about-body :global(p) {
