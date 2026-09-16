@@ -223,6 +223,14 @@ if (artist.id in NAME_COLOR_OVERRIDES) {
     right: 0;
     writing-mode: vertical-rl;
     pointer-events: none;
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.6s ease 0.05s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s;
+  }
+
+  .artist-photo-frame.is-revealed .artist-name-strip {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .artist-name {
@@ -235,7 +243,9 @@ if (artist.id in NAME_COLOR_OVERRIDES) {
   /* Social icons stack along the photo's left edge toward the bottom, the
      edge bisecting each icon the same way. Centering happens per-icon
      (not on the shared strip) so YouTube's wider box doesn't throw off
-     where the narrower square icons land on that edge. */
+     where the narrower square icons land on that edge. Every icon box is
+     now the same height, so a single gap reads as truly equal spacing top
+     to bottom (no per-icon nudging needed). */
   .artist-socials-strip {
     position: absolute;
     left: 0;
@@ -243,24 +253,46 @@ if (artist.id in NAME_COLOR_OVERRIDES) {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.84rem;
+    gap: 1rem;
   }
 
   .artist-socials-strip a {
     display: block;
     translate: -50% 0;
-    opacity: 0.9;
-    transition: opacity 0.15s ease, background-color 0.15s ease;
+    opacity: 0;
+    transform: translateX(-22px);
+    transition: opacity 0.5s ease, transform 0.5s ease, background-color 0.15s ease;
   }
 
-  .artist-socials-strip a:hover {
+  .artist-socials-strip a:nth-child(1) {
+    transition-delay: 0.15s;
+  }
+
+  .artist-socials-strip a:nth-child(2) {
+    transition-delay: 0.24s;
+  }
+
+  .artist-socials-strip a:nth-child(3) {
+    transition-delay: 0.33s;
+  }
+
+  .artist-socials-strip a:nth-child(4) {
+    transition-delay: 0.42s;
+  }
+
+  .artist-photo-frame.is-revealed .artist-socials-strip a {
+    opacity: 0.9;
+    transform: translateX(0);
+  }
+
+  .artist-photo-frame.is-revealed .artist-socials-strip a:hover {
     opacity: 1;
   }
 
   .social-icon {
     display: block;
-    width: 63px;
-    height: 63px;
+    width: 76px;
+    height: 76px;
     background-color: var(--off-white);
     -webkit-mask-size: contain;
     mask-size: contain;
@@ -272,30 +304,23 @@ if (artist.id in NAME_COLOR_OVERRIDES) {
   }
 
   /* The source icon glyphs don't share the same amount of internal padding
-     (Instagram's fills almost the whole canvas, YouTube's leaves a lot of
-     margin), so at a shared mask-size they don't read as the same size.
-     Facebook is the visual reference point; Instagram is scaled down to
-     match it. YouTube's badge is naturally wide rather than square, so
-     instead of overscaling it inside a square box (which just clips the
-     sides), its box is widened and left at mask-size: contain so the
-     whole glyph shows at a comparable visual size with nothing cut off. */
+     (Instagram's fills almost the whole canvas, YouTube's leaves a huge
+     margin above/below its badge), so at a shared mask-size they don't
+     read as the same size even in same-size boxes. Facebook is the visual
+     reference point; Instagram is scaled down slightly to match it.
+     YouTube is zoomed in (explicit px mask-size, not a %, so it scales
+     independently of the box's non-square shape) until its badge's actual
+     ink height matches Facebook's, with the box widened just enough to
+     stop that zoomed-in badge clipping at the sides. */
   .artist-socials-strip a[data-platform="instagram"] .social-icon {
     -webkit-mask-size: 78%;
     mask-size: 78%;
   }
 
-  /* YouTube's source canvas has a lot of empty vertical padding around
-     the badge itself (unlike Facebook/Instagram, whose ink runs close to
-     the canvas edge), so at an equal box gap it visually reads as
-     further from Instagram than Instagram is from Facebook. Pulled up
-     with a negative margin so the visible icons - not just their boxes -
-     end up evenly spaced. */
-  .artist-socials-strip a[data-platform="youtube"] {
-    margin-top: -16px;
-  }
-
   .artist-socials-strip a[data-platform="youtube"] .social-icon {
-    width: 181px;
+    width: 112px;
+    -webkit-mask-size: 144px 144px;
+    mask-size: 144px 144px;
   }
 
   .artist-socials-strip a:hover .social-icon {
@@ -325,6 +350,14 @@ if (artist.id in NAME_COLOR_OVERRIDES) {
     color: var(--off-white);
     white-space: nowrap;
     font-size: clamp(1.07rem, 3.1vw, 1.64rem);
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease 0.4s, transform 0.5s ease 0.4s;
+  }
+
+  .artist-photo-frame.is-revealed .artist-genre-strip {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .artist-spotify-wrap {
@@ -338,7 +371,7 @@ if (artist.id in NAME_COLOR_OVERRIDES) {
     font-size: 0.8rem;
     letter-spacing: 0.08em;
     color: var(--chai-gold);
-    margin: 0 0 var(--space-3);
+    margin: 0 0 var(--space-4);
   }
 
   .spotify-embed {
@@ -363,22 +396,78 @@ if (artist.id in NAME_COLOR_OVERRIDES) {
       max-width: 437px;
     }
 
+    /* NAME: horizontal and centred, straddling the photo's top edge instead
+       of running vertically down the right edge. */
+    .artist-name-strip {
+      writing-mode: horizontal-tb;
+      top: 0 !important;
+      left: 50%;
+      right: auto;
+      width: 100%;
+      padding: 0 var(--space-2);
+      text-align: center;
+      translate: -50% -50% !important;
+    }
+
+    .artist-name {
+      font-size: clamp(1.9rem, 9vw, 3rem) !important;
+      height: auto !important;
+      white-space: normal;
+    }
+
+    /* SOCIALS: a horizontal row below the genre, clear of the photo. */
+    .artist-socials-strip {
+      left: 50%;
+      bottom: 0;
+      flex-direction: row;
+      align-items: center;
+      gap: 1.3rem;
+      transform: translate(-50%, calc(100% + 52px));
+    }
+
+    .artist-socials-strip a {
+      translate: 0 0;
+    }
+
+    /* GENRE: centred on the photo's bottom edge instead of right-aligned. */
     .artist-genre-strip {
+      left: 50%;
+      right: auto;
+      translate: -50% 50%;
       font-size: 1.15rem;
-      right: 12px;
     }
 
     .social-icon {
-      width: 63px;
-      height: 63px;
+      width: 62px;
+      height: 62px;
     }
 
     .artist-socials-strip a[data-platform="youtube"] .social-icon {
-      width: 181px;
+      width: 90px;
+      -webkit-mask-size: 117px 117px;
+      mask-size: 117px 117px;
     }
 
     .artist-about-body :global(p) {
       font-size: 1.05rem;
+    }
+
+    /* Extra clearance below the frame for the socials row now living there,
+       and more still below that before the description starts. */
+    .photo-wrap {
+      padding-bottom: 8.5rem;
+    }
+
+    .artist-spotify-wrap {
+      margin-top: var(--space-3);
+    }
+
+    .spotify-eyebrow {
+      margin-bottom: var(--space-2);
+    }
+
+    .artist-page {
+      padding-bottom: var(--space-3);
     }
   }
 </style>
@@ -429,6 +518,11 @@ if (artist.id in NAME_COLOR_OVERRIDES) {
   // re-set to match whatever font size the name ends up at, since a
   // shrunk name's column is narrower than the SSR default assumed.
   function layoutArtistName() {
+    // Below 560px the name runs horizontally, centred above the photo (see
+    // the mobile media query) rather than as a fitted vertical column, so
+    // none of this measurement applies there.
+    if (window.matchMedia("(max-width: 560px)").matches) return;
+
     const frame = document.querySelector<HTMLElement>(".artist-photo-frame");
     const strip = document.querySelector<HTMLElement>("#artist-name-strip");
     const nameEl = document.querySelector<HTMLElement>("#artist-name");
@@ -465,4 +559,13 @@ if (artist.id in NAME_COLOR_OVERRIDES) {
   layoutArtistName();
   window.addEventListener("resize", layoutArtistName);
   document.fonts?.ready?.then(layoutArtistName);
+
+  // Name/socials/genre fade + slide into place once, staggered via their own
+  // CSS transition-delays above — held off a frame so the pre-reveal (opacity:
+  // 0) state actually paints first and the transition has something to animate from.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelector(".artist-photo-frame")?.classList.add("is-revealed");
+    });
+  });
 </script>

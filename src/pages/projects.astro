@@ -1,0 +1,472 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import Highlight from "../components/Highlight.astro";
+import { getEntry } from "astro:content";
+
+import HeroBg from "../assets/images/backgrounds/plum-2.png";
+import WiabPhoto from "../assets/images/wiab/wiab-hero-crowd.jpg";
+import WiabSticker from "../assets/images/logos/wiab-sticker.svg";
+import GrassrootsLogo from "../assets/images/logos/grassroots-rising.svg";
+import CommunityPhoto from "../assets/images/gallery/crowd-pikachu.jpg";
+
+const jamu = await getEntry("artists", "jamu");
+const conn3ct = await getEntry("artists", "conn3ct");
+
+const developed = [
+  {
+    entry: jamu,
+    eyebrow: "Supported Project",
+    body: "A fresh musical collective led by turntablist Mr Fitz, delivering a bold, big sound that's impossible to ignore — bass-heavy beats and genre-defying rhythms, with a live horn section behind MCs including Dr Syntax, Killa P, Binbag Wisdom and Blackout JA on debut album Hear The Sound.",
+  },
+  {
+    entry: conn3ct,
+    eyebrow: "Artist Development",
+    body: "A project born out of a desire to connect souls, musical heritage and powerful female spirit — Bristol's MĀDŁY, London's Amy True and Sheffield's Aziza Jaye sharing one monumental 90-minute show, with a house band that transforms live from Hip-Hop to Neo Soul to Afro-Jazz.",
+  },
+];
+---
+
+<BaseLayout title="Projects" description="Where It All Began, Grassroots Supporter, and Artist Development — the initiatives behind Chai Wallahs' stages.">
+  <!-- HERO -->
+  <section class="projects-hero">
+    <Image src={HeroBg} alt="" class="projects-hero-img" width={2200} height={1400} priority />
+    <div class="projects-hero-scrim"></div>
+    <div class="wrap projects-hero-content">
+      <p class="eyebrow">&gt; Beyond The Stage</p>
+      <h1>Projects &amp; Initiatives</h1>
+      <p class="projects-hero-sub">The ideas, artists and festivals we put our name behind — not just the ones we book.</p>
+    </div>
+  </section>
+
+  <!-- WHERE IT ALL BEGAN -->
+  <section class="section wiab-feature">
+    <div class="wrap wiab-feature-grid" data-reveal>
+      <div class="wiab-feature-media">
+        <Image src={WiabPhoto} alt="Crowd at Where It All Began" width={900} height={1100} class="wiab-feature-photo" />
+      </div>
+      <div class="wiab-feature-copy">
+        <Image src={WiabSticker} alt="" width={150} height={131} class="wiab-feature-logo" />
+        <p class="eyebrow">&gt; A New Festival</p>
+        <h2>Where It All <Highlight rotate={-1}>Began</Highlight></h2>
+        <p>
+          An alternative to the current independent festival model — a celebration of strictly independent
+          music and grassroots culture. A collaborative event bringing together independent festivals,
+          grassroots venues, promoters, curators and the huge community of artists and crews we've met
+          over 27 years.
+        </p>
+        <p class="wiab-feature-tag">Same people, same standards. A whole new scale.</p>
+        <a href="/where-it-all-began/" class="btn btn-solid">Find Out More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRASSROOTS SUPPORTER -->
+  <section class="grassroots-band">
+    <div class="wrap grassroots-grid" data-reveal>
+      <div class="grassroots-copy">
+        <Image src={GrassrootsLogo} alt="" width={150} height={36} class="grassroots-logo" />
+        <p class="eyebrow">&gt; The Bigger Picture</p>
+        <h2>Grassroots <Highlight color="ember" rotate={1.2}>Supporter</Highlight></h2>
+        <p>
+          We're all too aware of the problems faced by the independent industry — the same issues we've
+          faced for years, now amplified. <span class="gold-quote">"The global elite's vision for our future is not one we share."</span> The
+          opportunities and solutions are beginning to present themselves, and it feels like there's
+          genuine hope that we can be the change we wish to see: to bring people together, build a new
+          foundation, nurture the roots, and grow.
+        </p>
+        <p>
+          We've devised a collection of initiatives built around bringing people of like mind together —
+          to encourage activity, participation and taking responsibility for our futures and those of our
+          children. Even if we fail, we'll have been culturally enriched, and stood up for our truth.
+        </p>
+        <a href="https://grassrootsrising.co.uk" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Visit Grassroots Rising</a>
+      </div>
+      <div class="grassroots-media">
+        <Image src={CommunityPhoto} alt="The Chai Wallahs crowd, close together" width={900} height={1100} class="grassroots-photo" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ARTIST DEVELOPMENT -->
+  <section class="section artist-dev">
+    <div class="wrap" data-reveal>
+      <p class="eyebrow artist-dev-label">&gt; Artist Development</p>
+      <h2>What Chai Wallahs<br class="artist-dev-break" /> helps <Highlight rotate={-1}>grow</Highlight></h2>
+      <p class="artist-dev-intro">
+        Two acts we've backed beyond the booking — from stage time to studio time.
+      </p>
+      <div class="dev-grid">
+        {
+          developed.map(({ entry, eyebrow, body }) =>
+            entry ? (
+              <a href={`/artist/${entry.id}/`} class="dev-card" data-dev-card>
+                <div class="dev-card-media">
+                  <Image src={entry.data.image} alt={entry.data.name} width={640} height={800} />
+                  <div class="dev-card-scrim"></div>
+                </div>
+                <div class="dev-card-body">
+                  <p class="dev-card-eyebrow">{eyebrow}</p>
+                  <h3>{entry.data.name}</h3>
+                  <p class="dev-card-genres">{entry.data.genres.join(", ")}</p>
+                  <p class="dev-card-text">{body}</p>
+                  <span class="dev-card-cta">Meet {entry.data.name} &rarr;</span>
+                </div>
+              </a>
+            ) : null,
+          )
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Sections rise/fade into view as they scroll past, and settle back out if
+  // scrolled past again — same treatment used on the artist and events grids.
+  const revealSections = document.querySelectorAll<HTMLElement>("[data-reveal]");
+  if (revealSections.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.classList.toggle("is-visible", entry.isIntersecting);
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -5% 0px" },
+    );
+    revealSections.forEach((el) => observer.observe(el));
+  }
+</script>
+
+<style>
+  /* HERO — matches the About/Gigs/Festivals hero height, centred like the
+     rest of the site's mobile headers */
+  .projects-hero {
+    position: relative;
+    min-height: 48vh;
+    display: flex;
+    align-items: flex-end;
+    color: var(--off-white);
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .projects-hero :global(.projects-hero-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .projects-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.95) 12%, rgba(27, 21, 17, 0.4) 100%);
+  }
+
+  .projects-hero-content {
+    position: relative;
+    width: 100%;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .projects-hero-content .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .projects-hero-content h1 {
+    color: var(--off-white);
+    white-space: nowrap;
+    /* Scales primarily off viewport width (rather than the site's usual
+       rem-heavy clamp) so "Projects & Initiatives" stays on one line at
+       every width instead of wrapping like the other, shorter hero titles. */
+    font-size: clamp(1.7rem, 7vw, 6rem);
+  }
+
+  .projects-hero-sub {
+    max-width: 56ch;
+    margin: var(--space-2) auto 0;
+    opacity: 0.9;
+    font-size: 1.05rem;
+  }
+
+  /* Shared reveal-on-scroll for the three feature sections below the hero */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* WIAB FEATURE */
+  .wiab-feature {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .wiab-feature-grid {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .wiab-feature-media {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .wiab-feature-media :global(.wiab-feature-photo) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .wiab-feature-logo {
+    margin-bottom: var(--space-2);
+  }
+
+  .wiab-feature-copy .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .wiab-feature-copy h2 {
+    color: var(--off-white);
+    margin-bottom: var(--space-3);
+  }
+
+  .wiab-feature-copy p {
+    opacity: 0.9;
+    max-width: 58ch;
+    margin-bottom: var(--space-2);
+  }
+
+  .wiab-feature-tag {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: var(--chai-gold);
+    opacity: 1 !important;
+  }
+
+  .wiab-feature-copy .btn {
+    margin-top: var(--space-2);
+  }
+
+  /* GRASSROOTS */
+  .grassroots-band {
+    background: var(--stage-black);
+    color: var(--off-white);
+    padding: var(--space-6) 0;
+  }
+
+  .grassroots-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .grassroots-logo {
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  .grassroots-copy .eyebrow {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .grassroots-copy h2 {
+    color: var(--off-white);
+    margin-bottom: var(--space-3);
+  }
+
+  .grassroots-copy p {
+    opacity: 0.9;
+    max-width: 62ch;
+    margin-bottom: var(--space-3);
+  }
+
+  .grassroots-copy .gold-quote {
+    color: var(--chai-gold);
+    font-weight: 700;
+    opacity: 1;
+  }
+
+  .grassroots-media {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .grassroots-media :global(.grassroots-photo) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ARTIST DEVELOPMENT */
+  .artist-dev {
+    background: var(--stage-black);
+    color: var(--off-white);
+    text-align: center;
+  }
+
+  .artist-dev-label {
+    color: var(--chai-gold);
+  }
+
+  .artist-dev h2 {
+    color: var(--off-white);
+    margin: var(--space-1) 0 var(--space-2);
+  }
+
+  .artist-dev-break {
+    display: none;
+  }
+
+  .artist-dev-intro {
+    max-width: 50ch;
+    margin: 0 auto var(--space-4);
+    opacity: 0.85;
+  }
+
+  .dev-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    text-align: left;
+  }
+
+  .dev-card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    text-decoration: none;
+    color: var(--off-white);
+    background: rgba(239, 239, 239, 0.03);
+    border: 1px solid rgba(239, 239, 239, 0.14);
+    overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .dev-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--chai-gold);
+  }
+
+  .dev-card-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+
+  .dev-card-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .dev-card:hover .dev-card-media :global(img) {
+    transform: scale(1.06);
+  }
+
+  .dev-card-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(27, 21, 17, 0) 55%, rgba(27, 21, 17, 0.85) 100%);
+  }
+
+  .dev-card-body {
+    padding: var(--space-3);
+  }
+
+  .dev-card-eyebrow {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.07em;
+    color: var(--chai-gold);
+    margin-bottom: 0.4rem;
+  }
+
+  .dev-card-body h3 {
+    color: var(--off-white);
+    font-size: 1.6rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .dev-card-genres {
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
+    color: var(--chai-gold);
+    opacity: 0.9;
+    margin-bottom: var(--space-2);
+  }
+
+  .dev-card-text {
+    opacity: 0.85;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-bottom: var(--space-2);
+  }
+
+  .dev-card-cta {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--off-white);
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .dev-card:hover .dev-card-cta {
+    color: var(--chai-gold);
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 860px) {
+    .wiab-feature-grid,
+    .grassroots-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dev-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 499px) {
+    .projects-hero {
+      min-height: 33.6vh;
+      align-items: center;
+    }
+
+    .wiab-feature-media,
+    .grassroots-media {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    .projects-hero {
+      min-height: 38vh;
+      align-items: center;
+    }
+
+    .artist-dev-break {
+      display: inline;
+    }
+  }
+</style>

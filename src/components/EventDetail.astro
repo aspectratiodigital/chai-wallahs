@@ -22,6 +22,9 @@ const { Content } = await render(event);
 const posterSrc = poster ?? image;
 const hasBody = (event.body ?? "").trim().length > 0;
 
+// Tickets are no longer purchasable once the event's happened.
+const isPast = date < new Date();
+
 // Read the poster's real dimensions so the layout can adapt its column
 // split (and the image frame's aspect-ratio) to whatever shape was
 // uploaded, instead of forcing every poster into a fixed 4:5 box.
@@ -132,7 +135,7 @@ const timeValue = isFestival ? openingTime : time;
       </div>
       <p class="event-teaser">{blurb}</p>
       {
-        ticketUrl && (
+        ticketUrl && !isPast && (
           <a class="btn btn-solid event-ticket-btn" href={ticketUrl} target="_blank" rel="noopener noreferrer">
             Get Tickets
           </a>

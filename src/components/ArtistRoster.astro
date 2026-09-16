@@ -63,14 +63,20 @@ const YEARS = [2026, 2025, 2024, 2023];
           />
           <button type="button" class="search-clear" data-search-clear aria-label="Clear search">&times;</button>
         </div>
-        <div class="genre-pills" data-genre-pills>
-          {
-            genres.map(([key, label]) => (
-              <button type="button" class="genre-pill" data-genre-pill={key}>
-                {label}
-              </button>
-            ))
-          }
+        <div class="genre-dropdown" data-genre-dropdown>
+          <button type="button" class="genre-dropdown-toggle" data-genre-toggle aria-haspopup="true" aria-expanded="false">
+            <span data-genre-toggle-label>Genres</span>
+            <span class="genre-dropdown-arrow" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="genre-dropdown-panel" data-genre-panel hidden>
+            {
+              genres.map(([key, label]) => (
+                <button type="button" class="genre-pill" data-genre-pill={key}>
+                  {label}
+                </button>
+              ))
+            }
+          </div>
         </div>
       </div>
 
@@ -90,6 +96,10 @@ const YEARS = [2026, 2025, 2024, 2023];
     const clearBtn = document.querySelector<HTMLButtonElement>("[data-search-clear]");
     const genrePills = [...document.querySelectorAll<HTMLButtonElement>("[data-genre-pill]")];
     const noResults = document.querySelector<HTMLElement>("[data-no-results]");
+    const genreDropdown = document.querySelector<HTMLElement>("[data-genre-dropdown]");
+    const genreToggle = document.querySelector<HTMLButtonElement>("[data-genre-toggle]");
+    const genreToggleLabel = document.querySelector<HTMLElement>("[data-genre-toggle-label]");
+    const genrePanel = document.querySelector<HTMLElement>("[data-genre-panel]");
     if (!grid) return;
 
     const cards = [...grid.querySelectorAll<HTMLElement>("[data-artist-card]")];
@@ -130,6 +140,11 @@ const YEARS = [2026, 2025, 2024, 2023];
       applyFilters();
     });
 
+    function updateGenreToggleLabel() {
+      if (!genreToggleLabel) return;
+      genreToggleLabel.textContent = activeGenres.size === 0 ? "Genres" : `Genres (${activeGenres.size})`;
+    }
+
     genrePills.forEach((pill) => {
       pill.addEventListener("click", () => {
         const key = pill.dataset.genrePill ?? "";
@@ -140,12 +155,56 @@ const YEARS = [2026, 2025, 2024, 2023];
           activeGenres.add(key);
           pill.classList.add("active");
         }
+        updateGenreToggleLabel();
         applyFilters();
       });
+    });
+
+    // Dropdown floats over the artist grid rather than push it down the
+    // page — opens on click, closes on an outside click, a re-click, or Escape.
+    function closeGenrePanel() {
+      if (!genrePanel || !genreToggle) return;
+      genrePanel.hidden = true;
+      genreToggle.setAttribute("aria-expanded", "false");
+    }
+
+    function openGenrePanel() {
+      if (!genrePanel || !genreToggle) return;
+      genrePanel.hidden = false;
+      genreToggle.setAttribute("aria-expanded", "true");
+    }
+
+    genreToggle?.addEventListener("click", () => {
+      if (genrePanel?.hidden) openGenrePanel();
+      else closeGenrePanel();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!genreDropdown?.contains(e.target as Node)) closeGenrePanel();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeGenrePanel();
     });
   }
 
   initArtistFilters();
+
+  // Cards fade/rise in as they scroll into view, and reset back out if
+  // scrolled back past — both directions toggle the same class, so if a
+  // card is already visible on load (nothing to reveal) it just stays put.
+  const revealCards = document.querySelectorAll<HTMLElement>("[data-artist-card]");
+  if (revealCards.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.classList.toggle("is-visible", entry.isIntersecting);
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -5% 0px" },
+    );
+    revealCards.forEach((el) => observer.observe(el));
+  }
 </script>
 
 <style>
@@ -196,8 +255,8 @@ const YEARS = [2026, 2025, 2024, 2023];
      "See All Events" / "Apply to Play" buttons), reused here instead of the
      site's other box motif (the torn-paper texture) per explicit direction. */
   .year-pill,
-  .genre-pill,
-  .artist-search-wrap {
+  .artist-search-wrap,
+  .genre-dropdown-toggle {
     border: 2px solid currentColor;
     border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
   }
@@ -239,7 +298,9 @@ const YEARS = [2026, 2025, 2024, 2023];
 
   .artists-controls {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
     gap: var(--space-3);
     margin-bottom: var(--space-3);
   }
@@ -295,10 +356,73 @@ const YEARS = [2026, 2025, 2024, 2023];
     display: block;
   }
 
-  .genre-pills {
+  /* GENRE DROPDOWN: same wobbly box as the search bar, but its panel floats
+     over the artist grid below (position: absolute) instead of pushing the
+     grid further down the page when it opens. */
+  .genre-dropdown {
+    position: relative;
+  }
+
+  .genre-dropdown-toggle {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.6em;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9em;
+    min-width: 220px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--off-white);
+    background: transparent;
+    padding: 0.75em 1.1em;
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .genre-dropdown-toggle:hover {
+    transform: translate(-1px, -1px);
+  }
+
+  .genre-dropdown-toggle[aria-expanded="true"] {
+    color: var(--chai-gold);
+    border-color: var(--chai-gold);
+  }
+
+  .genre-dropdown-arrow {
+    font-size: 0.7em;
+    transition: transform 0.2s ease;
+  }
+
+  .genre-dropdown-toggle[aria-expanded="true"] .genre-dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .genre-dropdown-panel {
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    /* Right-aligned to the toggle (which sits well right-of-centre in the
+       controls row) so the panel opens back across the row instead of off
+       the edge of the viewport, the way left:0 did at in-between widths. */
+    right: 0;
+    left: auto;
+    z-index: 30;
+    width: min(380px, calc(100vw - 2 * var(--space-3)));
+    max-height: 340px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    padding: var(--space-2);
+    background: var(--stage-black);
+    border: 2px solid rgba(239, 239, 239, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  }
+
+  .genre-dropdown-panel[hidden] {
+    display: none;
   }
 
   .genre-pill {
@@ -306,10 +430,13 @@ const YEARS = [2026, 2025, 2024, 2023];
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    text-align: center;
     color: var(--off-white);
     font-weight: 700;
     background: transparent;
-    padding: 0.5em 1em;
+    border: 2px solid rgba(239, 239, 239, 0.3);
+    border-radius: 8px;
+    padding: 0.6em 0.5em;
     cursor: pointer;
     transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
@@ -335,6 +462,17 @@ const YEARS = [2026, 2025, 2024, 2023];
     gap: var(--space-3);
   }
 
+  .artists-grid :global([data-artist-card]) {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .artists-grid :global([data-artist-card].is-visible) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   @media (max-width: 1000px) {
     .artists-grid {
       grid-template-columns: repeat(3, 1fr);
@@ -347,10 +485,60 @@ const YEARS = [2026, 2025, 2024, 2023];
     }
   }
 
-  @media (max-width: 420px) {
+  @media (max-width: 499px) {
+    /* HERO: matches the other pages' mobile header — same height, centred text */
+    .artists-hero {
+      min-height: 33.6vh;
+      align-items: center;
+    }
+
+    .artists-hero-content {
+      text-align: center;
+    }
+
+    .year-switcher {
+      justify-content: center;
+    }
+
+    /* CONTROLS: search bar and genre dropdown stack full-width instead of
+       sitting side by side, and the dropdown panel matches that full width. */
+    .artists-controls {
+      flex-direction: column;
+    }
+
+    .artist-search-wrap,
+    .genre-dropdown,
+    .genre-dropdown-toggle {
+      max-width: none;
+      width: 100%;
+    }
+
+    .genre-dropdown-panel {
+      width: 100%;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* ARTISTS GRID: one full-width card per row, same photo ratio as
+       desktop — just scaled up to fill the phone screen. */
     .artists-grid {
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-2);
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+    }
+  }
+
+  @media (min-width: 500px) and (max-width: 850px) {
+    /* General tablet shrink — matches the other pages' mobile header */
+    .artists-hero {
+      min-height: 38vh;
+      align-items: center;
+    }
+
+    .artists-hero-content {
+      text-align: center;
+    }
+
+    .year-switcher {
+      justify-content: center;
     }
   }
 </style>

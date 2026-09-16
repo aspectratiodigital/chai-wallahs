@@ -711,6 +711,14 @@ const stats = [
     align-items: center;
     width: max-content;
     animation: festivals-scroll 32s linear infinite;
+    /* Promote to its own compositor layer and keep it there for the whole
+       animation — without this, Chromium can drop the masked logos (each
+       one its own -webkit-mask-image layer) from the paint tree mid-scroll
+       and only repaint them once something else forces a layout, which
+       reads as the marquee randomly going blank then snapping back. */
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
   }
 
   .festivals-set {
@@ -722,10 +730,10 @@ const stats = [
 
   @keyframes festivals-scroll {
     from {
-      transform: translateX(0);
+      transform: translate3d(0, 0, 0);
     }
     to {
-      transform: translateX(-50%);
+      transform: translate3d(-50%, 0, 0);
     }
   }
 
@@ -742,6 +750,10 @@ const stats = [
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
     mask-position: center;
+    /* Each masked logo gets its own compositor layer too, not just the
+       track — otherwise Chromium can still drop individual logos mid-scroll
+       even with the track itself promoted. */
+    transform: translateZ(0);
   }
 
   .festival-logo--big {

@@ -17,6 +17,10 @@ const formattedDate = date.toLocaleDateString("en-GB", {
   month: "short",
   year: "numeric",
 });
+
+// Tickets are no longer purchasable once the event's happened, so the CTA
+// only ever shows for events still ahead of us.
+const isPast = date < new Date();
 ---
 
 <a href={`${basePath}${event.id}/`} class:list={["event-card", { featured }]}>
@@ -28,7 +32,7 @@ const formattedDate = date.toLocaleDateString("en-GB", {
     <h3>{title}</h3>
     <p class="event-blurb">{blurb}</p>
     {
-      ticketUrl && (
+      ticketUrl && !isPast && (
         <span class="btn btn-outline">Get Tickets</span>
       )
     }
