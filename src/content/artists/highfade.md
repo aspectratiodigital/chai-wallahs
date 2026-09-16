@@ -10,3 +10,4 @@ socials:
 spotifyTrackUrl: "https://open.spotify.com/track/2lnXiFWGvgZLtjREZhVAni"
 ---
 
+On a three-man crusade to set dance floors alight with their inimitable brand of razor-sharp funk and disco, Edinburgh's High Fade captured the attention of a global audience with their music amassing over 30 million views and streams within six months of their first release and, in the process, gaining recognition from music heavyweights including Jack Black and Cypress Hill.

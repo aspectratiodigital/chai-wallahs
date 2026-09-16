@@ -9,3 +9,4 @@ socials:
   - { platform: "youtube", url: "https://www.youtube.com/channel/UCqAiJmwZDYEC1oUeNhtrhkw" }
 ---
 
+Formerly known as Little Thief, Oswald Slain's sound is a rich tapestry woven from the threads of classic Americana, echoing the timeless vibes of Neil Young and The Band, whilst infusing it with the gritty, energetic rock essence familiar from their previous works. Anchored by the driving rhythms and fuzzy guitars, their music offers both reflective depth and an irresistible groove, promising music that resonates with both heart and soul.

@@ -11,3 +11,4 @@ socials:
 spotifyTrackUrl: "https://open.spotify.com/track/1DrbmGpKGFfyKDVnSH3UcY"
 ---
 
+Bristol based, collaborative ensemble that have that uncanny ability to find that perfect line between pop and experimentation. They achieve a rare and colourful psychedelic minimalism that is strikingly engaging. Bone-melting. Intravenous cup-a-soup. Intimacy. A unique and bright collage of dead-good. Not for the faint of constitution. For divers, not paddlers.

@@ -10,3 +10,4 @@ socials:
   - { platform: "twitter", url: "https://twitter.com/BeatlesDubClub?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor" }
 ---
 
+A special mix brought together by DJ Chris Arnold showcasing a collection of covers, remixes, mashups as well as tunes that sampled arguably the greatest band that ever existed - The Beatles. Expect to hear plenty of reggae, ska, latin, hip hop, funk and even drum & bass takes on the wonderful music created by John, Paul, George & Ringo.

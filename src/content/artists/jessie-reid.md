@@ -10,3 +10,4 @@ socials:
 spotifyTrackUrl: "https://open.spotify.com/track/7grprmWr6Pyo6HjEzKpi8O"
 ---
 
+Jessie Reid is a Shropshire-based singer-songwriter whose soulful, folk-inspired music has been featured on Made in Chelsea, Love Island, and BBC 6 Music. With over 8 million Spotify streams, she played Glastonbury Acoustic Stage 2024 and continues to captivate audiences with her distinctive percussive guitar style and evocative songwriting.
