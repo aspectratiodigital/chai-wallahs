@@ -81,11 +81,12 @@ const artists = defineCollection({
     image: z.string(),
     socials: z.array(z.object({ platform: z.string(), url: z.string().url() })).default([]),
     years: z.array(z.number()),
-    // The Spotify Artist ID (found in their Spotify URL: open.spotify.com/artist/<this>).
-    // Set once per artist - the actual featured track is looked up fresh from Spotify's
-    // API at build time (see src/lib/spotify.ts), so it stays current as artists release
-    // new music without ever needing to be updated by hand.
-    spotifyArtistId: z.string().optional(),
+    // A track to feature via Spotify's embed player - paste either the
+    // full share link (open.spotify.com/track/...) or just the bare
+    // track ID; whichever is easiest when copying it from Spotify's own
+    // "Share" menu. Update this whenever there's a new track worth
+    // featuring - there's no API involved, so nothing updates itself.
+    spotifyTrackUrl: z.string().optional(),
   }),
 });
 

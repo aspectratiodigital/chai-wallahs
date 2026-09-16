@@ -4,7 +4,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 import sharp from "sharp";
-import { getMostPopularTrack } from "../../lib/spotify";
 
 import FacebookIcon from "../../assets/images/social/facebook.png";
 import InstagramIcon from "../../assets/images/social/instagram.png";
@@ -30,26 +29,19 @@ const PLATFORM_LABEL: Record<string, string> = {
 
 export async function getStaticPaths() {
   const artists = await getCollection("artists");
-  // Fetched once per build, not per page view: each artist's current
-  // most-popular track (per Spotify's own popularity score), looked up
-  // fresh so it tracks new releases without anyone updating a link by
-  // hand. Artists without a spotifyArtistId, or any lookup that fails,
-  // just get no player - never blocks the rest of the build.
-  return Promise.all(
-    artists.map(async (artist) => {
-      const topTrack = artist.data.spotifyArtistId
-        ? await getMostPopularTrack(artist.data.spotifyArtistId)
-        : null;
-      return {
-        params: { slug: artist.id },
-        props: { artist, topTrack },
-      };
-    }),
-  );
+  return artists.map((artist) => ({
+    params: { slug: artist.id },
+    props: { artist },
+  }));
 }
 
-const { artist, topTrack } = Astro.props;
-const { name, genres, image, socials } = artist.data;
+const { artist } = Astro.props;
+const { name, genres, image, socials, spotifyTrackUrl } = artist.data;
+
+// Accepts either a full share link (open.spotify.com/track/<id>...) or a
+// bare track ID pasted straight in - whichever was easiest when copying
+// it from Spotify's own "Share" menu.
+const spotifyTrackId = spotifyTrackUrl?.match(/track\/([a-zA-Z0-9]+)/)?.[1] ?? spotifyTrackUrl ?? null;
 const { Content } = await render(artist);
 const hasBody = (artist.body ?? "").trim().length > 0;
 
@@ -134,18 +126,18 @@ try {
     </div>
 
     {
-      topTrack && (
+      spotifyTrackId && (
         <div class="wrap artist-spotify-wrap">
-          <p class="spotify-eyebrow">Listen — {topTrack.name}</p>
+          <p class="spotify-eyebrow">Listen on Spotify</p>
           <iframe
             class="spotify-embed"
-            src={`https://open.spotify.com/embed/track/${topTrack.id}?theme=0`}
+            src={`https://open.spotify.com/embed/track/${spotifyTrackId}?theme=0`}
             width="100%"
             height="152"
             frameborder="0"
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
             loading="lazy"
-            title={`${name} on Spotify — ${topTrack.name}`}
+            title={`${name} on Spotify`}
           />
         </div>
       )
