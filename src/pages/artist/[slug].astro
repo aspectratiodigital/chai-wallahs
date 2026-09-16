@@ -59,19 +59,29 @@ const hasBody = (artist.body ?? "").trim().length > 0;
 const NAME_MAX_PX = 88.32; // the hard ceiling - same size for every name
 const NAME_HALF_PX = NAME_MAX_PX / 2;
 
+// Manual overrides for artists whose name colour shouldn't follow the
+// automatic photo-luma logic below - keyed by content slug.
+const NAME_COLOR_OVERRIDES: Record<string, string> = {
+  samana: "var(--chai-gold)",
+};
+
 // White by default. Only switch to gold when the photo is light enough
 // that white would clash against it - never black.
 let nameColor = "var(--off-white)";
-try {
-  const filePath = path.join(process.cwd(), "public", image.replace(/^\//, ""));
-  const { channels } = await sharp(filePath).stats();
-  const [r, g, b] = channels;
-  const meanLuma = 0.299 * r.mean + 0.587 * g.mean + 0.114 * b.mean;
-  if (meanLuma > 150) {
-    nameColor = "var(--chai-gold)";
+if (artist.id in NAME_COLOR_OVERRIDES) {
+  nameColor = NAME_COLOR_OVERRIDES[artist.id];
+} else {
+  try {
+    const filePath = path.join(process.cwd(), "public", image.replace(/^\//, ""));
+    const { channels } = await sharp(filePath).stats();
+    const [r, g, b] = channels;
+    const meanLuma = 0.299 * r.mean + 0.587 * g.mean + 0.114 * b.mean;
+    if (meanLuma > 150) {
+      nameColor = "var(--chai-gold)";
+    }
+  } catch {
+    // Fall back to white above if the file can't be read.
   }
-} catch {
-  // Fall back to white above if the file can't be read.
 }
 ---
 
@@ -126,6 +136,16 @@ try {
     </div>
 
     {
+      hasBody && (
+        <div class="wrap artist-about-wrap">
+          <div class="artist-about-body">
+            <Content />
+          </div>
+        </div>
+      )
+    }
+
+    {
       spotifyTrackId && (
         <div class="wrap artist-spotify-wrap">
           <p class="spotify-eyebrow">Listen on Spotify</p>
@@ -139,16 +159,6 @@ try {
             loading="lazy"
             title={`${name} on Spotify`}
           />
-        </div>
-      )
-    }
-
-    {
-      hasBody && (
-        <div class="wrap artist-about-wrap">
-          <div class="artist-about-body">
-            <Content />
-          </div>
         </div>
       )
     }
@@ -285,7 +295,7 @@ try {
   }
 
   .artist-socials-strip a[data-platform="youtube"] .social-icon {
-    width: 151px;
+    width: 181px;
   }
 
   .artist-socials-strip a:hover .social-icon {
@@ -319,7 +329,7 @@ try {
 
   .artist-spotify-wrap {
     max-width: 560px;
-    margin-bottom: var(--space-5);
+    margin-top: var(--space-5);
   }
 
   .spotify-eyebrow {
@@ -328,7 +338,7 @@ try {
     font-size: 0.8rem;
     letter-spacing: 0.08em;
     color: var(--chai-gold);
-    margin: 0 0 var(--space-1);
+    margin: 0 0 var(--space-3);
   }
 
   .spotify-embed {
@@ -364,7 +374,7 @@ try {
     }
 
     .artist-socials-strip a[data-platform="youtube"] .social-icon {
-      width: 151px;
+      width: 181px;
     }
 
     .artist-about-body :global(p) {
