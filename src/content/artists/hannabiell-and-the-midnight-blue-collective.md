@@ -2,11 +2,12 @@
 name: "HANNABIELL & THE MIDNIGHT BLUE COLLECTIVE"
 genres: ["LATIN", "JAZZ", "AFRO", "FUNK", "BLUES"]
 image: "/uploads/artists/hannabiell-and-the-midnight-blue-collective.jpg"
-years: [2024, 2025]
+years: [2023, 2024, 2025]
 socials:
   - { platform: "facebook", url: "https://www.facebook.com/hannabiellandmidnightblue" }
   - { platform: "instagram", url: "https://www.instagram.com/hannabiellandmidnightblue/" }
   - { platform: "youtube", url: "https://www.youtube.com/playlist?list=PLrjgvOJgwEnHM0CcIb_yXv7c1W4MhH5l-" }
+  - { platform: "twitter", url: "https://twitter.com/Hannabiell" }
 spotifyTrackUrl: "https://open.spotify.com/track/6r0XotBTME3kf4jA04uvs2"
 ---
 

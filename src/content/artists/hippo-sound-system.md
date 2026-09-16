@@ -1,8 +1,8 @@
 ---
 name: "HIPPO SOUND SYSTEM"
-genres: ["DANCE", "LATIN", "DRUM & BASS"]
+genres: ["DANCE", "BLUES", "LATIN", "DRUM & BASS"]
 image: "/uploads/artists/hippo-sound-system.jpg"
-years: [2026]
+years: [2023, 2024, 2025, 2026]
 socials:
   - { platform: "facebook", url: "https://www.facebook.com/hipposoundsystem/?locale=en_GB" }
   - { platform: "instagram", url: "https://www.instagram.com/hipposoundsystem/?hl=en-gb" }

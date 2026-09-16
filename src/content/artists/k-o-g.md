@@ -2,11 +2,12 @@
 name: "K.O.G."
 genres: ["GLOBAL", "FUSION"]
 image: "/uploads/artists/k-o-g.jpg"
-years: [2024, 2025]
+years: [2023, 2024, 2025]
 socials:
   - { platform: "facebook", url: "https://www.facebook.com/zongobrigade/" }
   - { platform: "instagram", url: "https://www.instagram.com/kogmusicuk/?hl=en" }
   - { platform: "youtube", url: "https://www.youtube.com/playlist?list=PLrjgvOJgwEnE1a9azkcLTF8TVSROUqcq4" }
+  - { platform: "twitter", url: "https://twitter.com/kogmusic1?lang=en" }
 spotifyTrackUrl: "https://open.spotify.com/track/42eaD83n4asr182640omwf"
 ---
 
