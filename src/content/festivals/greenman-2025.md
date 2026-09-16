@@ -1,7 +1,8 @@
 ---
 title: "Greenman Festival 2025"
 date: 2025-08-14
-time: "Thu 14 – Sun 17 Aug"
+endDate: 2025-08-17
+openingTime: "10:00am"
 venue: "Crickhowell"
 address: "Crickhowell NP8 1LP, UK"
 blurb: "Tumble through ten wild lands of laughs, literature, art, science, mischief and music."

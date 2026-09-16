@@ -1,7 +1,8 @@
 ---
 title: "Kendal Calling 2025"
 date: 2025-07-31
-time: "Thu 31 Jul – Sun 3 Aug"
+endDate: 2025-08-03
+openingTime: "9:00am"
 venue: "Lowther Deer Park"
 address: "Lowther, Penrith CA10 2HX, UK"
 blurb: "Music + friends + good times = Kendal Calling."

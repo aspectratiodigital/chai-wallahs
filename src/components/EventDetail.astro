@@ -16,7 +16,7 @@ const { kind, event } = Astro.props;
 const basePath = kind === "gigs" ? "/gigs/" : "/festivals/";
 const backLabel = kind === "gigs" ? "All Gigs" : "All Festivals";
 
-const { title, date, time, venue, address, blurb, ticketUrl, image, poster } = event.data;
+const { title, date, time, endDate, openingTime, venue, address, blurb, ticketUrl, image, poster } = event.data;
 const { Content } = await render(event);
 
 const posterSrc = poster ?? image;
@@ -52,6 +52,27 @@ const formattedDate = date.toLocaleDateString("en-GB", {
   month: "long",
   year: "numeric",
 });
+
+// Festivals: when a real end date is known, the Date row shows the full
+// span and "Time" becomes "Opening Time" (the first day's gate/doors time)
+// instead of duplicating that same span. Gigs never touch this - single
+// date, plain "Time" label, as before.
+const WEEKDAY_ABBR = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH_ABBR = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+function formatFestivalRange(start: Date, end: Date) {
+  const sameMonth = start.getUTCMonth() === end.getUTCMonth() && start.getUTCFullYear() === end.getUTCFullYear();
+  const startStr = `${WEEKDAY_ABBR[start.getUTCDay()]} ${start.getUTCDate()}${sameMonth ? "" : ` ${MONTH_ABBR[start.getUTCMonth()]}`}`;
+  const endStr = `${WEEKDAY_ABBR[end.getUTCDay()]} ${end.getUTCDate()} ${MONTH_ABBR[end.getUTCMonth()]} ${end.getUTCFullYear()}`;
+  return `${startStr} – ${endStr}`;
+}
+
+const isFestival = kind === "festivals";
+const dateDisplay = isFestival && endDate ? formatFestivalRange(date, endDate) : formattedDate;
+const timeLabel = isFestival ? "Opening Time" : "Time";
+const timeValue = isFestival ? openingTime : time;
 ---
 
 <BaseLayout title={title} description={blurb}>
@@ -82,13 +103,13 @@ const formattedDate = date.toLocaleDateString("en-GB", {
       <div class="event-info-card">
         <div class="info-row">
           <span class="info-label">Date</span>
-          <span class="info-value">{formattedDate}</span>
+          <span class="info-value">{dateDisplay}</span>
         </div>
         {
-          time && (
+          timeValue && (
             <div class="info-row">
-              <span class="info-label">Time</span>
-              <span class="info-value">{time}</span>
+              <span class="info-label">{timeLabel}</span>
+              <span class="info-value">{timeValue}</span>
             </div>
           )
         }
@@ -118,9 +139,11 @@ const formattedDate = date.toLocaleDateString("en-GB", {
         )
       }
 
-      <h2 class="about-heading">About This Event</h2>
-      <div class="event-about-body">
-        {hasBody ? <Content /> : <p>{blurb}</p>}
+      <div class="event-about-wrap" id="event-about-wrap">
+        <h2 class="about-heading">About This Event</h2>
+        <div class="event-about-body">
+          {hasBody ? <Content /> : <p>{blurb}</p>}
+        </div>
       </div>
     </div>
   </section>
@@ -260,8 +283,21 @@ const formattedDate = date.toLocaleDateString("en-GB", {
     margin-bottom: var(--space-4);
   }
 
+  /* By default this sits in the normal float-wrap flow beside the poster.
+     A small script (below) forces it below the poster instead, at full
+     width, whenever the whole block doesn't fit in the space remaining
+     beside the image - never letting it wrap partially. */
+  .event-about-wrap {
+    margin-top: var(--space-2);
+  }
+
+  .event-about-wrap.force-below {
+    clear: both;
+  }
+
   .about-heading {
     color: var(--off-white);
+    font-size: clamp(1.7rem, 2.6vw + 1rem, 2.5rem);
     margin-bottom: var(--space-3);
   }
 
@@ -312,3 +348,39 @@ const formattedDate = date.toLocaleDateString("en-GB", {
     }
   }
 </style>
+
+<script>
+  // The poster is a float, so by default About This Event wraps into any
+  // space left beside it - including partially, if it's taller than that
+  // remaining space. That partial wrap looks broken, so: measure whether
+  // the whole block (heading + body) fits above the poster's bottom edge,
+  // and force it below at full width if not. Re-checked on resize since
+  // wrapping depends on viewport width.
+  function layoutAbout() {
+    const poster = document.querySelector<HTMLElement>(".event-poster-frame");
+    const about = document.querySelector<HTMLElement>("#event-about-wrap");
+    if (!poster || !about) return;
+
+    // Reset first so we're always measuring the natural float-wrap position,
+    // not a forced-below state left over from a wider viewport.
+    about.classList.remove("force-below");
+
+    const isFloating = getComputedStyle(poster).float !== "none";
+    if (!isFloating) return; // mobile: already stacked, nothing to do
+
+    const posterBottom = poster.getBoundingClientRect().bottom;
+    const aboutRect = about.getBoundingClientRect();
+    const tolerance = 2; // guard against sub-pixel rounding flicker
+
+    const startedBesideImage = aboutRect.top < posterBottom - tolerance;
+    const overflowsPastImage = aboutRect.bottom > posterBottom + tolerance;
+
+    if (startedBesideImage && overflowsPastImage) {
+      about.classList.add("force-below");
+    }
+  }
+
+  layoutAbout();
+  window.addEventListener("resize", layoutAbout);
+  document.fonts?.ready?.then(layoutAbout);
+</script>

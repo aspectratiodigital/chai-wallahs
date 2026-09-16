@@ -8,6 +8,13 @@ const eventSchema = z.object({
   title: z.string(),
   date: z.coerce.date(),
   time: z.string().optional(),
+  // Festivals only: when a festival runs across multiple days, endDate marks
+  // the last day (the "Date" row then shows the full start-end range) and
+  // openingTime holds the actual first-day gate/doors time (the "Time" row
+  // becomes "Opening Time"). Gigs never set these and keep using `time` as
+  // a plain single-day time string, label "Time".
+  endDate: z.coerce.date().optional(),
+  openingTime: z.string().optional(),
   venue: z.string().optional(),
   address: z.string().optional(),
   blurb: z.string(),

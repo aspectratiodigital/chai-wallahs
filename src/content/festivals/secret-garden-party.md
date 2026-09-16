@@ -1,7 +1,8 @@
 ---
 title: "Secret Garden Party"
 date: 2024-07-25
-time: "Thu 25 – Sun 28 Jul"
+endDate: 2024-07-28
+openingTime: "9:00am"
 venue: "Abbots Ripton"
 address: "Abbots Ripton, Huntingdon PE28, UK"
 blurb: "With 'Secret Garden Party: Roots', a new beginning, with fresh frivolity and new collectives."
