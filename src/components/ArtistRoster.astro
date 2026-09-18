@@ -190,15 +190,20 @@ const YEARS = [2026, 2025, 2024, 2023];
 
   initArtistFilters();
 
-  // Cards fade/rise in as they scroll into view, and reset back out if
-  // scrolled back past — both directions toggle the same class, so if a
-  // card is already visible on load (nothing to reveal) it just stays put.
+  // Cards fade/rise in as they scroll into view, and only reset back out
+  // once scrolled back up past them. A card that exits through the *top*
+  // of the viewport (scrolling down past it) stays loaded in — only an
+  // exit through the *bottom* (scrolling back up past it) hides it again.
   const revealCards = document.querySelectorAll<HTMLElement>("[data-artist-card]");
   if (revealCards.length) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          entry.target.classList.toggle("is-visible", entry.isIntersecting);
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+          } else if (entry.boundingClientRect.top >= 0) {
+            entry.target.classList.remove("is-visible");
+          }
         });
       },
       { threshold: 0.15, rootMargin: "0px 0px -5% 0px" },

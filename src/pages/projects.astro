@@ -41,7 +41,7 @@ const developed = [
 
   <!-- WHERE IT ALL BEGAN -->
   <section class="section wiab-feature">
-    <div class="wrap wiab-feature-grid" data-reveal>
+    <div class="wrap wiab-feature-grid">
       <div class="wiab-feature-media">
         <Image src={WiabPhoto} alt="Crowd at Where It All Began" width={900} height={1100} class="wiab-feature-photo" />
       </div>
@@ -63,9 +63,9 @@ const developed = [
 
   <!-- GRASSROOTS SUPPORTER -->
   <section class="grassroots-band">
-    <div class="wrap grassroots-grid" data-reveal>
+    <div class="wrap grassroots-grid">
       <div class="grassroots-copy">
-        <Image src={GrassrootsLogo} alt="" width={150} height={36} class="grassroots-logo" />
+        <Image src={GrassrootsLogo} alt="" width={220} height={53} class="grassroots-logo" />
         <p class="eyebrow">&gt; The Bigger Picture</p>
         <h2>Grassroots <Highlight color="ember" rotate={1.2}>Supporter</Highlight></h2>
         <p>
@@ -90,7 +90,7 @@ const developed = [
 
   <!-- ARTIST DEVELOPMENT -->
   <section class="section artist-dev">
-    <div class="wrap" data-reveal>
+    <div class="wrap">
       <p class="eyebrow artist-dev-label">&gt; Artist Development</p>
       <h2>What Chai Wallahs<br class="artist-dev-break" /> helps <Highlight rotate={-1}>grow</Highlight></h2>
       <p class="artist-dev-intro">
@@ -121,22 +121,6 @@ const developed = [
   </section>
 </BaseLayout>
 
-<script>
-  // Sections rise/fade into view as they scroll past, and settle back out if
-  // scrolled past again — same treatment used on the artist and events grids.
-  const revealSections = document.querySelectorAll<HTMLElement>("[data-reveal]");
-  if (revealSections.length) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          entry.target.classList.toggle("is-visible", entry.isIntersecting);
-        });
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -5% 0px" },
-    );
-    revealSections.forEach((el) => observer.observe(el));
-  }
-</script>
 
 <style>
   /* HERO — matches the About/Gigs/Festivals hero height, centred like the
@@ -190,18 +174,6 @@ const developed = [
     margin: var(--space-2) auto 0;
     opacity: 0.9;
     font-size: 1.05rem;
-  }
-
-  /* Shared reveal-on-scroll for the three feature sections below the hero */
-  [data-reveal] {
-    opacity: 0;
-    transform: translateY(32px);
-    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  [data-reveal].is-visible {
-    opacity: 1;
-    transform: translateY(0);
   }
 
   /* WIAB FEATURE */
@@ -277,6 +249,8 @@ const developed = [
 
   .grassroots-logo {
     display: block;
+    width: clamp(180px, 22vw, 220px);
+    height: auto;
     margin-bottom: var(--space-2);
   }
 
@@ -444,6 +418,10 @@ const developed = [
 
     .dev-grid {
       grid-template-columns: 1fr;
+    }
+
+    .grassroots-logo {
+      width: clamp(180px, 40vw, 220px);
     }
   }
 

@@ -190,16 +190,16 @@ collections:
         label: Contact Page
         file: src/content/site/contact.json
         fields:
-          - label: "The 3 track boxes"
+          - label: "The 4 track boxes"
             name: tracks
             widget: list
             fields:
-              - { label: "ID (must stay artists / crew / production — controls icon)", name: id, widget: select, options: [artists, crew, production] }
+              - { label: "ID (must stay artists / crew / production / grassroots-supporter — controls icon)", name: id, widget: select, options: [artists, crew, production, grassroots-supporter] }
               - { label: Title, name: title, widget: string }
               - { label: Body text, name: text, widget: text }
               - { label: Button text, name: cta, widget: string }
               - { label: "Email subject line", name: subject, widget: string }
-              - { label: "Box colour", name: color, widget: select, options: [ember, velvet, crown] }
+              - { label: "Box colour", name: color, widget: select, options: [ember, velvet, crown, gold] }
 
       - name: wiab
         label: "Where It All Began Page"

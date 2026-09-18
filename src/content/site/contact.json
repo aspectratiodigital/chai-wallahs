@@ -4,7 +4,7 @@
       "id": "artists",
       "title": "Artists",
       "text": "To perform on our stage, fill in the sheet and come fill our tent, with big songs and phat beats. We're welcoming submissions for 2027 — send your most up-to-date videos, tracks, and biog to show us where you are now as performers.",
-      "cta": "Apply to Play",
+      "cta": "Join The Movement",
       "subject": "2027 Artist Application",
       "color": "ember"
     },
@@ -23,6 +23,14 @@
       "cta": "Discuss Your Event",
       "subject": "Event Production Enquiry",
       "color": "crown"
+    },
+    {
+      "id": "grassroots-supporter",
+      "title": "Grassroots Supporter",
+      "text": "Interested in backing the wider grassroots cause we work towards — beyond the stage and the bar? Get in touch to find out how you can support the movement.",
+      "cta": "Get Involved",
+      "subject": "Grassroots Supporter Enquiry",
+      "color": "gold"
     }
   ]
 }
