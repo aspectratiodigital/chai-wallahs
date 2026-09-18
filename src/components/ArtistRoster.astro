@@ -194,6 +194,21 @@ const YEARS = [2026, 2025, 2024, 2023];
   // once scrolled back up past them. A card that exits through the *top*
   // of the viewport (scrolling down past it) stays loaded in — only an
   // exit through the *bottom* (scrolling back up past it) hides it again.
+  // The scroll-direction check (not just position) matters: right at the
+  // observer's own margin line, a slow scroll can cross back and forth and
+  // fire an exit even while still net-scrolling the same way - gating the
+  // hide on "was this exit caused by an upward scroll" stops that flicker.
+  let lastScrollY = window.scrollY;
+  let scrollingUp = false;
+  window.addEventListener(
+    "scroll",
+    () => {
+      scrollingUp = window.scrollY < lastScrollY;
+      lastScrollY = window.scrollY;
+    },
+    { passive: true },
+  );
+
   const revealCards = document.querySelectorAll<HTMLElement>("[data-artist-card]");
   if (revealCards.length) {
     const observer = new IntersectionObserver(
@@ -201,7 +216,7 @@ const YEARS = [2026, 2025, 2024, 2023];
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("is-visible");
-          } else if (entry.boundingClientRect.top >= 0) {
+          } else if (scrollingUp && entry.boundingClientRect.top >= 0) {
             entry.target.classList.remove("is-visible");
           }
         });
