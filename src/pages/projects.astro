@@ -337,16 +337,28 @@ const developed = [
     border-color: var(--chai-gold);
   }
 
+  /* The media box's height is fractional (4:3 of a fluid width), so its bottom
+     edge lands mid-pixel. While the card lifts and the photo scales on hover,
+     that anti-aliased last row let the card background show through as a thin
+     line. The picture and scrim therefore overscan the clip edge by a pixel,
+     over an opaque backing, on their own stable layer. */
   .dev-card-media {
     position: relative;
     aspect-ratio: 4 / 3;
     overflow: hidden;
+    background: var(--stage-black);
+    isolation: isolate;
+    transform: translateZ(0);
   }
 
   .dev-card-media :global(img) {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: -1px;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    max-width: none;
     object-fit: cover;
+    backface-visibility: hidden;
     transition: transform 0.4s ease;
   }
 
@@ -356,7 +368,7 @@ const developed = [
 
   .dev-card-scrim {
     position: absolute;
-    inset: 0;
+    inset: -1px;
     background: linear-gradient(180deg, rgba(27, 21, 17, 0) 55%, rgba(27, 21, 17, 0.85) 100%);
   }
 

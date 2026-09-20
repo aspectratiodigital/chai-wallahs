@@ -9,7 +9,7 @@ import DirectBg from "../assets/images/backgrounds/plum-2.png";
 import ArtistIcon from "../assets/images/symbols/white/Artist.png";
 import CrewIcon from "../assets/images/symbols/white/Crew.png";
 import VenueIcon from "../assets/images/symbols/white/Venue.png";
-import RootsIcon from "../assets/images/symbols/white/Roots1.png";
+import CultureIcon from "../assets/images/symbols/white/Culture.png";
 import FacebookIcon from "../assets/images/social/facebook.png";
 import InstagramIcon from "../assets/images/social/instagram.png";
 import YoutubeIcon from "../assets/images/social/youtube.png";
@@ -29,7 +29,7 @@ const trackVisuals: Record<string, { icon: ImageMetadata; rotate: number }> = {
   artists: { icon: ArtistIcon, rotate: -1.2 },
   crew: { icon: CrewIcon, rotate: 0.8 },
   production: { icon: VenueIcon, rotate: -0.8 },
-  "grassroots-supporter": { icon: RootsIcon, rotate: 1 },
+  "grassroots-supporter": { icon: CultureIcon, rotate: 1 },
 };
 
 const siteContent = await getEntry("site", "contact");
@@ -132,11 +132,11 @@ const tracks = (siteContent?.data.tracks ?? []).map((t) => ({
   }
 
   .tracks {
-    max-width: calc(var(--content-max) * 0.85);
+    max-width: var(--content-max);
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     align-items: stretch;
-    gap: var(--space-5);
+    gap: var(--space-3);
   }
 
   .tracks :global(.track) {
