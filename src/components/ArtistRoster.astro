@@ -160,6 +160,19 @@ const YEARS = [2026, 2025, 2024, 2023];
       });
     });
 
+    // Arriving from a genre tag on an artist page (/artists/?genre=hip-hop):
+    // start with that genre already selected and the grid filtered to it.
+    const preselected = new URLSearchParams(window.location.search).get("genre")?.toLowerCase();
+    if (preselected) {
+      const pill = genrePills.find((p) => p.dataset.genrePill === preselected);
+      if (pill) {
+        activeGenres.add(preselected);
+        pill.classList.add("active");
+        updateGenreToggleLabel();
+        applyFilters();
+      }
+    }
+
     // Dropdown floats over the artist grid rather than push it down the
     // page — opens on click, closes on an outside click, a re-click, or Escape.
     function closeGenrePanel() {
@@ -168,10 +181,44 @@ const YEARS = [2026, 2025, 2024, 2023];
       genreToggle.setAttribute("aria-expanded", "false");
     }
 
+    // Mobile only: reorder the pills (first-fit, widest first) so each row is
+    // as full as it can be; the CSS then stretches every row to the panel's
+    // width. Desktop keeps the alphabetical order the pills were rendered in.
+    const alphabetical = [...genrePills];
+    function packGenrePills() {
+      if (!genrePanel) return;
+      if (!window.matchMedia("(max-width: 499px)").matches) {
+        genrePanel.append(...alphabetical);
+        return;
+      }
+      if (genrePanel.hidden) return;
+      const cs = getComputedStyle(genrePanel);
+      const gap = parseFloat(cs.columnGap) || 8;
+      const avail = genrePanel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      alphabetical.forEach((p) => (p.style.flex = "0 0 auto"));
+      const items = alphabetical.map((p) => ({ p, w: p.getBoundingClientRect().width })).sort((a, b) => b.w - a.w);
+      alphabetical.forEach((p) => (p.style.flex = ""));
+      const rows: { pills: HTMLElement[]; used: number }[] = [];
+      for (const { p, w } of items) {
+        const row = rows.find((r) => (r.pills.length ? r.used + gap + w : w) <= avail);
+        if (row) {
+          row.used = row.pills.length ? row.used + gap + w : w;
+          row.pills.push(p);
+        } else rows.push({ pills: [p], used: w });
+      }
+      genrePanel.append(...rows.flatMap((r) => r.pills));
+      // A short last row would stretch a lone pill across the whole panel, so
+      // leave it at its natural width instead.
+      const last = rows[rows.length - 1];
+      if (rows.length > 1 && last.used < avail * 0.55) last.pills.forEach((p) => (p.style.flex = "0 0 auto"));
+    }
+    window.addEventListener("resize", packGenrePills);
+
     function openGenrePanel() {
       if (!genrePanel || !genreToggle) return;
       genrePanel.hidden = false;
       genreToggle.setAttribute("aria-expanded", "true");
+      packGenrePills();
     }
 
     genreToggle?.addEventListener("click", () => {
@@ -455,8 +502,9 @@ const YEARS = [2026, 2025, 2024, 2023];
     font-weight: 700;
     background: transparent;
     border: 2px solid rgba(239, 239, 239, 0.3);
-    border-radius: 8px;
-    padding: 0.6em 0.5em;
+    /* Same hand-drawn wobble as the year buttons and search bar. */
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    padding: 0.6em 1em;
     cursor: pointer;
     transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
@@ -505,6 +553,36 @@ const YEARS = [2026, 2025, 2024, 2023];
     }
   }
 
+  /* GENRE FILTER: the dropdown (toggle + floating panel) is a mobile-only
+     pattern — space is tight there, so collapsing it behind a toggle earns
+     its keep. From tablet width up there's room to just show every genre
+     inline as a free-flowing row of pills, each sized to its own label
+     rather than forced into a uniform grid. */
+  @media (min-width: 500px) {
+    .genre-dropdown-toggle {
+      display: none;
+    }
+
+    .genre-dropdown-panel {
+      display: flex !important;
+      flex-wrap: wrap;
+      position: static;
+      width: auto;
+      max-width: none;
+      max-height: none;
+      overflow: visible;
+      gap: 0.6rem;
+      padding: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .genre-pill {
+      flex: 0 0 auto;
+    }
+  }
+
   @media (max-width: 499px) {
     /* HERO: matches the other pages' mobile header — same height, centred text */
     .artists-hero {
@@ -533,9 +611,21 @@ const YEARS = [2026, 2025, 2024, 2023];
       width: 100%;
     }
 
+    /* The panel shows every genre at its full length (no inner scrollbar), using
+       the same pills as desktop — each as wide as its own label — packed
+       (see packGenrePills) and stretched so every row fills the panel edge to
+       edge, whatever the phone width. */
     .genre-dropdown-panel {
       width: 100%;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      max-height: none;
+      overflow: visible;
+    }
+
+    .genre-pill {
+      flex: 1 1 auto;
     }
 
     /* ARTISTS GRID: one full-width card per row, same photo ratio as

@@ -1,0 +1,571 @@
+---
+// The ORIGINAL artist page design, kept so it can be compared with (or
+// restored over) the current one — see [slug].astro for which artists use it.
+import path from "node:path";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import { render, type CollectionEntry } from "astro:content";
+import sharp from "sharp";
+
+import FacebookIcon from "../assets/images/social/facebook.png";
+import InstagramIcon from "../assets/images/social/instagram.png";
+import YoutubeIcon from "../assets/images/social/youtube.png";
+import TiktokIcon from "../assets/images/social/tiktok.svg";
+import XIcon from "../assets/images/social/x.svg";
+
+const PLATFORM_ICON: Record<string, ImageMetadata> = {
+  facebook: FacebookIcon,
+  instagram: InstagramIcon,
+  youtube: YoutubeIcon,
+  tiktok: TiktokIcon,
+  twitter: XIcon,
+};
+
+const PLATFORM_LABEL: Record<string, string> = {
+  facebook: "Facebook",
+  instagram: "Instagram",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  twitter: "X",
+};
+
+interface Props {
+  artist: CollectionEntry<"artists">;
+}
+
+const { artist } = Astro.props;
+const { name, genres, image, socials, spotifyTrackUrl } = artist.data;
+
+// Accepts either a full share link (open.spotify.com/track/<id>...) or a
+// bare track ID pasted straight in - whichever was easiest when copying
+// it from Spotify's own "Share" menu.
+const spotifyTrackId = spotifyTrackUrl?.match(/track\/([a-zA-Z0-9]+)/)?.[1] ?? spotifyTrackUrl ?? null;
+const { Content } = await render(artist);
+const hasBody = (artist.body ?? "").trim().length > 0;
+
+// The name runs as vertical text straddling the photo's right edge, at
+// one fixed size (NAME_MAX_PX) for every artist - short names like
+// "Birty" fit on one line; longer ones wrap onto additional lines rather
+// than shrinking, so the font size never has to vary by name length.
+// writing-mode: vertical-rl stacks wrapped lines right-to-left, so the
+// *first* line of the name (in reading order) lands on the photo's right
+// edge and straddles it, with later lines continuing further left, fully
+// on the photo - e.g. "TC & The Groove Family" wraps to "TC & THE" at
+// the edge, "GROOVE FAMILY" to its left. JS (below) sets the height that
+// triggers wrapping, since that depends on the genre text's real
+// rendered position.
+const NAME_MAX_PX = 88.32; // the hard ceiling - same size for every name
+const NAME_HALF_PX = NAME_MAX_PX / 2;
+
+// Manual overrides for artists whose name colour shouldn't follow the
+// automatic photo-luma logic below - keyed by content slug.
+const NAME_COLOR_OVERRIDES: Record<string, string> = {
+  samana: "var(--chai-gold)",
+};
+
+// White by default. Only switch to gold when the photo is light enough
+// that white would clash against it - never black.
+let nameColor = "var(--off-white)";
+if (artist.id in NAME_COLOR_OVERRIDES) {
+  nameColor = NAME_COLOR_OVERRIDES[artist.id];
+} else {
+  try {
+    const filePath = path.join(process.cwd(), "public", image.replace(/^\//, ""));
+    const { channels } = await sharp(filePath).stats();
+    const [r, g, b] = channels;
+    const meanLuma = 0.299 * r.mean + 0.587 * g.mean + 0.114 * b.mean;
+    if (meanLuma > 150) {
+      nameColor = "var(--chai-gold)";
+    }
+  } catch {
+    // Fall back to white above if the file can't be read.
+  }
+}
+---
+
+<BaseLayout title={name} description={genres.length ? `${name} — ${genres.join(", ")}` : name}>
+  <div class="artist-page">
+    <div class="wrap back-row">
+      <a class="eyebrow back-link" href="/artists/">&lt; Back to Artists</a>
+    </div>
+
+    <div class="wrap photo-wrap">
+      <div class="artist-photo-frame">
+        <Image src={image} alt={name} width={690} height={863} class="artist-photo" />
+
+        <div class="artist-name-strip" id="artist-name-strip" style={`translate: ${NAME_HALF_PX}px 0;`}>
+          <h1
+            class="artist-name"
+            id="artist-name"
+            data-max-font-px={NAME_MAX_PX}
+            style={`font-size: ${NAME_MAX_PX}px; color: ${nameColor};`}
+          >
+            {name}
+          </h1>
+        </div>
+
+        {
+          socials.length > 0 && (
+            <div class="artist-socials-strip">
+              {socials.map((s) => (
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${name} on ${PLATFORM_LABEL[s.platform] ?? s.platform}`}
+                  data-platform={s.platform}
+                >
+                  {PLATFORM_ICON[s.platform] ? (
+                    <span
+                      class="social-icon"
+                      style={`-webkit-mask-image:url("${PLATFORM_ICON[s.platform].src}"); mask-image:url("${PLATFORM_ICON[s.platform].src}");`}
+                    />
+                  ) : (
+                    <span class="social-fallback">{PLATFORM_LABEL[s.platform] ?? s.platform}</span>
+                  )}
+                </a>
+              ))}
+            </div>
+          )
+        }
+
+        {genres.length > 0 && <p class="artist-genre-strip">{genres.join(", ")}</p>}
+      </div>
+    </div>
+
+    {
+      hasBody && (
+        <div class="wrap artist-about-wrap">
+          <div class="artist-about-body">
+            <Content />
+          </div>
+        </div>
+      )
+    }
+
+    {
+      spotifyTrackId && (
+        <div class="wrap artist-spotify-wrap">
+          <p class="spotify-eyebrow">Listen on Spotify</p>
+          <iframe
+            class="spotify-embed"
+            src={`https://open.spotify.com/embed/track/${spotifyTrackId}?theme=0`}
+            width="100%"
+            height="152"
+            frameborder="0"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            title={`${name} on Spotify`}
+          />
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .artist-page {
+    background: var(--stage-black);
+    color: var(--off-white);
+    padding-bottom: var(--space-6);
+    overflow-x: clip;
+  }
+
+  .back-row {
+    padding-top: var(--space-3);
+  }
+
+  .back-link {
+    display: inline-block;
+    color: var(--chai-gold);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .photo-wrap {
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-5);
+    display: flex;
+    justify-content: center;
+  }
+
+  .artist-photo-frame {
+    position: relative;
+    width: 100%;
+    max-width: 644px;
+  }
+
+  .artist-photo-frame :global(.artist-photo) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  /* Name runs vertically along the photo's right edge. The translate here
+     (set inline, = half the fixed font size) shifts it right by exactly
+     half of one line's own width, so that line straddles the edge - half
+     over the image, half hanging into the black background - regardless
+     of how many lines the name wraps onto, since only the first
+     (vertical-rl-rightmost) line's position depends on this. Vertically
+     it runs from just below the photo's top to just above the genre text
+     (see TOP_OFFSET/GENRE_CLEARANCE in the script below); top here is
+     only the pre-JS fallback, refined precisely by that script. */
+  .artist-name-strip {
+    position: absolute;
+    top: 15px;
+    right: 0;
+    writing-mode: vertical-rl;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.6s ease 0.05s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s;
+  }
+
+  .artist-photo-frame.is-revealed .artist-name-strip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .artist-name {
+    margin: 0;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: normal;
+  }
+
+  /* Social icons stack along the photo's left edge toward the bottom, the
+     edge bisecting each icon the same way. Centering happens per-icon
+     (not on the shared strip) so YouTube's wider box doesn't throw off
+     where the narrower square icons land on that edge. Every icon box is
+     now the same height, so a single gap reads as truly equal spacing top
+     to bottom (no per-icon nudging needed). */
+  .artist-socials-strip {
+    position: absolute;
+    left: 0;
+    bottom: 14%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .artist-socials-strip a {
+    display: block;
+    translate: -50% 0;
+    opacity: 0;
+    transform: translateX(-22px);
+    transition: opacity 0.5s ease, transform 0.5s ease, background-color 0.15s ease;
+  }
+
+  .artist-socials-strip a:nth-child(1) {
+    transition-delay: 0.15s;
+  }
+
+  .artist-socials-strip a:nth-child(2) {
+    transition-delay: 0.24s;
+  }
+
+  .artist-socials-strip a:nth-child(3) {
+    transition-delay: 0.33s;
+  }
+
+  .artist-socials-strip a:nth-child(4) {
+    transition-delay: 0.42s;
+  }
+
+  .artist-photo-frame.is-revealed .artist-socials-strip a {
+    opacity: 0.9;
+    transform: translateX(0);
+  }
+
+  .artist-photo-frame.is-revealed .artist-socials-strip a:hover {
+    opacity: 1;
+  }
+
+  .social-icon {
+    display: block;
+    width: 76px;
+    height: 76px;
+    background-color: var(--off-white);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    transition: background-color 0.15s ease;
+  }
+
+  /* The source icon glyphs don't share the same amount of internal padding
+     (Instagram's fills almost the whole canvas, YouTube's leaves a huge
+     margin above/below its badge), so at a shared mask-size they don't
+     read as the same size even in same-size boxes. Facebook is the visual
+     reference point; Instagram is scaled down slightly to match it.
+     YouTube's badge is both short AND wide relative to its canvas, so
+     matching Facebook's ink height alone (as a much larger explicit px
+     mask-size) also blows its ink width out to ~3x Facebook's — it reads
+     as huge even though the "height" matches. Instead its mask-size is
+     kept modest, just enough that it reads as the same visual weight as
+     the others (a touch bigger footprint, since its shape is flatter). */
+  .artist-socials-strip a[data-platform="instagram"] .social-icon {
+    -webkit-mask-size: 78%;
+    mask-size: 78%;
+  }
+
+  .artist-socials-strip a[data-platform="youtube"] .social-icon {
+    width: 80px;
+    -webkit-mask-size: 92px 92px;
+    mask-size: 92px 92px;
+  }
+
+  .artist-socials-strip a:hover .social-icon {
+    background-color: var(--chai-gold);
+  }
+
+  .social-fallback {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--off-white);
+  }
+
+  /* Genre sits at the bottom-right corner, its trailing edge a fixed 16px
+     in from the photo's right edge, and the photo's bottom edge bisecting
+     it vertically through its centre - matching how the name and socials
+     straddle their own edges. */
+  .artist-genre-strip {
+    position: absolute;
+    bottom: 0;
+    right: 13px;
+    translate: 0 50%;
+    margin: 0;
+    font-style: italic;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--off-white);
+    white-space: nowrap;
+    font-size: clamp(1.07rem, 3.1vw, 1.64rem);
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease 0.4s, transform 0.5s ease 0.4s;
+  }
+
+  .artist-photo-frame.is-revealed .artist-genre-strip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .artist-spotify-wrap {
+    max-width: 560px;
+    margin-top: var(--space-5);
+  }
+
+  .spotify-eyebrow {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    color: var(--chai-gold);
+    margin: 0 0 var(--space-4);
+  }
+
+  .spotify-embed {
+    display: block;
+    border-radius: 12px;
+  }
+
+  .artist-about-wrap {
+    max-width: 1120px;
+    text-align: center;
+  }
+
+  .artist-about-body :global(p) {
+    opacity: 0.85;
+    line-height: 1.7;
+    font-size: 1.35rem;
+    margin-bottom: 1em;
+  }
+
+  @media (max-width: 560px) {
+    .artist-photo-frame {
+      max-width: 437px;
+    }
+
+    /* NAME: horizontal and centred, straddling the photo's top edge instead
+       of running vertically down the right edge. */
+    .artist-name-strip {
+      writing-mode: horizontal-tb;
+      top: 0 !important;
+      left: 50%;
+      right: auto;
+      width: 100%;
+      padding: 0 var(--space-2);
+      text-align: center;
+      translate: -50% -50% !important;
+    }
+
+    .artist-name {
+      font-size: clamp(1.9rem, 9vw, 3rem) !important;
+      height: auto !important;
+      white-space: normal;
+    }
+
+    /* SOCIALS: a horizontal row below the genre, clear of the photo. */
+    .artist-socials-strip {
+      left: 50%;
+      bottom: 0;
+      flex-direction: row;
+      align-items: center;
+      gap: 1.3rem;
+      transform: translate(-50%, calc(100% + 52px));
+    }
+
+    .artist-socials-strip a {
+      translate: 0 0;
+    }
+
+    /* GENRE: centred on the photo's bottom edge instead of right-aligned. */
+    .artist-genre-strip {
+      left: 50%;
+      right: auto;
+      translate: -50% 50%;
+      font-size: 1.15rem;
+    }
+
+    .social-icon {
+      width: 62px;
+      height: 62px;
+    }
+
+    .artist-socials-strip a[data-platform="youtube"] .social-icon {
+      width: 65px;
+      -webkit-mask-size: 75px 75px;
+      mask-size: 75px 75px;
+    }
+
+    .artist-about-body :global(p) {
+      font-size: 1.05rem;
+    }
+
+    /* Extra clearance below the frame for the socials row now living there,
+       and more still below that before the description starts. */
+    .photo-wrap {
+      padding-bottom: 8.5rem;
+    }
+
+    .artist-spotify-wrap {
+      margin-top: var(--space-3);
+    }
+
+    .spotify-eyebrow {
+      margin-bottom: var(--space-2);
+    }
+
+    .artist-page {
+      padding-bottom: var(--space-3);
+    }
+  }
+</style>
+
+<script>
+  // Roughly how many lines (columns, under vertical-lr) the name is
+  // currently wrapped onto at the given font size: each column's width
+  // is close to the font size (line-height: 1), so width/fontSize
+  // clusters near an integer line count.
+  function columnCount(nameEl: HTMLElement, fontPx: number): number {
+    nameEl.style.fontSize = `${fontPx}px`;
+    const width = nameEl.getBoundingClientRect().width;
+    return Math.max(1, Math.round(width / fontPx));
+  }
+
+  // Most names fit in <= 2 lines at the shared max size and are left
+  // there untouched. The rare outlier that would need 3+ lines at that
+  // size is shrunk - via binary search, since re-wrapping at each
+  // candidate size has to be measured, not computed - down to the
+  // largest size that still keeps it within 2 lines, rather than
+  // dragging every artist's font size down to accommodate a handful of
+  // long names.
+  function fitNameWithinTwoLines(nameEl: HTMLElement, maxFontPx: number): number {
+    if (columnCount(nameEl, maxFontPx) <= 2) {
+      nameEl.style.fontSize = `${maxFontPx}px`;
+      return maxFontPx;
+    }
+    let lo = 10;
+    let hi = maxFontPx;
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2;
+      if (columnCount(nameEl, mid) <= 2) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+    nameEl.style.fontSize = `${lo}px`;
+    return lo;
+  }
+
+  // Constrain the name to the real run length between TOP_OFFSET below
+  // the photo's top and GENRE_CLEARANCE above the genre text, so the
+  // browser wraps the name onto as many lines as it needs within that
+  // space (instead of shrinking one line's font size for every name),
+  // then cap it at 2 lines - shrinking only the names that actually
+  // need it to get there. The strip's edge-straddling translate is
+  // re-set to match whatever font size the name ends up at, since a
+  // shrunk name's column is narrower than the SSR default assumed.
+  function layoutArtistName() {
+    // Below 560px the name runs horizontally, centred above the photo (see
+    // the mobile media query) rather than as a fitted vertical column, so
+    // none of this measurement applies there.
+    if (window.matchMedia("(max-width: 560px)").matches) return;
+
+    const frame = document.querySelector<HTMLElement>(".artist-photo-frame");
+    const strip = document.querySelector<HTMLElement>("#artist-name-strip");
+    const nameEl = document.querySelector<HTMLElement>("#artist-name");
+    const genre = document.querySelector<HTMLElement>(".artist-genre-strip");
+    if (!frame || !strip || !nameEl) return;
+
+    const TOP_OFFSET = 15;
+    const GENRE_CLEARANCE = 31;
+    const FALLBACK_BOTTOM = 68;
+
+    const frameRect = frame.getBoundingClientRect();
+    let bottomOffset = FALLBACK_BOTTOM;
+    if (genre) {
+      const genreRect = genre.getBoundingClientRect();
+      bottomOffset = frameRect.bottom - genreRect.top + GENRE_CLEARANCE;
+    }
+
+    strip.style.top = `${TOP_OFFSET}px`;
+
+    // height, not width, is what constrains wrapping here: under
+    // writing-mode: vertical-rl the block/inline axes swap, so the
+    // physical `height` property is what the browser treats as the
+    // per-line length before it wraps onto a new (physically wider)
+    // line, the vertical equivalent of `width` constraining wrapping in
+    // horizontal writing mode.
+    const availableLength = Math.max(0, frameRect.height - TOP_OFFSET - bottomOffset);
+    nameEl.style.height = `${availableLength}px`;
+
+    const maxFontPx = parseFloat(nameEl.dataset.maxFontPx || "88.32");
+    const finalFontPx = fitNameWithinTwoLines(nameEl, maxFontPx);
+    strip.style.translate = `${finalFontPx / 2}px 0`;
+  }
+
+  layoutArtistName();
+  window.addEventListener("resize", layoutArtistName);
+  document.fonts?.ready?.then(layoutArtistName);
+
+  // Name/socials/genre fade + slide into place once, staggered via their own
+  // CSS transition-delays above — held off a frame so the pre-reveal (opacity:
+  // 0) state actually paints first and the transition has something to animate from.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelector(".artist-photo-frame")?.classList.add("is-revealed");
+    });
+  });
+</script>

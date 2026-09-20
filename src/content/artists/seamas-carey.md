@@ -8,6 +8,15 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/seamascarey/?hl=en-gb" }
   - { platform: "youtube", url: "https://www.youtube.com/user/seamasify/videos" }
 spotifyTrackUrl: "https://open.spotify.com/track/1XZ2Y8bqrA1FFzKKtrlUJH"
+activeSince: 2020
+newestAlbum:
+  title: "Song of Trespass"
+  year: 2024
+  url: "https://open.spotify.com/album/2wjMd0f73NdFFqhAMrxa3O"
+  cover: "/uploads/artists/seamas-carey-album.jpg"
+  kind: "Single"
+videoId: "3dGBiuPfVEI"
+videoTitle: "Men Are Singing: Wild Mountain Thyme"
 ---
 
 Seamas Carey, the Cornish artist/bloke/founder of Cornwall's first alternative male voice choir, Men Are Singing, encourages people to make sounds with their voices, wake up their bodies and take themselves less seriously. Expect harmonious rounds, silly warm ups, daft noises and cross generational collective joy.

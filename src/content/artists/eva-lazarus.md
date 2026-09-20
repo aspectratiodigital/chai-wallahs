@@ -10,6 +10,15 @@ socials:
   - { platform: "twitter", url: "https://twitter.com/EvaLazarus" }
   - { platform: "tiktok", url: "https://www.tiktok.com/@evalazarus" }
 spotifyTrackUrl: "https://open.spotify.com/track/0K2XxY1LB3CYG4QhulZerK"
+activeSince: 2017
+newestAlbum:
+  title: "Make Your Own Sunshine"
+  year: 2025
+  url: "https://music.apple.com/gb/album/make-your-own-sunshine/1781079922"
+  cover: "/uploads/artists/eva-lazarus-album.jpg"
+  kind: "Album"
+videoId: "eLzAFFIx-gk"
+videoTitle: "Everyday Shella (Remix)"
 ---
 
 Eva Lazarus is a multi genre artist best known for shutting down sound systems across the world! Best known for her collaborations with Mungo's Hi Fi, she also banks collabs with Benny Page, Swindle, DJ Yoda and many more in her music vault.

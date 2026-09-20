@@ -9,6 +9,15 @@ socials:
   - { platform: "youtube", url: "https://youtube.com/playlist?list=PLrjgvOJgwEnFG5XpTtVilqpnVLePnqx9L" }
   - { platform: "twitter", url: "https://twitter.com/melonyxmusic" }
 spotifyTrackUrl: "https://open.spotify.com/track/1RI8b1pidURxKNdgIE5oq5"
+activeSince: 2021
+newestAlbum:
+  title: "Soul Glow"
+  year: 2023
+  url: "https://music.apple.com/gb/album/soul-glow/6799200619"
+  cover: "/uploads/artists/melonyx-album.jpg"
+  kind: "Album"
+videoId: "KGpkC0BYtRo"
+videoTitle: "MELONYX - Melanin Queens (Official Video)"
 ---
 
 This is the sound of modern Black-British Soul. A duo hailing from Nottingham, these two Sisters of Soul are a multifaceted harmonic force, embodying contrast and compliment, ebb and flow, balance. Signed to Tru-Thoughts the future is bright. Check in for perfect harmonies and soulful grooves.

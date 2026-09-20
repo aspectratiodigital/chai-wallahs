@@ -8,6 +8,15 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/losfsurfersmokers/?hl=en" }
   - { platform: "youtube", url: "https://www.youtube.com/@losfsurfersmokersbanda" }
 spotifyTrackUrl: "https://open.spotify.com/track/5vQh8UviYdXteUc2LtldM6"
+activeSince: 2019
+newestAlbum:
+  title: "¡En vivo!"
+  year: 2021
+  url: "https://music.apple.com/gb/album/en-vivo/1591137316"
+  cover: "/uploads/artists/los-fuckin-surfer-smokers-album.jpg"
+  kind: "Album"
+videoId: "cerigW5c9XY"
+videoTitle: "Kumbia Surfin´ (OFFICIAL VIDEO) - LFSS"
 ---
 
 LFSS is a Colombian band formed in early 2017 in Bogotá by Sergio Arias and Alejandro Reverend. LFSS blends Surf, Western, and Retro music with influences from traditional rhythms such as Cumbia, Psychedelic Chicha, Brass ensembles, and Swing. in 2023, the band expanded their reach with a European tour, performing in the UK, Belgium, and Spain.

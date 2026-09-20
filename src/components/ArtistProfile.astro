@@ -1,0 +1,791 @@
+---
+// The current artist page design. Everything comes from the artist's CMS entry
+// (src/content/artists/*.md); any section without data is left out, so a sparse
+// entry still gives a clean page. The original design lives on in
+// ArtistPageClassic.astro.
+import path from "node:path";
+import sharp from "sharp";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { render, type CollectionEntry } from "astro:content";
+
+import FacebookIcon from "../assets/images/social/facebook.png";
+import InstagramIcon from "../assets/images/social/instagram.png";
+import YoutubeIcon from "../assets/images/social/youtube.png";
+import TiktokIcon from "../assets/images/social/tiktok.svg";
+import XIcon from "../assets/images/social/x.svg";
+
+interface Props {
+  artist: CollectionEntry<"artists">;
+  /** Shows a small "Design Test" tag — used by the comparison page only. */
+  testLabel?: string;
+}
+
+const { artist, testLabel } = Astro.props;
+const d = artist.data;
+const name = d.name.replace(/\s*\(Design Test\)/i, "");
+const { genres, socials, spotifyTrackUrl, activeSince, festivals, newestAlbum, livePhoto, poster, videoId } = d;
+
+const PLATFORM_ICON: Record<string, ImageMetadata> = {
+  facebook: FacebookIcon,
+  instagram: InstagramIcon,
+  youtube: YoutubeIcon,
+  tiktok: TiktokIcon,
+  twitter: XIcon,
+};
+
+const spotifyTrackId = spotifyTrackUrl?.match(/track\/([a-zA-Z0-9]+)/)?.[1] ?? spotifyTrackUrl ?? null;
+const { Content } = await render(artist);
+const hasBody = (artist.body ?? "").trim().length > 0;
+
+// Gallery: whichever of live photo / newest album cover / poster exist. Each
+// tile needs its picture's width÷height so the hovered tile can grow to fit it.
+async function ratio(src: string): Promise<number> {
+  try {
+    const m = await sharp(path.join(process.cwd(), "public", src.replace(/^\//, ""))).metadata();
+    return m.width && m.height ? m.width / m.height : 1;
+  } catch {
+    return 1;
+  }
+}
+const kindWord = newestAlbum && newestAlbum.kind !== "Album" ? `${newestAlbum.kind}, ` : "";
+const galleryDefs = [
+  livePhoto && { src: livePhoto.image, label: "Live", text: livePhoto.caption ?? "On stage.", alt: `${name} performing live` },
+  newestAlbum?.cover && {
+    src: newestAlbum.cover,
+    label: "Album",
+    text: `${newestAlbum.title}, ${newestAlbum.year}.`,
+    alt: `Cover of ${name}'s ${newestAlbum.title}`,
+  },
+  poster && { src: poster.image, label: poster.kind, text: poster.caption ?? `${name} — ${poster.kind.toLowerCase()} poster.`, alt: `${name} ${poster.kind.toLowerCase()} poster` },
+].filter(Boolean) as { src: string; label: string; text: string; alt: string }[];
+const gallery = await Promise.all(galleryDefs.map(async (g) => ({ ...g, ar: await ratio(g.src) })));
+
+// Each half of the ticker has to be wider than any screen for a seamless loop.
+const repeats = Math.max(1, Math.ceil(12 / Math.max(festivals.length, 1)));
+const tickerItems = Array.from({ length: repeats }, () => festivals).flat();
+
+// Names vary from "Amy True" to "TC & The Groove Family": scale the display
+// type to the name's length so long names wrap to a couple of lines, not five.
+const nameSize =
+  name.length <= 10
+    ? "clamp(3.4rem, 8vw, 7.2rem)"
+    : name.length <= 16
+      ? "clamp(2.6rem, 5.6vw, 5rem)"
+      : name.length <= 24
+        ? "clamp(2.2rem, 4.6vw, 4rem)"
+        : "clamp(1.9rem, 3.8vw, 3.2rem)";
+
+// A row of five icons needs smaller icons on a phone than a row of three.
+const manySocials = socials.length > 4;
+
+// Clean outlined lettering. -webkit-text-stroke only has mitred joins, which
+// spike at every sharp corner of this display face; a ring of offset
+// text-shadows gives an evenly rounded outline instead.
+const OUTLINE_R = 0.03;
+const OUTLINE_N = 40;
+const outline = Array.from({ length: OUTLINE_N }, (_, i) => {
+  const a = (i / OUTLINE_N) * Math.PI * 2;
+  return `${(Math.cos(a) * OUTLINE_R).toFixed(4)}em ${(Math.sin(a) * OUTLINE_R).toFixed(4)}em 0 var(--off-white)`;
+}).join(", ");
+---
+
+<BaseLayout title={testLabel ? `${name} — ${testLabel}` : name} description={genres.length ? `${name} — ${genres.join(", ")}` : name}>
+  <div class="test-page">
+    <div class="wrap back-row">
+      <a class="eyebrow back-link" href="/artists/">&lt; Back to Artists</a>
+      {testLabel && <span class="eyebrow test-flag">{testLabel}</span>}
+    </div>
+
+    {
+      festivals.length > 0 && (
+        <div class="marquee" aria-hidden="true">
+          <div class="marquee-track">
+            {[...tickerItems, ...tickerItems].map((item) => (
+              <span class="marquee-item">{item}</span>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    <section class:list={["wrap", "hero", { "hero--no-ticker": festivals.length === 0 }]}>
+      <div class="polaroid-wrap" data-tilt>
+        <div class="polaroid" data-tilt-card>
+          <img src={d.image} alt={name} width="700" height="860" class="polaroid-photo" />
+          {activeSince && <p class="polaroid-caption">Est. {activeSince}</p>}
+        </div>
+      </div>
+
+      <div class="hero-info">
+        <h1 class="artist-name" style={`font-size:${nameSize};text-shadow:${outline}`}>{name}</h1>
+
+        <div class="spec-panel">
+          <dl>
+            {
+              genres.length > 0 && (
+                <div class="spec-row spec-row--genre" data-genre-row>
+                  <dt>Genre</dt>
+                  <dd class="genre-tags">
+                    {genres.map((g) => (
+                      <a class="genre-tag" href={`/artists/?genre=${encodeURIComponent(g.toLowerCase())}`}>
+                        {g}
+                      </a>
+                    ))}
+                  </dd>
+                </div>
+              )
+            }
+            {
+              newestAlbum && (
+                <div class="spec-row">
+                  <dt>{newestAlbum.kind === "Album" ? "Newest album" : "Latest release"}</dt>
+                  <dd>
+                    <a class="album-link" href={newestAlbum.url} target="_blank" rel="noopener noreferrer">
+                      {newestAlbum.title} ({kindWord}
+                      {newestAlbum.year})
+                    </a>
+                  </dd>
+                </div>
+              )
+            }
+          </dl>
+          <a class="btn btn-solid book-btn" href="/contact/#artists">Book {name}</a>
+        </div>
+
+        {
+          socials.length > 0 && (
+            <div class:list={["socials-row", { "socials-row--many": manySocials }]}>
+              {socials.map((s) => (
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${name} on ${s.platform === "twitter" ? "X" : s.platform}`}
+                  class="social-link"
+                  data-platform={s.platform}
+                >
+                  {PLATFORM_ICON[s.platform] && (
+                    <span
+                      class="social-icon"
+                      style={`-webkit-mask-image:url("${PLATFORM_ICON[s.platform].src}"); mask-image:url("${PLATFORM_ICON[s.platform].src}");`}
+                    />
+                  )}
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      {
+        spotifyTrackId && (
+          <iframe
+            class="spotify-embed"
+            src={`https://open.spotify.com/embed/track/${spotifyTrackId}?theme=0`}
+            width="100%"
+            height="152"
+            frameborder="0"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            title={`${name} on Spotify`}
+          />
+        )
+      }
+
+      {
+        hasBody && (
+          <div class="about-lead">
+            <Content />
+          </div>
+        )
+      }
+    </section>
+
+    {
+      gallery.length > 0 && (
+        <section class="section gallery-section">
+          <div class="wrap">
+            <p class="eyebrow section-label">&gt; Gallery</p>
+            <div class="gallery-accordion" data-gallery>
+              {gallery.map((g) => (
+                <figure class="gallery-tile" tabindex="0" style={`--ar:${g.ar}`}>
+                  <img src={g.src} alt={g.alt} class="gallery-photo" loading="lazy" />
+                  <figcaption class="gallery-caption">
+                    <h3>{g.label}</h3>
+                    <p>{g.text}</p>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      videoId && (
+        <section class="wrap video-section">
+          <p class="eyebrow section-label">&gt; Watch</p>
+          <div class="video-wrap">
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}`}
+              title={d.videoTitle ?? `${name} on YouTube`}
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              loading="lazy"
+              allowfullscreen
+            />
+          </div>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+
+
+<script>
+  // TILT: the polaroid leans toward the cursor, perspective-style.
+  const tiltWrap = document.querySelector<HTMLElement>("[data-tilt]");
+  const tiltCard = document.querySelector<HTMLElement>("[data-tilt-card]");
+  if (tiltWrap && tiltCard) {
+    tiltWrap.addEventListener("pointermove", (e) => {
+      const rect = tiltWrap.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      tiltCard.style.transform = `rotate(-2deg) rotateX(${py * -10}deg) rotateY(${px * 14}deg)`;
+    });
+    tiltWrap.addEventListener("pointerleave", () => {
+      tiltCard.style.transform = "";
+    });
+  }
+
+  // GENRE LABEL: centred against a single row of tags; if the tags wrap onto
+  // more rows, the label pins to the top of the first row instead.
+  const genreRow = document.querySelector<HTMLElement>("[data-genre-row]");
+  if (genreRow) {
+    const tags = [...genreRow.querySelectorAll<HTMLElement>(".genre-tag")];
+    const check = () => {
+      const wrapped = tags.length > 1 && tags[tags.length - 1].offsetTop > tags[0].offsetTop + 2;
+      genreRow.classList.toggle("is-multiline", wrapped);
+    };
+    check();
+    window.addEventListener("resize", check);
+    document.fonts?.ready?.then(check);
+  }
+
+  // GALLERY: one tile is "active" at a time (hover or keyboard focus) and
+  // grows to its picture's own proportions; the rest share what's left.
+  const gallery = document.querySelector<HTMLElement>("[data-gallery]");
+  if (gallery) {
+    const tiles = [...gallery.querySelectorAll<HTMLElement>(".gallery-tile")];
+    const activate = (tile: HTMLElement | null) => tiles.forEach((t) => t.classList.toggle("is-active", t === tile));
+    tiles.forEach((tile) => {
+      tile.addEventListener("pointerenter", () => activate(tile));
+      tile.addEventListener("focus", () => activate(tile));
+      tile.addEventListener("blur", () => activate(null));
+    });
+    gallery.addEventListener("pointerleave", () => activate(null));
+  }
+</script>
+
+<style>
+  .test-page {
+    background: var(--stage-black);
+    color: var(--off-white);
+    padding-bottom: var(--space-6);
+    overflow-x: clip;
+  }
+
+  .back-row {
+    padding-top: var(--space-3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .back-link {
+    color: var(--chai-gold);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .test-flag {
+    color: rgba(239, 239, 239, 0.5);
+  }
+
+  /* FESTIVAL TICKER */
+  .marquee {
+    margin-top: var(--space-3);
+    background: var(--chai-gold);
+    color: var(--stage-black);
+    overflow: hidden;
+    white-space: nowrap;
+    transform: rotate(-1deg);
+  }
+
+  .marquee-track {
+    display: inline-flex;
+    animation: marquee-scroll 34s linear infinite;
+  }
+
+  .marquee-item {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    padding: 0.5em 1.2em;
+    white-space: nowrap;
+  }
+
+  .marquee-item::after {
+    content: "\2022";
+    margin-left: 1.2em;
+  }
+
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* HERO — two columns, two rows: photo + info on top; Spotify (photo's
+     width) beside the description underneath. */
+  .hero {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    grid-template-areas:
+      "photo info"
+      "spotify about";
+    column-gap: var(--space-5);
+    row-gap: var(--space-5);
+    padding-block: var(--space-6) var(--space-4);
+  }
+
+  .polaroid-wrap {
+    grid-area: photo;
+    align-self: center;
+    perspective: 1200px;
+  }
+
+  .hero-info {
+    grid-area: info;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .spotify-embed {
+    grid-area: spotify;
+    align-self: start;
+    display: block;
+    border-radius: 12px;
+    margin-top: var(--space-2);
+  }
+
+  .about-lead {
+    grid-area: about;
+    align-self: start;
+    max-width: 62ch;
+    font-size: 1.2rem;
+    opacity: 0.85;
+    line-height: 1.7;
+  }
+
+  .polaroid {
+    position: relative;
+    background: var(--off-white);
+    padding: 14px 14px 44px;
+    transform: rotate(-2deg);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+    transition: transform 0.25s ease-out;
+    will-change: transform;
+  }
+
+  .polaroid-photo {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center 30%;
+    filter: saturate(0.85);
+  }
+
+  .polaroid-caption {
+    position: relative;
+    z-index: 1;
+    margin: 12px 4px 0;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--stage-black);
+    opacity: 0.6;
+  }
+
+  /* Name: hollow lettering — page-black fill, off-white outline built from a
+     ring of offset text-shadows (set inline) so corners stay round and clean. */
+  .artist-name {
+    font-size: clamp(3.4rem, 8vw, 7.2rem);
+    color: var(--stage-black);
+    margin: 0;
+    padding: 0.04em 0;
+  }
+
+  .spec-panel {
+    border: 1px solid rgba(239, 239, 239, 0.35);
+    padding: var(--space-4);
+  }
+
+  .spec-panel dl {
+    margin: 0 0 var(--space-3);
+  }
+
+  .spec-row {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid rgba(239, 239, 239, 0.15);
+    align-items: center;
+  }
+
+  .spec-row:last-child {
+    border-bottom: none;
+  }
+
+  /* Genre row: label is centred while the tags fit on one line, and pins to
+     the top of the first line once they wrap (toggled by the script). */
+  .spec-row--genre.is-multiline {
+    align-items: start;
+  }
+
+  .spec-row--genre.is-multiline dt {
+    line-height: 1;
+  }
+
+  .album-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .album-link:hover {
+    color: var(--chai-gold);
+  }
+
+  .spec-row dt {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(239, 239, 239, 0.55);
+  }
+
+  .spec-row dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+  }
+
+  .genre-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .genre-tag {
+    display: inline-block;
+    text-decoration: none;
+    color: var(--off-white);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border: 2px solid var(--off-white);
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    padding: 0.45em 1em;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .genre-tag:hover {
+    animation: wiggle 0.4s ease;
+    border-color: var(--chai-gold);
+    color: var(--chai-gold);
+  }
+
+  @keyframes wiggle {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-6deg) scale(1.08);
+    }
+    75% {
+      transform: rotate(6deg) scale(1.08);
+    }
+  }
+
+  .book-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* SOCIALS — colour change on hover only, no movement. Per-platform optical
+     sizing: the source glyphs carry different internal padding, so equal boxes
+     don't read as equal sizes. */
+  .socials-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .socials-row {
+    --icon: 77px;
+    flex-wrap: wrap;
+  }
+
+  .social-icon {
+    display: block;
+    width: var(--icon);
+    height: var(--icon);
+    background-color: var(--off-white);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    transition: background-color 0.15s ease;
+  }
+
+  .social-link[data-platform="instagram"] .social-icon {
+    -webkit-mask-size: 78%;
+    mask-size: 78%;
+  }
+
+  .social-link[data-platform="youtube"] .social-icon {
+    width: calc(var(--icon) * 1.065);
+    -webkit-mask-size: calc(var(--icon) * 1.195) calc(var(--icon) * 1.195);
+    mask-size: calc(var(--icon) * 1.195) calc(var(--icon) * 1.195);
+  }
+
+  /* Measured ink sizes (share of the 640px source canvas) put TikTok's
+     glyph at 66% x 75% and X's at 100% x 91%: TikTok already reads at the
+     right size filling its box; X runs full-width, so it is pulled in to
+     ~74% to match the others' visual weight. */
+  .social-link[data-platform="twitter"] .social-icon {
+    -webkit-mask-size: 74%;
+    mask-size: 74%;
+  }
+
+  .social-link:hover .social-icon {
+    background-color: var(--chai-gold);
+  }
+
+  /* GALLERY — WIAB-style accordion. Idle: equal, cropped tiles. Active: that
+     tile grows to the width its own picture needs at this height (so a wide
+     photo widens, a tall poster stays narrow), and the others give up
+     exactly that much room. */
+  .gallery-section {
+    --gallery-h: 460px;
+    background: rgba(239, 239, 239, 0.03);
+  }
+
+  .section-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-3);
+  }
+
+  .gallery-accordion {
+    display: flex;
+    gap: 4px;
+    height: var(--gallery-h);
+  }
+
+  .gallery-tile {
+    position: relative;
+    flex: 1 1 0px;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    cursor: pointer;
+    transition: flex 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .gallery-tile.is-active {
+    flex: 0 0 min(calc(var(--gallery-h) * var(--ar)), 64%);
+  }
+
+  .gallery-tile:focus-visible {
+    outline: 3px solid var(--chai-gold);
+    outline-offset: -3px;
+  }
+
+  .gallery-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery-caption {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: var(--space-3) var(--space-2) var(--space-2);
+    background: linear-gradient(0deg, rgba(27, 21, 17, 0.95) 0%, rgba(27, 21, 17, 0.5) 60%, transparent 100%);
+  }
+
+  .gallery-caption h3 {
+    font-size: 1.05rem;
+    white-space: nowrap;
+    color: var(--off-white);
+    margin-bottom: 0.5rem;
+  }
+
+  .gallery-caption p {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--off-white);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease 0.1s;
+  }
+
+  .gallery-tile.is-active .gallery-caption p {
+    opacity: 0.9;
+    max-height: 8em;
+  }
+
+  /* VIDEO — full width; the embed itself is the thumbnail. */
+  .video-section {
+    padding-block: var(--space-5);
+  }
+
+  .video-wrap {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+
+  .video-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .genre-tag:focus-visible,
+  .album-link:focus-visible,
+  .social-link:focus-visible,
+  .book-btn:focus-visible {
+    outline: 3px solid var(--chai-gold);
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+
+    .genre-tag:hover {
+      animation: none;
+    }
+
+    .polaroid,
+    .gallery-tile {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .hero {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "photo"
+        "info"
+        "about"
+        "spotify";
+      row-gap: var(--space-4);
+      padding-top: var(--space-3);
+    }
+
+    .socials-row {
+      justify-content: center;
+      --icon: 64px;
+    }
+
+    .socials-row--many {
+      --icon: 50px;
+      gap: 0.75rem;
+    }
+
+    .test-page {
+      padding-bottom: 0;
+    }
+
+    .video-section {
+      padding-bottom: var(--space-3);
+    }
+
+    .gallery-accordion {
+      height: auto;
+      flex-direction: column;
+    }
+
+    .gallery-tile,
+    .gallery-tile.is-active {
+      flex: none;
+      aspect-ratio: var(--ar);
+      max-height: 520px;
+    }
+
+    .gallery-caption p {
+      opacity: 0.9;
+      max-height: 8em;
+    }
+  }
+
+  @media (max-width: 499px) {
+    .spec-panel {
+      padding: var(--space-2);
+    }
+
+    .spec-row {
+      grid-template-columns: 72px 1fr;
+      gap: var(--space-1);
+    }
+
+    .spec-row dt {
+      letter-spacing: 0.04em;
+    }
+
+    .spec-row dd {
+      font-size: 1.05rem;
+    }
+
+    .genre-tags {
+      gap: 0.4rem;
+    }
+
+    .genre-tag {
+      font-size: 0.7rem;
+      padding: 0.4em 0.8em;
+    }
+  }
+</style>

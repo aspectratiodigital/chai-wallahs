@@ -1,0 +1,11 @@
+---
+// Amy True in the CURRENT design, kept at its own address so it can be shown
+// next to her real page (which deliberately still uses the original design).
+// Hidden from the artist listing (its `years` is empty) — reach it by URL.
+import { getEntry } from "astro:content";
+import ArtistProfile from "../../components/ArtistProfile.astro";
+
+const artist = await getEntry("artists", "amy-true-test");
+---
+
+<ArtistProfile artist={artist!} testLabel="Design comparison" />

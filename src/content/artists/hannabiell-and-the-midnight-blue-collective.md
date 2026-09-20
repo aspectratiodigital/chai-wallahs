@@ -9,6 +9,15 @@ socials:
   - { platform: "youtube", url: "https://www.youtube.com/playlist?list=PLrjgvOJgwEnHM0CcIb_yXv7c1W4MhH5l-" }
   - { platform: "twitter", url: "https://twitter.com/Hannabiell" }
 spotifyTrackUrl: "https://open.spotify.com/track/6r0XotBTME3kf4jA04uvs2"
+activeSince: 2013
+newestAlbum:
+  title: "Protest Culture"
+  year: 2013
+  url: "https://open.spotify.com/album/0vARijxyU5k5bwGQxb61if"
+  cover: "/uploads/artists/hannabiell-and-the-midnight-blue-collective-album.jpg"
+  kind: "Album"
+videoId: "4G5sB6wfTlo"
+videoTitle: "Hannabiell & Midnight Blue"
 ---
 
 A high energy Afro Fusion Collective fusing powerful and upbeat Latin & African percussion, brass, vocal chants, Blues, Jazz, Afro-beat, and Funk, to create a unique sound and an invigorating party atmosphere that will get you up on your feet.

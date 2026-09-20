@@ -9,6 +9,18 @@ socials:
   - { platform: "youtube", url: "https://www.youtube.com/playlist?list=PLrjgvOJgwEnHO7DqMDBv3qHOJyytcc0uw" }
   - { platform: "twitter", url: "https://twitter.com/MpHybridsound" }
 spotifyTrackUrl: "https://open.spotify.com/track/5GkTwDJjNWIheeceA5LSDM"
+activeSince: 2019
+newestAlbum:
+  title: "Soul V2"
+  year: 2022
+  url: "https://music.apple.com/gb/album/soul-v2-single/1620792584"
+  cover: "/uploads/artists/hybridmp-album.jpg"
+  kind: "Single"
+livePhoto:
+  image: "/uploads/artists/hybridmp-live.jpg"
+  caption: "Live: Ooo's On The Ouse #002 // HybridMP - Everything I Planned To Do This Summer (LIVE)"
+videoId: "-6aXmBmgaac"
+videoTitle: "HybridMP - Soul v2 (Official Video)"
 ---
 
 Straight out of Cambridge, HybridMp is an alternative Hip-Hop artist, at the beginning of a very exciting musical journey. Expect intricate flows, thought provoking lyrics & a heartfelt relatability. A key partner in Cambridge based collective - Sabotage Audio, Nigee is definitely on the rise, and we are mega pumped to have him on Chai this year.

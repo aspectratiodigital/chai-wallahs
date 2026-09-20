@@ -8,6 +8,8 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/hotsteppasmusic/?hl=en" }
   - { platform: "youtube", url: "https://youtube.com/playlist?list=PLrjgvOJgwEnFGpHn27WHdEuVGwR5h_Bvx" }
 spotifyTrackUrl: "https://open.spotify.com/track/26Prfvk9o5cwyLMCl5zQMS"
+videoId: "P0nd0TaqaaM"
+videoTitle: "Dub Princess & Hotsteppas - No Fear"
 ---
 
 Singer songwriter Dub Princess has been writing new music with Hotsteppas for the past few years, as well as adding her original songs to the set. This has sparked a new flavour to an already established and well respected band in the Bristol scene.

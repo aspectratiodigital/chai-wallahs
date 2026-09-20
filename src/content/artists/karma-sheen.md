@@ -9,6 +9,15 @@ socials:
   - { platform: "youtube", url: "https://www.youtube.com/channel/UCXK7WNZJ5q-2GINOn2bh4Xw" }
   - { platform: "twitter", url: "https://twitter.com/karmasheen" }
 spotifyTrackUrl: "https://open.spotify.com/track/5drnbye4diSlBYtXW3VD69"
+activeSince: 2023
+newestAlbum:
+  title: "Karma Sheen"
+  year: 2023
+  url: "https://open.spotify.com/album/6VEjzb5gfNb3r4CK0trsxJ"
+  cover: "/uploads/artists/karma-sheen-album.jpg"
+  kind: "Album"
+videoId: "0BtU7oy7vDc"
+videoTitle: "Karma Sheen - Mian Ki Jive (Official Video)"
 ---
 
 Karma Sheen is the brainchild of singer-songwriter, and lead guitarist Sameer Khan. An incredible blend of classic rock ala Cream, Jimi Hendrix, Hindustani classical and most notably a strong link with Sameer's cultural heritage through Sufi-poetry inspired lyricism.

@@ -87,6 +87,39 @@ const artists = defineCollection({
     // "Share" menu. Update this whenever there's a new track worth
     // featuring - there's no API involved, so nothing updates itself.
     spotifyTrackUrl: z.string().optional(),
+
+    // --- Profile-page extras. All optional: the page simply leaves out any
+    // section it has no data for.
+    // First year they properly started releasing music publicly (the polaroid's "Est.").
+    activeSince: z.number().int().optional(),
+    // Festivals they've played — the scrolling banner at the top of the page.
+    festivals: z.array(z.string()).default([]),
+    // Newest full-length album (or, failing that, EP/single — see `kind`).
+    newestAlbum: z
+      .object({
+        title: z.string(),
+        year: z.number().int(),
+        // Spotify where we could match it, otherwise Apple Music.
+        url: z.string().url(),
+        // Cover art, stored under public/uploads/artists/.
+        cover: z.string().optional(),
+        kind: z.enum(["Album", "EP", "Single", "Release"]).default("Album"),
+      })
+      .optional(),
+    // A photo of them on stage — a frame from one of their own live videos when
+    // there's no better one. Must be a different picture from `image`.
+    livePhoto: z.object({ image: z.string(), caption: z.string().optional() }).optional(),
+    // One gig or festival poster.
+    poster: z
+      .object({
+        image: z.string(),
+        kind: z.enum(["Gig", "Festival"]).default("Gig"),
+        caption: z.string().optional(),
+      })
+      .optional(),
+    // YouTube video ID for the player at the bottom of the page.
+    videoId: z.string().optional(),
+    videoTitle: z.string().optional(),
   }),
 });
 

@@ -8,6 +8,19 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/carsickofficial" }
   - { platform: "youtube", url: "https://www.youtube.com/@carsickofficial" }
 spotifyTrackUrl: "https://open.spotify.com/track/2xBd2zWZAMnZta1qi4hNgV"
+activeSince: 2006
+festivals: ["Reading"]
+newestAlbum:
+  title: "Bambino"
+  year: 2018
+  url: "https://music.apple.com/gb/album/bambino/1445467145"
+  cover: "/uploads/artists/carsick-album.jpg"
+  kind: "Album"
+livePhoto:
+  image: "/uploads/artists/carsick-live.jpg"
+  caption: "Live: The CARSICK Diaries: Reading Festival 2024"
+videoId: "fCsiTSpQgKw"
+videoTitle: "CARSICK - Violence (Official Music Video)"
 ---
 
 Known for their high-energy, chaotic live performances, they have gained a reputation as an exciting, up-and-coming act in the UK music scene, with music that focuses on the "trials and tribulations of life as a young adult".

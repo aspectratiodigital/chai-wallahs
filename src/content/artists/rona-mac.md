@@ -8,6 +8,18 @@ socials:
   - { platform: "instagram", url: "https://www.instagram.com/ronamac_music/?hl=en-gb" }
   - { platform: "youtube", url: "https://www.youtube.com/channel/UCWFHoKHr8N9zyfQaU_Nu03Q" }
 spotifyTrackUrl: "https://open.spotify.com/track/1HmlA867Emsc6Cvit60wII"
+activeSince: 2020
+newestAlbum:
+  title: "Honeymilk and Heavy Weather"
+  year: 2024
+  url: "https://open.spotify.com/album/5My9tIr4EiA3EUphvKJfmN"
+  cover: "/uploads/artists/rona-mac-album.jpg"
+  kind: "Album"
+livePhoto:
+  image: "/uploads/artists/rona-mac-live.jpg"
+  caption: "Live: September by Rona Mac, live"
+videoId: "rTUb38UPy3M"
+videoTitle: "It's Been A Year by Wil Owen and Rona Mac (Official Lyric Video)"
 ---
 
 Rona Mac is an established artist from West Wales, crafting music that sits comfortably in the realms of alternative folk, with nods to indie-pop and classic singer-songwriter. Rooted in a deeply DIY ethos, she has built her sound from the ground up—writing, recording, and producing her music in a weathered caravan on the most westerly tip of mainland Wales.
