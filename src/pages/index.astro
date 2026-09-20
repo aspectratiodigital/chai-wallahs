@@ -20,6 +20,10 @@ import GreenmanLogo from "../assets/images/festivals/greenman.svg";
 import SgpLogo from "../assets/images/festivals/secret-garden-party.svg";
 import BoomerangLogo from "../assets/images/festivals/boomerang.svg";
 import ShambalaLogo from "../assets/images/festivals/shambala.svg";
+import GlastonburyLogo from "../assets/images/festivals/glastonbury.svg";
+import BodyAndSoulLogo from "../assets/images/festivals/body-and-soul.svg";
+import SunriseLogo from "../assets/images/festivals/sunrise-celebration.svg";
+import FusionLogo from "../assets/images/festivals/fusion.svg";
 import KendalCallingRaw from "../assets/images/festivals/kendal-calling.svg?raw";
 
 const siteContent = await getEntry("site", "home");
@@ -47,12 +51,22 @@ const missionPoints = (siteContent?.data.missionPoints ?? []).map((point, i) => 
 // The 5 festival-logo marquee entries — kept here rather than in the CMS: Kendal
 // Calling needs its multi-colour artwork inlined raw (a mask-image would flatten
 // it to one silhouette), which content-collection image() fields can't express.
+// Each logo links to the festival's own site. Where the festival has ended or
+// its site is gone, it links to the best remaining source instead (noted below).
 const festivalLogos = [
-  { name: "Greenman", logo: GreenmanLogo },
-  { name: "Kendal Calling", inlineSvg: KendalCallingRaw, big: true },
-  { name: "Secret Garden Party", logo: SgpLogo, big: true },
-  { name: "Boomerang", logo: BoomerangLogo },
-  { name: "Shambala", logo: ShambalaLogo },
+  { name: "Glastonbury", logo: GlastonburyLogo, url: "https://www.glastonburyfestivals.co.uk/" },
+  { name: "Greenman", logo: GreenmanLogo, url: "https://www.greenman.net/" },
+  { name: "Kendal Calling", inlineSvg: KendalCallingRaw, huge: true, url: "https://kendalcalling.co.uk/" },
+  // Ended in 2025; the official site now carries the festival's story on its About page.
+  { name: "Body & Soul", logo: BodyAndSoulLogo, big: true, url: "https://bodyandsoul.ie/about" },
+  // Ended in 2017 and the festival's domain no longer serves a site: Wikipedia.
+  { name: "Secret Garden Party", logo: SgpLogo, large: true, url: "https://en.wikipedia.org/wiki/Secret_Garden_Party" },
+  { name: "Fusion", logo: FusionLogo, big: true, url: "https://fusion-festival.de/" },
+  // Its website is down; the festival's Instagram is its live official channel.
+  { name: "Boomerang", logo: BoomerangLogo, url: "https://www.instagram.com/boomerangfestival.mt/" },
+  // The festival's domain has lapsed: Wikipedia.
+  { name: "Sunrise Celebration", logo: SunriseLogo, big: true, url: "https://en.wikipedia.org/wiki/Sunrise_Celebration" },
+  { name: "Shambala", logo: ShambalaLogo, url: "https://www.shambalafestival.org/" },
 ];
 
 const stats = [
@@ -235,21 +249,28 @@ const stats = [
           [0, 1].map((copy) => (
             <div class="festivals-set" aria-hidden={copy === 1 ? "true" : undefined}>
               {
-                festivalLogos.map((f) =>
-                  f.inlineSvg ? (
-                    <span
-                      class:list={["festival-logo", "festival-logo--inline", { "festival-logo--big": f.big }]}
-                      aria-label={f.name}
-                      set:html={f.inlineSvg}
-                    />
-                  ) : (
-                    <span
-                      class:list={["festival-logo", { "festival-logo--big": f.big }]}
-                      aria-label={f.name}
-                      style={`-webkit-mask-image:url("${f.logo.src}"); mask-image:url("${f.logo.src}");`}
-                    />
-                  ),
-                )
+                festivalLogos.map((f) => (
+                  <a
+                    class="festival-link"
+                    href={f.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${f.name} (opens in a new tab)`}
+                    tabindex={copy === 1 ? -1 : undefined}
+                  >
+                    {f.inlineSvg ? (
+                      <span
+                        class:list={["festival-logo", "festival-logo--inline", { "festival-logo--huge": f.huge }]}
+                        set:html={f.inlineSvg}
+                      />
+                    ) : (
+                      <span
+                        class:list={["festival-logo", { "festival-logo--big": f.big, "festival-logo--large": f.large }]}
+                        style={`-webkit-mask-image:url("${f.logo.src}"); mask-image:url("${f.logo.src}");`}
+                      />
+                    )}
+                  </a>
+                ))
               }
             </div>
           ))
@@ -702,6 +723,7 @@ const stats = [
   .festivals-marquee {
     width: 100%;
     overflow: hidden;
+    padding-block: 14px;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
   }
@@ -761,6 +783,18 @@ const stats = [
     height: 98px;
   }
 
+  /* Kendal Calling's artwork is squarer than the rest, so it needs more box
+     to read at the same visual weight. */
+  .festival-logo--huge {
+    width: 220px;
+    height: 165px;
+  }
+
+  .festival-logo--large {
+    width: 236px;
+    height: 118px;
+  }
+
   .festival-logo--inline {
     background-color: transparent;
     opacity: 0.85;
@@ -772,10 +806,57 @@ const stats = [
     height: 100%;
   }
 
-  .festival-logo--inline :global(svg) {
+  /* Logos are links: gold, a small lift and lean on hover/focus. The marquee
+     keeps scrolling underneath. */
+  .festival-link {
     display: block;
-    width: 100%;
-    height: 100%;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  .festival-logo {
+    transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .festival-logo--inline :global(svg path),
+  .festival-logo--inline :global(svg polygon),
+  .festival-logo--inline :global(svg circle) {
+    transition: fill 0.3s ease;
+  }
+
+  .festival-link:hover .festival-logo,
+  .festival-link:focus-visible .festival-logo {
+    background-color: var(--chai-gold);
+    opacity: 1;
+    transform: translateZ(0) translateY(-5px) scale(1.06) rotate(-1.5deg);
+  }
+
+  .festival-link:hover .festival-logo--inline,
+  .festival-link:focus-visible .festival-logo--inline {
+    background-color: transparent;
+  }
+
+  /* Kendal's artwork is multi-colour (dark backing plate + light figure), so
+     recolour just the light shapes and leave the backing plate alone. */
+  .festival-link:hover .festival-logo--inline :global(svg path:not(.cls-1)),
+  .festival-link:hover .festival-logo--inline :global(svg polygon),
+  .festival-link:hover .festival-logo--inline :global(svg circle),
+  .festival-link:focus-visible .festival-logo--inline :global(svg path:not(.cls-1)),
+  .festival-link:focus-visible .festival-logo--inline :global(svg polygon),
+  .festival-link:focus-visible .festival-logo--inline :global(svg circle) {
+    fill: var(--chai-gold);
+  }
+
+  .festival-link:focus-visible {
+    outline: 2px solid var(--chai-gold);
+    outline-offset: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .festival-link:hover .festival-logo,
+    .festival-link:focus-visible .festival-logo {
+      transform: translateZ(0);
+    }
   }
 
   /* FINAL CTA */
