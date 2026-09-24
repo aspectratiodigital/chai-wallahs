@@ -1,5 +1,5 @@
 ---
-name: "CFE"
+name: "Conservatoire Folk Ensemble"
 genres: ["FOLK", "JAZZ", "AFRO", "FUSION", "GLOBAL"]
 image: "/uploads/artists/cfe.jpg"
 years: [2026]

@@ -524,13 +524,20 @@ const YEARS = [2026, 2025, 2024, 2023];
     margin-bottom: var(--space-3);
   }
 
+  /* Flex, not grid: a grid's leftover cells on an incomplete last row stay
+     empty and left-aligned, while flex-wrap + justify-content: center lets
+     that row's cards centre themselves instead. Each card's flex-basis is
+     set to match the column count at each breakpoint below. */
   .artists-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    --artists-cols: 4;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-3);
   }
 
   .artists-grid :global([data-artist-card]) {
+    flex: 0 1 calc((100% - (var(--artists-cols) - 1) * var(--space-3)) / var(--artists-cols));
     opacity: 0;
     transform: translateY(28px);
     transition: opacity 0.5s ease, transform 0.5s ease;
@@ -543,13 +550,13 @@ const YEARS = [2026, 2025, 2024, 2023];
 
   @media (max-width: 1000px) {
     .artists-grid {
-      grid-template-columns: repeat(3, 1fr);
+      --artists-cols: 3;
     }
   }
 
   @media (max-width: 700px) {
     .artists-grid {
-      grid-template-columns: repeat(2, 1fr);
+      --artists-cols: 2;
     }
   }
 
@@ -631,7 +638,7 @@ const YEARS = [2026, 2025, 2024, 2023];
     /* ARTISTS GRID: one full-width card per row, same photo ratio as
        desktop — just scaled up to fill the phone screen. */
     .artists-grid {
-      grid-template-columns: 1fr;
+      --artists-cols: 1;
       gap: var(--space-3);
     }
   }
