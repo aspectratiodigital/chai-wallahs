@@ -225,16 +225,19 @@ const links = [
       flex-direction: column;
       align-items: flex-start;
       justify-content: center;
-      padding: var(--space-4);
+      padding: var(--space-3);
       transform: translateX(100%);
       transition: transform 0.25s ease;
-      gap: var(--space-4);
+      gap: var(--space-2);
       border-left: 1px solid rgba(239, 239, 239, 0.15);
+      /* However tall the phone, the menu never needs more room than this to
+         show every link plus the button without scrolling. */
+      overflow-y: auto;
     }
 
     .nav ul {
       flex-direction: column;
-      gap: var(--space-3);
+      gap: 0.3em;
     }
 
     .nav ul a {
@@ -261,27 +264,19 @@ const links = [
   }
 
   @media (max-width: 499px) {
-    .nav {
-      justify-content: flex-start;
-      padding-top: 6rem;
-    }
-
     .nav ul a {
       font-family: var(--font-display);
-      font-size: 2.1rem;
+      font-size: 1.5rem;
+      line-height: 1.15;
       letter-spacing: 0.01em;
     }
   }
 
   @media (min-width: 500px) and (max-width: 850px) {
-    .nav {
-      justify-content: flex-start;
-      padding-top: 6rem;
-    }
-
     .nav ul a {
       font-family: var(--font-display);
-      font-size: 2.4rem;
+      font-size: 1.8rem;
+      line-height: 1.15;
       letter-spacing: 0.01em;
     }
   }
