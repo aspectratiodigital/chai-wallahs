@@ -25,6 +25,10 @@ import BodyAndSoulLogo from "../assets/images/festivals/body-and-soul.svg";
 import SunriseLogo from "../assets/images/festivals/sunrise-celebration.svg";
 import FusionLogo from "../assets/images/festivals/fusion.svg";
 import KendalCallingRaw from "../assets/images/festivals/kendal-calling.svg?raw";
+import ElectricPicnicLogo from "../assets/images/festivals/electric-picnic.svg";
+import BoomtownLogo from "../assets/images/festivals/boomtown.svg";
+import ShindigLogo from "../assets/images/festivals/shindig.svg";
+import BestivalLogo from "../assets/images/festivals/bestival.svg";
 
 const siteContent = await getEntry("site", "home");
 const allGigs = await getCollection("gigs", ({ data }) => !data.draft);
@@ -54,19 +58,25 @@ const missionPoints = (siteContent?.data.missionPoints ?? []).map((point, i) => 
 // Each logo links to the festival's own site. Where the festival has ended or
 // its site is gone, it links to the best remaining source instead (noted below).
 const festivalLogos = [
-  { name: "Glastonbury", logo: GlastonburyLogo, url: "https://www.glastonburyfestivals.co.uk/" },
-  { name: "Greenman", logo: GreenmanLogo, url: "https://www.greenman.net/" },
+  // Ended in 2018 and the domain is gone: Wikipedia.
+  { name: "Bestival", logo: BestivalLogo, wide: true, url: "https://en.wikipedia.org/wiki/Bestival" },
   { name: "Kendal Calling", inlineSvg: KendalCallingRaw, huge: true, url: "https://kendalcalling.co.uk/" },
-  // Ended in 2025; the official site now carries the festival's story on its About page.
-  { name: "Body & Soul", logo: BodyAndSoulLogo, big: true, url: "https://bodyandsoul.ie/about" },
+  { name: "Greenman", logo: GreenmanLogo, url: "https://www.greenman.net/" },
   // Ended in 2017 and the festival's domain no longer serves a site: Wikipedia.
   { name: "Secret Garden Party", logo: SgpLogo, large: true, url: "https://en.wikipedia.org/wiki/Secret_Garden_Party" },
+  { name: "Shambala", logo: ShambalaLogo, url: "https://www.shambalafestival.org/" },
+  { name: "Glastonbury", logo: GlastonburyLogo, url: "https://www.glastonburyfestivals.co.uk/" },
+  { name: "Boomtown", logo: BoomtownLogo, xwide: true, url: "https://www.boomtownfair.co.uk/" },
+  // Ended after its 10th edition in 2024; the official site is still live.
+  { name: "Shindig", logo: ShindigLogo, wide: true, url: "https://shindigfestival.co.uk/" },
+  // Ended in 2025; the official site now carries the festival's story on its About page.
+  { name: "Body & Soul", logo: BodyAndSoulLogo, big: true, url: "https://bodyandsoul.ie/about" },
   { name: "Fusion", logo: FusionLogo, big: true, url: "https://fusion-festival.de/" },
   // Its website is down; the festival's Instagram is its live official channel.
   { name: "Boomerang", logo: BoomerangLogo, url: "https://www.instagram.com/boomerangfestival.mt/" },
   // The festival's domain has lapsed: Wikipedia.
   { name: "Sunrise Celebration", logo: SunriseLogo, big: true, url: "https://en.wikipedia.org/wiki/Sunrise_Celebration" },
-  { name: "Shambala", logo: ShambalaLogo, url: "https://www.shambalafestival.org/" },
+  { name: "Electric Picnic", logo: ElectricPicnicLogo, wide: true, url: "https://www.electricpicnic.ie/" },
 ];
 
 const stats = [
@@ -265,7 +275,7 @@ const stats = [
                       />
                     ) : (
                       <span
-                        class:list={["festival-logo", { "festival-logo--big": f.big, "festival-logo--large": f.large }]}
+                        class:list={["festival-logo", { "festival-logo--big": f.big, "festival-logo--large": f.large, "festival-logo--wide": f.wide, "festival-logo--xwide": f.xwide }]}
                         style={`-webkit-mask-image:url("${f.logo.src}"); mask-image:url("${f.logo.src}");`}
                       />
                     )}
@@ -793,6 +803,19 @@ const stats = [
   .festival-logo--large {
     width: 236px;
     height: 118px;
+  }
+
+  /* Electric Picnic, Shindig and Bestival are wordmark logos, much wider
+     than tall, so they need a shallower box to read at full width. */
+  .festival-logo--wide {
+    width: 250px;
+    height: 78px;
+  }
+
+  /* Boomtown's wordmark is wider still. */
+  .festival-logo--xwide {
+    width: 280px;
+    height: 55px;
   }
 
   .festival-logo--inline {
