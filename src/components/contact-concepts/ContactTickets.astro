@@ -54,7 +54,9 @@ const colorVar: Record<string, string> = {
             />
             <h3>{t.title}</h3>
             <p class="ticket-blurb">{t.blurb}</p>
-            <span class="ticket-flip-hint">Tap to flip &#8635;</span>
+            <span class="ticket-flip-hint">
+              <span class="ticket-hint-tap">Tap to flip</span><span class="ticket-hint-hover">Hover to flip</span> &#8635;
+            </span>
           </div>
           <div class="ticket-face ticket-back">
             <p>{t.text}</p>
@@ -77,6 +79,7 @@ const colorVar: Record<string, string> = {
       ticket.addEventListener("click", (e) => {
         // Let the CTA link inside the flipped-open back face work normally.
         if ((e.target as HTMLElement).closest("a")) return;
+        if (window.matchMedia("(hover: hover)").matches) return;
         toggle();
       });
       ticket.addEventListener("keydown", (e) => {
@@ -120,6 +123,27 @@ const colorVar: Record<string, string> = {
 
   .ticket.is-flipped .ticket-inner {
     transform: rotateY(180deg);
+  }
+
+  /* Devices with a real pointer flip on hover (and on keyboard focus);
+     touch screens keep tap-to-flip via the .is-flipped class. */
+  .ticket-hint-hover {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .ticket:hover .ticket-inner,
+    .ticket:focus-within .ticket-inner {
+      transform: rotateY(180deg);
+    }
+
+    .ticket-hint-tap {
+      display: none;
+    }
+
+    .ticket-hint-hover {
+      display: inline;
+    }
   }
 
   .ticket-face {
