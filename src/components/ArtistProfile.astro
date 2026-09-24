@@ -78,15 +78,6 @@ const nameSize =
 // A row of five icons needs smaller icons on a phone than a row of three.
 const manySocials = socials.length > 4;
 
-// Clean outlined lettering. -webkit-text-stroke only has mitred joins, which
-// spike at every sharp corner of this display face; a ring of offset
-// text-shadows gives an evenly rounded outline instead.
-const OUTLINE_R = 0.03;
-const OUTLINE_N = 40;
-const outline = Array.from({ length: OUTLINE_N }, (_, i) => {
-  const a = (i / OUTLINE_N) * Math.PI * 2;
-  return `${(Math.cos(a) * OUTLINE_R).toFixed(4)}em ${(Math.sin(a) * OUTLINE_R).toFixed(4)}em 0 var(--off-white)`;
-}).join(", ");
 ---
 
 <BaseLayout title={testLabel ? `${name} — ${testLabel}` : name} description={genres.length ? `${name} — ${genres.join(", ")}` : name}>
@@ -117,7 +108,7 @@ const outline = Array.from({ length: OUTLINE_N }, (_, i) => {
       </div>
 
       <div class="hero-info">
-        <h1 class="artist-name" style={`font-size:${nameSize};text-shadow:${outline}`}>{name}</h1>
+        <h1 class="artist-name" style={`font-size:${nameSize}`}>{name}</h1>
 
         <div class="spec-panel">
           <dl>
@@ -434,11 +425,9 @@ const outline = Array.from({ length: OUTLINE_N }, (_, i) => {
     opacity: 0.6;
   }
 
-  /* Name: hollow lettering — page-black fill, off-white outline built from a
-     ring of offset text-shadows (set inline) so corners stay round and clean. */
   .artist-name {
     font-size: clamp(3.4rem, 8vw, 7.2rem);
-    color: var(--stage-black);
+    color: var(--off-white);
     margin: 0;
     padding: 0.04em 0;
   }
