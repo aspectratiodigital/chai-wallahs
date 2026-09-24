@@ -3,6 +3,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import TornBox from "../components/TornBox.astro";
 import Highlight from "../components/Highlight.astro";
+import TimelineFlame from "../components/timeline-concepts/TimelineFlame.astro";
+import TimelineWayfinderHorizontal from "../components/timeline-concepts/TimelineWayfinderHorizontal.astro";
 import { getEntry } from "astro:content";
 
 import HeroImg from "../assets/images/backgrounds/green-2.png";
@@ -56,6 +58,38 @@ const timeline = siteContent?.data.timeline ?? [];
       </ol>
     </div>
   </section>
+
+  <!-- ==========================================================
+       TIMELINE REDESIGN — for internal comparison only.
+       "Wayfinder" was the chosen favourite among the earlier draft
+       concepts, kept here in its original vertical form plus a new
+       horizontal-slider take. Remove this whole block (and the two
+       timeline-concepts components) once one is chosen, or once
+       neither is wanted.
+       ========================================================== -->
+  <section class="section concepts-intro">
+    <div class="wrap">
+      <p class="eyebrow concepts-label">&gt; Timeline redesign — draft concepts</p>
+      <h2>Wayfinder, two ways</h2>
+      <p class="concepts-note">
+        The favourite from the earlier round of drafts, kept in its original vertical form, plus a new horizontal
+        take: scroll into it and the page pauses, scrolling drives the slider left to right instead, and only once
+        it's fully through does the page carry on.
+      </p>
+    </div>
+  </section>
+
+  <section class="section concept-block concept-block--alt">
+    <div class="wrap">
+      <p class="eyebrow concept-tag">Wayfinder — vertical</p>
+      <h3>Walked through the story</h3>
+      <p class="concept-desc">The classic alternating layout, but a gold marker travels down the spine as you scroll, carrying a badge that names whichever year it's currently passing, with a giant ghost numeral behind every card.</p>
+      <TimelineFlame timeline={timeline} />
+    </div>
+  </section>
+
+  <TimelineWayfinderHorizontal timeline={timeline} title="27 years of stages" label="Wayfinder — horizontal slider" />
+  <!-- ========================================================== -->
 
   <!-- MISSION -->
   <section class="mission-band">
@@ -211,8 +245,8 @@ const timeline = siteContent?.data.timeline ?? [];
     margin: 0;
     padding: 0;
     display: grid;
-    /* Six narrow columns: 11 entries sit on just two rows. */
-    grid-template-columns: repeat(6, 1fr);
+    /* Five columns: 10 entries sit evenly on two rows of five. */
+    grid-template-columns: repeat(5, 1fr);
     gap: var(--space-4) 0;
   }
 
@@ -235,6 +269,56 @@ const timeline = siteContent?.data.timeline ?? [];
     font-family: var(--font-mono);
     font-weight: 700;
     font-size: 0.95rem;
+  }
+
+  /* TIMELINE REDESIGN CONCEPTS (comparison-only block) */
+  .concepts-intro {
+    background: var(--stage-black);
+    color: var(--off-white);
+    padding-bottom: 0;
+  }
+
+  .concepts-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .concepts-intro h2 {
+    color: var(--off-white);
+    margin-bottom: var(--space-2);
+  }
+
+  .concepts-note {
+    max-width: 62ch;
+    opacity: 0.75;
+  }
+
+  .concept-block {
+    background: var(--stage-black);
+    color: var(--off-white);
+    padding-top: var(--space-4);
+  }
+
+  .concept-block--alt {
+    background: #14100c;
+  }
+
+  .concept-tag {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .concept-block h3 {
+    color: var(--off-white);
+    font-size: clamp(1.6rem, 2.6vw + 1rem, 2.4rem);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-desc {
+    max-width: 62ch;
+    opacity: 0.75;
+    font-size: 0.95rem;
+    margin-bottom: var(--space-4);
   }
 
   /* MISSION BAND */
@@ -437,12 +521,6 @@ const timeline = siteContent?.data.timeline ?? [];
     max-width: 52ch;
     margin-bottom: var(--space-3);
     opacity: 0.9;
-  }
-
-  @media (max-width: 1100px) {
-    .timeline {
-      grid-template-columns: repeat(4, 1fr);
-    }
   }
 
   @media (max-width: 860px) {

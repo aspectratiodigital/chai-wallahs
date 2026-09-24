@@ -1,0 +1,247 @@
+---
+// Concept 4 — Wayfinder: a classic alternating zigzag, but a gold marker
+// travels down the centre spine as you scroll, carrying a badge that names
+// whichever year it's currently passing — plus a giant ghost numeral behind
+// each card. The most editorial/immersive of the four: it wants to feel
+// like being walked through the story rather than just reading it.
+interface Entry {
+  year: string;
+  text: string;
+}
+interface Props {
+  timeline: Entry[];
+}
+const { timeline } = Astro.props;
+---
+
+<div class="flame-wrap" data-flame-root>
+  <div class="flame-spine" data-flame-spine aria-hidden="true">
+    <div class="flame-marker" data-flame-marker>
+      <span class="flame-badge" data-flame-badge>{timeline[0]?.year}</span>
+    </div>
+  </div>
+  <ol class="flame-list">
+    {
+      timeline.map((t, i) => (
+        <li class:list={["flame-item", i % 2 === 0 ? "flame-item--left" : "flame-item--right"]} data-flame-item data-top={t.year}>
+          <span class="flame-num" aria-hidden="true">{t.year}</span>
+          <div class="flame-card">
+            <span class="flame-year">{t.year}</span>
+            <p>{t.text}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<script>
+  function initFlame(root: HTMLElement) {
+    const spine = root.querySelector<HTMLElement>("[data-flame-spine]");
+    const marker = root.querySelector<HTMLElement>("[data-flame-marker]");
+    const badge = root.querySelector<HTMLElement>("[data-flame-badge]");
+    const items = [...root.querySelectorAll<HTMLElement>("[data-flame-item]")];
+    if (!spine || !marker || !badge || !items.length) return;
+
+    let raf = 0;
+    function update() {
+      raf = 0;
+      const rect = spine.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const total = rect.height + vh * 0.4;
+      const travelled = vh * 0.6 - rect.top;
+      const progress = Math.min(1, Math.max(0, travelled / total));
+      const y = progress * rect.height;
+      marker.style.transform = `translateY(${y}px)`;
+      marker.style.opacity = progress > 0 && progress < 1 ? "1" : progress >= 1 ? "1" : "0";
+
+      const markerAbs = rect.top + y;
+      let current = items[0].dataset.top ?? "";
+      items.forEach((item) => {
+        if (item.getBoundingClientRect().top <= markerAbs) current = item.dataset.top ?? current;
+      });
+      if (badge.textContent !== current) badge.textContent = current;
+    }
+
+    function onScroll() {
+      if (!raf) raf = requestAnimationFrame(update);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    update();
+
+    // Cards rise in from their own side as they scroll into view.
+    let lastY = window.scrollY;
+    let scrollingUp = false;
+    window.addEventListener(
+      "scroll",
+      () => {
+        scrollingUp = window.scrollY < lastY;
+        lastY = window.scrollY;
+      },
+      { passive: true },
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add("is-visible");
+          else if (scrollingUp && entry.boundingClientRect.top >= 0) entry.target.classList.remove("is-visible");
+        });
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -10% 0px" },
+    );
+    items.forEach((item) => observer.observe(item));
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-flame-root]").forEach(initFlame);
+</script>
+
+<style>
+  .flame-wrap {
+    position: relative;
+  }
+
+  .flame-spine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    transform: translateX(-1px);
+    background: rgba(239, 239, 239, 0.16);
+  }
+
+  .flame-marker {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -7px;
+    border-radius: 50%;
+    background: var(--chai-gold);
+    box-shadow: 0 0 0 5px rgba(248, 179, 27, 0.18), 0 0 16px 2px rgba(248, 179, 27, 0.55);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .flame-badge {
+    position: absolute;
+    top: 50%;
+    left: 26px;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--stage-black);
+    background: var(--chai-gold);
+    padding: 0.3em 0.6em;
+    border-radius: 3px;
+  }
+
+  .flame-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .flame-item {
+    position: relative;
+    width: 46%;
+    opacity: 0;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .flame-item--left {
+    margin-right: auto;
+    text-align: right;
+    transform: translateX(-24px);
+  }
+
+  .flame-item--right {
+    margin-left: auto;
+    text-align: left;
+    transform: translateX(24px);
+  }
+
+  .flame-item.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .flame-num {
+    position: absolute;
+    top: -0.5em;
+    font-family: var(--font-display);
+    font-size: 5.5rem;
+    line-height: 1;
+    color: var(--off-white);
+    opacity: 0.06;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .flame-item--left .flame-num {
+    right: 0;
+  }
+
+  .flame-item--right .flame-num {
+    left: 0;
+  }
+
+  .flame-card {
+    position: relative;
+    z-index: 1;
+  }
+
+  .flame-year {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    color: var(--chai-gold);
+    margin-bottom: 0.4em;
+  }
+
+  .flame-card p {
+    opacity: 0.85;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 700px) {
+    .flame-spine {
+      left: 18px;
+    }
+
+    .flame-marker {
+      left: 18px;
+    }
+
+    .flame-badge {
+      left: 34px;
+    }
+
+    .flame-item,
+    .flame-item--left,
+    .flame-item--right {
+      width: auto;
+      margin: 0 0 0 44px;
+      text-align: left;
+      transform: translateX(24px);
+    }
+
+    .flame-item--left .flame-num,
+    .flame-item--right .flame-num {
+      left: 0;
+      right: auto;
+    }
+  }
+</style>

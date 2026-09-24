@@ -1,0 +1,371 @@
+---
+// Concept 4b — Wayfinder, horizontal: the vertical version's own look and
+// mechanics — ghost numeral behind the small gold year, no boxes, entries
+// alternating either side of the line — just turned on its side. The
+// title sits at the top of the pinned block itself, so it stays in view
+// the whole time. Scrolling into the section locks the page in place once
+// the section's top reaches the top of the page view (i.e. just below the
+// sticky header); continued scroll-down then slides the years past a
+// fixed horizontal spine left→right, and only a little after they've all
+// gone by does the page carry on scrolling past it. Scrolling back up
+// runs it in reverse.
+interface Entry {
+  year: string;
+  text: string;
+}
+interface Props {
+  timeline: Entry[];
+  title: string;
+  label: string;
+}
+const { timeline, title, label } = Astro.props;
+---
+
+<div class="hway" data-hway-root>
+  <div class="hway-pin" data-hway-pin>
+    <div class="wrap hway-header">
+      <p class="eyebrow hway-tag">{label}</p>
+      <h3 class="hway-title">{title}</h3>
+    </div>
+
+    <div class="hway-slider" data-hway-slider>
+      <div class="hway-line" aria-hidden="true">
+        <span class="hway-line-fill" data-hway-fill></span>
+        <span class="hway-marker" data-hway-marker>
+          <span class="hway-badge" data-hway-badge>{timeline[0]?.year}</span>
+        </span>
+      </div>
+
+      <div class="hway-viewport">
+        <div class="hway-track" data-hway-track>
+          {
+            timeline.map((t, i) => (
+              <div class:list={["hway-item", i % 2 === 0 ? "hway-item--above" : "hway-item--below"]} data-hway-panel data-year={t.year}>
+                <div class="hway-item-content" data-hway-content>
+                  <div class="hway-num-wrap">
+                    <span class="hway-num" aria-hidden="true">{t.year}</span>
+                    <span class="hway-year">{t.year}</span>
+                  </div>
+                  <p>{t.text}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initHway(root: HTMLElement) {
+    const pin = root.querySelector<HTMLElement>("[data-hway-pin]");
+    const track = root.querySelector<HTMLElement>("[data-hway-track]");
+    const panels = [...root.querySelectorAll<HTMLElement>("[data-hway-panel]")];
+    const contents = [...root.querySelectorAll<HTMLElement>("[data-hway-content]")];
+    const fill = root.querySelector<HTMLElement>("[data-hway-fill]");
+    const marker = root.querySelector<HTMLElement>("[data-hway-marker]");
+    const badge = root.querySelector<HTMLElement>("[data-hway-badge]");
+    if (!pin || !track || !panels.length || !fill || !marker || !badge) return;
+
+    // The pin sticks below the site's own sticky header, not at the very top
+    // of the viewport — so "the section's top reaches the top of the page
+    // view" means the top of the *visible* page, under the header. The
+    // title lives inside the pin itself, so it rides along and stays put.
+    const header = document.getElementById("site-header");
+
+    // A little extra scroll held at the very end (after the slider has
+    // fully finished) before the pin releases, so the next section doesn't
+    // start creeping up right as the last year arrives.
+    const HOLD_AFTER_END = 280;
+
+    let extra = 0;
+
+    function measure() {
+      const stickyTop = header?.getBoundingClientRect().height ?? 0;
+      pin!.style.top = `${stickyTop}px`;
+      const viewportW = window.innerWidth;
+      const trackW = track!.scrollWidth;
+      extra = Math.max(0, trackW - viewportW);
+      root.style.height = `${pin!.getBoundingClientRect().height + extra + HOLD_AFTER_END}px`;
+    }
+
+    let raf = 0;
+    function update() {
+      raf = 0;
+      const stickyTop = parseFloat(pin!.style.top) || 0;
+      const rect = root.getBoundingClientRect();
+      const progress = extra > 0 ? Math.min(1, Math.max(0, (stickyTop - rect.top) / extra)) : 0;
+      track!.style.transform = `translateX(${-progress * extra}px)`;
+      fill!.style.width = `${progress * 100}%`;
+      marker!.style.left = `${progress * 100}%`;
+
+      const idx = Math.min(panels.length - 1, Math.round(progress * (panels.length - 1)));
+      const year = panels[idx].dataset.year ?? "";
+      if (badge!.textContent !== year) badge!.textContent = year;
+    }
+
+    function onScroll() {
+      if (!raf) raf = requestAnimationFrame(update);
+    }
+
+    measure();
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", () => {
+      measure();
+      update();
+    });
+
+    // Each year's text rises into place from the side of the line it sits
+    // on — above-the-line entries drop in from above, below-the-line
+    // entries rise in from below — same fade + travel style as the
+    // vertical version. It animates back out again too if you scroll back
+    // past it (mirroring the vertical version's own rule: only hide on a
+    // *reverse* exit, never on a forward one, so passing an entry while
+    // still moving ahead doesn't undo it).
+    let lastScrollY = window.scrollY;
+    let scrollingBack = false;
+    window.addEventListener(
+      "scroll",
+      () => {
+        scrollingBack = window.scrollY < lastScrollY;
+        lastScrollY = window.scrollY;
+      },
+      { passive: true },
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add("is-visible");
+          else if (scrollingBack) entry.target.classList.remove("is-visible");
+        });
+      },
+      { threshold: 0.2 },
+    );
+    contents.forEach((el) => observer.observe(el));
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-hway-root]").forEach(initHway);
+</script>
+
+<style>
+  .hway {
+    position: relative;
+    background: var(--stage-black);
+    /* Breathing room after the pin releases, so the next section doesn't
+       press right up against the text below the timeline. This is separate
+       from the held scroll distance at the end of the slider itself — that
+       gap happens while still pinned; this one is normal flow, after. */
+    margin-bottom: var(--space-6);
+  }
+
+  .hway-pin {
+    position: sticky;
+    top: 0;
+    overflow: hidden;
+    background: var(--stage-black);
+    padding-top: var(--space-3);
+  }
+
+  .hway-header {
+    position: relative;
+    z-index: 4;
+  }
+
+  .hway-tag {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .hway-title {
+    color: var(--off-white);
+    font-size: clamp(1.6rem, 2.6vw + 1rem, 2.4rem);
+    margin-bottom: var(--space-2);
+  }
+
+  .hway-slider {
+    position: relative;
+    height: min(48vh, 400px);
+    overflow: hidden;
+  }
+
+  /* The fixed horizontal spine — the years slide past it, not the other way
+     round, same as the vertical version's spine + travelling marker. */
+  .hway-line {
+    position: absolute;
+    top: 50%;
+    left: var(--space-4);
+    right: var(--space-4);
+    height: 2px;
+    transform: translateY(-1px);
+    background: rgba(239, 239, 239, 0.16);
+    z-index: 2;
+  }
+
+  .hway-line-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0%;
+    background: var(--chai-gold);
+    box-shadow: 0 0 12px 1px rgba(248, 179, 27, 0.6);
+  }
+
+  .hway-marker {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--chai-gold);
+    box-shadow: 0 0 0 5px rgba(248, 179, 27, 0.18), 0 0 16px 2px rgba(248, 179, 27, 0.55);
+  }
+
+  .hway-badge {
+    position: absolute;
+    top: -2.1em;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--stage-black);
+    background: var(--chai-gold);
+    padding: 0.3em 0.6em;
+    border-radius: 3px;
+  }
+
+  .hway-viewport {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .hway-track {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+    gap: var(--space-3);
+    padding: 0 var(--space-4);
+    will-change: transform;
+  }
+
+  .hway-item {
+    position: relative;
+    flex: 0 0 300px;
+    height: 100%;
+  }
+
+  /* The content block itself is what fades/travels in — its top-to-bottom
+     order (ghost year, small gold year, body text) never changes; only
+     which edge it's anchored to the line by flips between above/below.
+     Its own text is allowed to run wider than the item's own slot — the
+     next item along is two slots away on the same side (its immediate
+     neighbour sits on the *other* side of the line), so a little visual
+     spill underneath a neighbour never actually collides with its text. */
+  /* The reveal offset is carried as a custom property set by the low-
+     specificity `.hway-item--above`/`--below` selectors and read by
+     `.hway-item-content`, rather than baked into a `.hway-item--above
+     .hway-item-content` descendant-combinator rule — Astro's CSS scoping
+     appends the component's scope attribute to *every* compound in a
+     selector, so a two-part descendant selector ends up with higher
+     specificity than the one-part `.hway-item-content.is-visible` rule
+     below it and was silently always winning, no matter the source order.
+     Keeping every rule that touches `transform` down to a single compound
+     sidesteps that entirely. */
+  .hway-item--above {
+    --hway-offset: -56px;
+  }
+
+  .hway-item--below {
+    --hway-offset: 56px;
+  }
+
+  .hway-item-content {
+    position: absolute;
+    left: 0;
+    width: 340px;
+    color: var(--off-white);
+    opacity: 0;
+    transform: translateY(var(--hway-offset));
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .hway-item--above .hway-item-content {
+    bottom: calc(50% + 26px);
+  }
+
+  .hway-item--below .hway-item-content {
+    top: calc(50% + 26px);
+  }
+
+  .hway-item-content.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* The grey ghost year sits in normal flow (so it takes up real space and
+     the body text below can never overlap it); the small gold year is
+     pinned to its bottom-left corner, sitting just above the body text. */
+  .hway-num-wrap {
+    position: relative;
+  }
+
+  .hway-num {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 4.4rem;
+    line-height: 0.9;
+    color: var(--off-white);
+    opacity: 0.07;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .hway-year {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    color: var(--chai-gold);
+  }
+
+  .hway-item-content p {
+    max-width: 100%;
+    margin-top: 0.75em;
+    opacity: 0.85;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 700px) {
+    .hway-slider {
+      height: min(60vh, 460px);
+    }
+
+    .hway-item {
+      flex: 0 0 220px;
+    }
+
+    .hway-item-content {
+      width: 260px;
+    }
+
+    .hway-num {
+      font-size: 3.4rem;
+    }
+
+    .hway-item-content p {
+      font-size: 0.85rem;
+    }
+  }
+</style>
