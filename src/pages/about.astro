@@ -67,23 +67,10 @@ const timeline = siteContent?.data.timeline ?? [];
        timeline-concepts components) once one is chosen, or once
        neither is wanted.
        ========================================================== -->
-  <section class="section concepts-intro">
-    <div class="wrap">
-      <p class="eyebrow concepts-label">&gt; Timeline redesign — draft concepts</p>
-      <h2>Wayfinder, two ways</h2>
-      <p class="concepts-note">
-        The favourite from the earlier round of drafts, kept in its original vertical form, plus a new horizontal
-        take: scroll into it and the page pauses, scrolling drives the slider left to right instead, and only once
-        it's fully through does the page carry on.
-      </p>
-    </div>
-  </section>
-
   <section class="section concept-block concept-block--alt">
     <div class="wrap">
       <p class="eyebrow concept-tag">Wayfinder — vertical</p>
-      <h3>Walked through the story</h3>
-      <p class="concept-desc">The classic alternating layout, but a gold marker travels down the spine as you scroll, carrying a badge that names whichever year it's currently passing, with a giant ghost numeral behind every card.</p>
+      <h3>27 years of stages</h3>
       <TimelineFlame timeline={timeline} />
     </div>
   </section>
@@ -311,7 +298,7 @@ const timeline = siteContent?.data.timeline ?? [];
   .concept-block h3 {
     color: var(--off-white);
     font-size: clamp(1.6rem, 2.6vw + 1rem, 2.4rem);
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-4);
   }
 
   .concept-desc {

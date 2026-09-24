@@ -56,6 +56,7 @@ const { timeline, title, label } = Astro.props;
     </div>
   </div>
 </div>
+<div class="hway-after" aria-hidden="true"></div>
 
 <script>
   function initHway(root: HTMLElement) {
@@ -154,11 +155,16 @@ const { timeline, title, label } = Astro.props;
   .hway {
     position: relative;
     background: var(--stage-black);
-    /* Breathing room after the pin releases, so the next section doesn't
-       press right up against the text below the timeline. This is separate
-       from the held scroll distance at the end of the slider itself — that
-       gap happens while still pinned; this one is normal flow, after. */
-    margin-bottom: var(--space-6);
+  }
+
+  /* Breathing room after the pin releases, so the next section doesn't
+     press right up against the text below the timeline. A real element (not
+     a margin) so it carries the same dark background instead of showing the
+     page's off-white. Separate from the held scroll distance at the end of
+     the slider itself, which happens while still pinned. */
+  .hway-after {
+    height: var(--space-6);
+    background: var(--stage-black);
   }
 
   .hway-pin {
