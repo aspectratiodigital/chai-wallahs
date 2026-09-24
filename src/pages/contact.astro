@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import TornBox from "../components/TornBox.astro";
 import { getEntry } from "astro:content";
+import ContactTickets from "../components/contact-concepts/ContactTickets.astro";
 
 import HeroImg from "../assets/images/backgrounds/orange-1.png";
 import DirectBg from "../assets/images/backgrounds/plum-2.png";
@@ -32,11 +33,20 @@ const trackVisuals: Record<string, { icon: ImageMetadata; rotate: number }> = {
   "grassroots-supporter": { icon: CultureIcon, rotate: 1 },
 };
 
+// One-line teasers for the ticket concept's front face — the full text stays on the back.
+const trackBlurbs: Record<string, string> = {
+  artists: "Ready to play our stage? Tell us why.",
+  crew: "Fancy joining the folks behind the bar?",
+  production: "Want Chai Wallahs at your event?",
+  "grassroots-supporter": "Want to back the wider movement?",
+};
+
 const siteContent = await getEntry("site", "contact");
 const tracks = (siteContent?.data.tracks ?? []).map((t) => ({
   ...t,
   icon: trackVisuals[t.id]?.icon,
   rotate: trackVisuals[t.id]?.rotate ?? 0,
+  blurb: trackBlurbs[t.id] ?? "",
 }));
 ---
 
@@ -86,6 +96,47 @@ const tracks = (siteContent?.data.tracks ?? []).map((t) => ({
       </div>
     </div>
   </section>
+
+  <!-- ==========================================================
+       CONTACT REDESIGN — for internal comparison only.
+       "Tickets" was the chosen favourite among the earlier draft concepts.
+       Two colour treatments of it, stacked so they can be judged side by
+       side. Remove this whole block (and the contact-concepts/ContactTickets
+       component) once one is chosen, or once neither is wanted.
+       ========================================================== -->
+  <section class="section concepts-intro">
+    <div class="wrap">
+      <p class="eyebrow concepts-label">&gt; Contact redesign — draft concepts</p>
+      <h2>Flip the stub</h2>
+      <p class="concepts-note">
+        Four festival-ticket stubs instead of four colour blocks, in the same wobbly box shape as the site's
+        buttons. Tap one and it flips over on its long edge to reveal the full story and the CTA. Three colour
+        treatments below, for comparison.
+      </p>
+    </div>
+  </section>
+
+  <section class="section concept-block">
+    <div class="wrap">
+      <p class="eyebrow concept-tag">Tickets — outline</p>
+      <ContactTickets tracks={tracks} email={EMAIL} variant="outline" />
+    </div>
+  </section>
+
+  <section class="section concept-block concept-block--alt">
+    <div class="wrap">
+      <p class="eyebrow concept-tag">Tickets — colour</p>
+      <ContactTickets tracks={tracks} email={EMAIL} variant="color" />
+    </div>
+  </section>
+
+  <section class="section concept-block">
+    <div class="wrap">
+      <p class="eyebrow concept-tag">Tickets — filled</p>
+      <ContactTickets tracks={tracks} email={EMAIL} variant="filled" />
+    </div>
+  </section>
+  <!-- ========================================================== -->
 </BaseLayout>
 
 <style>
@@ -129,6 +180,46 @@ const tracks = (siteContent?.data.tracks ?? []).map((t) => ({
   .section {
     background: var(--stage-black);
     border-bottom: 1px solid rgba(239, 239, 239, 0.1);
+  }
+
+  /* CONTACT REDESIGN CONCEPTS (comparison-only block) */
+  .concepts-label {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .concepts-intro h2 {
+    color: var(--off-white);
+    margin-bottom: var(--space-2);
+  }
+
+  .concepts-note {
+    max-width: 62ch;
+    opacity: 0.75;
+    color: var(--off-white);
+  }
+
+  .concept-block--alt {
+    background: #14100c;
+  }
+
+  .concept-tag {
+    color: var(--chai-gold);
+    margin-bottom: var(--space-1);
+  }
+
+  .concept-block h3 {
+    color: var(--off-white);
+    font-size: clamp(1.6rem, 2.6vw + 1rem, 2.4rem);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-desc {
+    max-width: 62ch;
+    opacity: 0.75;
+    color: var(--off-white);
+    font-size: 0.95rem;
+    margin-bottom: var(--space-4);
   }
 
   .tracks {
