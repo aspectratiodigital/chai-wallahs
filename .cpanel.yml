@@ -1,0 +1,31 @@
+---
+# cPanel Git Version Control deployment script.
+#
+# This runs automatically whenever you click "Deploy HEAD Commit" (or "Update
+# from Remote" + Deploy) on the repo in cPanel > Git Version Control. It builds
+# the static Astro site and copies the output into public_html.
+#
+# BEFORE THIS WORKS, edit the two placeholders below:
+#
+#   YOUR_CPANEL_USERNAME  -> your Krystal cPanel account username
+#   NODEVENV_PATH         -> the exact path cPanel's "Setup Node.js App" gives you.
+#
+# To get NODEVENV_PATH:
+#   1. cPanel > Setup Node.js App > Create Application
+#   2. Pick the highest available Node.js version (needs to be >= 22.12 — check
+#      what versions are listed; if 22.x isn't offered, see the note in the
+#      chat reply about lowering the "engines" field in package.json instead).
+#   3. Application root can be anything unused, e.g. "nodeapp" — it's just a
+#      placeholder app, not actually run; we only need the node binary it sets up.
+#   4. After creating it, the app's page shows a line like:
+#        source /home/YOUR_CPANEL_USERNAME/nodevenv/nodeapp/22/bin/activate
+#      Copy that exact path into the "source" line below.
+#
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/YOUR_CPANEL_USERNAME/public_html
+    - source /home/YOUR_CPANEL_USERNAME/nodevenv/NODEVENV_PATH/bin/activate
+    - npm ci
+    - npm run build
+    - deactivate
+    - /bin/cp -R $(pwd)/dist/. $DEPLOYPATH
