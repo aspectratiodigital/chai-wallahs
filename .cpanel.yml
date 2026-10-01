@@ -5,10 +5,10 @@
 # from Remote" + Deploy) on the repo in cPanel > Git Version Control. It builds
 # the static Astro site and copies the output into public_html.
 #
-# BEFORE THIS WORKS, edit the two placeholders below:
+# BEFORE THIS WORKS, edit the remaining placeholder below:
 #
-#   YOUR_CPANEL_USERNAME  -> your Krystal cPanel account username
-#   NODEVENV_PATH         -> the exact path cPanel's "Setup Node.js App" gives you.
+#   NODEVENV_PATH  -> the exact path cPanel's "Setup Node.js App" gives you.
+#                      (cPanel username is already filled in: chaiwall)
 #
 # To get NODEVENV_PATH:
 #   1. cPanel > Setup Node.js App > Create Application
@@ -23,8 +23,8 @@
 #
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/YOUR_CPANEL_USERNAME/public_html
-    - source /home/YOUR_CPANEL_USERNAME/nodevenv/NODEVENV_PATH/bin/activate
+    - export DEPLOYPATH=/home/chaiwall/public_html
+    - source /home/chaiwall/nodevenv/NODEVENV_PATH/bin/activate
     - npm ci
     - npm run build
     - deactivate
