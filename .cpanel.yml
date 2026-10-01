@@ -1,0 +1,16 @@
+---
+# cPanel Git Version Control deployment script.
+#
+# This runs automatically whenever you click "Deploy HEAD Commit" (or "Update
+# from Remote" + Deploy) on the repo in cPanel > Git Version Control. It builds
+# the static Astro site (using the Node 22 venv set up via Setup Node.js App)
+# and copies the output into public_html.
+#
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/chaiwall/public_html
+    - source /home/chaiwall/nodevenv/nodeapp/22/bin/activate
+    - npm ci
+    - npm run build
+    - deactivate
+    - /bin/cp -R $(pwd)/dist/. $DEPLOYPATH
