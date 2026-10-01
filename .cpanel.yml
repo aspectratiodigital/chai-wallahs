@@ -3,28 +3,13 @@
 #
 # This runs automatically whenever you click "Deploy HEAD Commit" (or "Update
 # from Remote" + Deploy) on the repo in cPanel > Git Version Control. It builds
-# the static Astro site and copies the output into public_html.
-#
-# BEFORE THIS WORKS, edit the remaining placeholder below:
-#
-#   NODEVENV_PATH  -> the exact path cPanel's "Setup Node.js App" gives you.
-#                      (cPanel username is already filled in: chaiwall)
-#
-# To get NODEVENV_PATH:
-#   1. cPanel > Setup Node.js App > Create Application
-#   2. Pick the highest available Node.js version (needs to be >= 22.12 — check
-#      what versions are listed; if 22.x isn't offered, see the note in the
-#      chat reply about lowering the "engines" field in package.json instead).
-#   3. Application root can be anything unused, e.g. "nodeapp" — it's just a
-#      placeholder app, not actually run; we only need the node binary it sets up.
-#   4. After creating it, the app's page shows a line like:
-#        source /home/YOUR_CPANEL_USERNAME/nodevenv/nodeapp/22/bin/activate
-#      Copy that exact path into the "source" line below.
+# the static Astro site (using the Node 22 venv set up via Setup Node.js App)
+# and copies the output into public_html.
 #
 deployment:
   tasks:
     - export DEPLOYPATH=/home/chaiwall/public_html
-    - source /home/chaiwall/nodevenv/NODEVENV_PATH/bin/activate
+    - source /home/chaiwall/nodevenv/nodeapp/22/bin/activate
     - npm ci
     - npm run build
     - deactivate
