@@ -4,6 +4,7 @@ import EventCard from "../components/EventCard.astro";
 import Highlight from "../components/Highlight.astro";
 import { Image } from "astro:assets";
 import { getCollection, getEntry } from "astro:content";
+import { getAllProducts, isShopifyConfigured, type ShopifyProduct } from "../lib/shopify";
 
 import HeroBg from "../assets/images/backgrounds/orange-2.png";
 import StampWhite from "../assets/images/logos/Icon-Hand-drawn-White.png";
@@ -42,8 +43,15 @@ const upcomingEvents = [
   .sort((a, b) => a.event.data.date.valueOf() - b.event.data.date.valueOf())
   .slice(0, 2);
 
-const allProducts = await getCollection("products");
-const merch = allProducts.filter((p) => p.data.featured);
+// Featured merch: products tagged "featured" in Shopify, falling back to the
+// first 3 products if nothing's tagged yet. Fails soft to an empty teaser
+// (section just doesn't render) if Shopify isn't configured.
+let allProducts: ShopifyProduct[] = [];
+if (isShopifyConfigured()) {
+  allProducts = await getAllProducts().catch(() => []);
+}
+const tagged = allProducts.filter((p) => p.tags.some((t) => t.toLowerCase() === "featured"));
+const merch = (tagged.length ? tagged : allProducts).slice(0, 3);
 
 // Icons are fixed brand assets, matched to the CMS-editable text by position.
 const missionIcons = [RootsIcon, CrewIcon, SoundIcon, DancingIcon, CommunityIcon];
@@ -223,12 +231,14 @@ const stats = [
       <div class="merch-grid">
         {
           merch.map((item) => (
-            <a href="/shop/" class="merch-card">
+            <a href={`/shop/${item.handle}/`} class="merch-card">
               <div class="merch-swatch">
-                <Image src={item.data.image} alt={item.data.name} width={480} height={480} />
+                {item.featuredImage && <img src={item.featuredImage.url} alt={item.title} width={480} height={480} loading="lazy" />}
               </div>
-              <p class="merch-name">{item.data.name}</p>
-              <p class="merch-price eyebrow">{new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(item.data.price)}</p>
+              <p class="merch-name">{item.title}</p>
+              <p class="merch-price eyebrow">
+                {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(Number(item.priceRange.minVariantPrice.amount))}
+              </p>
             </a>
           ))
         }

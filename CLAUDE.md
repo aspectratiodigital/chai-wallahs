@@ -12,7 +12,18 @@ Manage the background server with `astro dev stop`, `astro dev status`, and `ast
 
 Astro static site for Chai Wallahs (grassroots festival company, est. 1999), replacing the old Wix site at chaiwallahs.co.uk. Design follows the brand book: Stage Black `#1B1511`, Off White `#EFEFEF`, Chai Gold `#F8B31B` as the primary palette, with secondary colours (Velvet/Forest Deep/Forest/Ember/Crown) used sparingly per the brand's "3 colour rule". Fonts: Poster Cut Neue (headlines, self-hosted in `public/fonts`), PT Sans (body, Google Fonts), JetBrains Mono (labels/utility).
 
-Content lives in Astro Content Collections (`src/content/`, schema in `src/content.config.ts`): `gigs`, `festivals`, `products`, `venues`, `partners`, `artists`, and `site` (per-page JSON copy/hero text). Shop is showcase-only — real checkout stays on the existing Wix store (`chaiwallahs.co.uk/category/all-products`); the `products` schema has unused `shopifyHandle`/`sku` fields reserved for a future Shopify swap so that migration is a data-source change, not a schema rewrite.
+Content lives in Astro Content Collections (`src/content/`, schema in `src/content.config.ts`): `gigs`, `festivals`, `venues`, `partners`, `artists`, and `site` (per-page JSON copy/hero text). Shop products are no longer a content collection — see "Shop / Shopify integration" below.
+
+## Shop / Shopify integration
+
+The merch store (`/shop/`) is a headless Shopify storefront, not a content collection: `src/lib/shopify.ts` talks to Shopify's Storefront API (GraphQL), products/variants/stock live entirely in Shopify admin, and checkout/payment is handed off to Shopify's own hosted checkout (`cart.checkoutUrl`) — this site never touches payment details. Store: `admin.shopify.com/store/chaiwallahs-qbr1901v` (Plus client transfer plan).
+
+- **Env vars** (see `.env.example`): `PUBLIC_SHOPIFY_STORE_DOMAIN` (the `*.myshopify.com` domain — always this, even once the storefront itself is live at `chaiwallahs.co.uk/store`) and `PUBLIC_SHOPIFY_STOREFRONT_TOKEN` (Settings → Apps and sales channels → Develop apps → an app's Storefront API access token). Both are `PUBLIC_` on purpose: the Storefront API token only ever grants unauthenticated read + cart scopes, so it's safe in client JS — there's no secret Admin API token anywhere in this repo.
+- **Fetch strategy**: build-time (SSG). `/shop/` and `/shop/[handle]/` fetch products via `getAllProducts()`/`getStaticPaths()` at build time, same model as the old content collection — a Shopify product/price/stock change needs a rebuild+redeploy to show up on the site. If that becomes a pain point, add a Shopify webhook → Netlify build hook so publishing a product triggers a rebuild automatically.
+- **Cart**: `src/lib/cart.ts` manages a Shopify `Cart` object client-side (ID kept in `localStorage`), broadcasting `cart:updated` on `window` so `CartDrawer.astro` (mounted once in `BaseLayout`) and the header's cart badge stay in sync without a framework. "Checkout" just links to `cart.checkoutUrl` — Shopify's own hosted checkout page.
+- **Featured merch** (homepage teaser): products tagged `featured` in Shopify, falling back to the first 3 products if nothing's tagged. Set the tag in Shopify admin, not here.
+- **Fails soft**: every Shopify call is wrapped so a missing/invalid token or an API outage degrades to an empty grid with a "check back shortly" message (`shop.unavailableNote` in Decap) rather than breaking the build or the page.
+- Decap CMS no longer has a Products collection — it was removed from `public/admin/config.yml` when products moved to Shopify.
 
 ## Content editing (Decap CMS)
 

@@ -1,0 +1,247 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getAllProducts, isShopifyConfigured, type ShopifyProduct } from "../../lib/shopify";
+
+export async function getStaticPaths() {
+  if (!isShopifyConfigured()) return [];
+  const products = await getAllProducts().catch(() => [] as ShopifyProduct[]);
+  return products.map((product) => ({ params: { handle: product.handle }, props: { product } }));
+}
+
+const { product } = Astro.props as { product: ShopifyProduct };
+const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+const hasOptions = product.options.some((o) => !(o.name === "Title" && o.values.length === 1 && o.values[0] === "Default Title"));
+---
+
+<BaseLayout title={product.title} description={product.description || undefined}>
+  <section class="section">
+    <div class="wrap pdp">
+      <div class="pdp-gallery">
+        {
+          (product.images.length ? product.images : [product.featuredImage]).filter(Boolean).map((img, i) => (
+            <img src={img!.url} alt={img!.altText ?? product.title} width={800} height={800} loading={i === 0 ? "eager" : "lazy"} />
+          ))
+        }
+      </div>
+
+      <div class="pdp-info">
+        <a href="/shop/" class="back-link">&larr; Back to shop</a>
+        <h1>{product.title}</h1>
+        <p class="pdp-price" data-price>{currency.format(Number(product.priceRange.minVariantPrice.amount))}</p>
+
+        {product.descriptionHtml && <div class="pdp-description" set:html={product.descriptionHtml} />}
+
+        <form id="product-form" data-product={JSON.stringify(product)}>
+          {
+            hasOptions &&
+              product.options.map((option) => (
+                <div class="option-group">
+                  <p class="option-label">{option.name}</p>
+                  <div class="option-values" data-option-name={option.name}>
+                    {option.values.map((value, i) => (
+                      <button type="button" class="option-btn" data-value={value} aria-pressed={i === 0 ? "true" : "false"}>
+                        {value}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))
+          }
+
+          <p class="stock-note" data-stock-note hidden>Out of stock in this size/colour.</p>
+
+          <button type="submit" class="btn btn-solid add-to-cart" data-add-to-cart>
+            Add to Cart
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { addToCart } from "../../lib/cart";
+  import type { ShopifyProduct, ShopifyVariant } from "../../lib/shopify";
+
+  const form = document.getElementById("product-form") as HTMLFormElement | null;
+  if (form) {
+    const product: ShopifyProduct = JSON.parse(form.dataset.product ?? "{}");
+    const priceEl = document.querySelector<HTMLElement>("[data-price]");
+    const stockNote = document.querySelector<HTMLElement>("[data-stock-note]");
+    const addButton = document.querySelector<HTMLButtonElement>("[data-add-to-cart]");
+    const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+
+    const selected: Record<string, string> = {};
+    for (const option of product.options) {
+      selected[option.name] = option.values[0];
+    }
+
+    function findVariant(): ShopifyVariant | undefined {
+      return product.variants.find((variant) =>
+        variant.selectedOptions.every((opt) => selected[opt.name] === opt.value),
+      );
+    }
+
+    function render() {
+      const variant = findVariant();
+      if (variant && priceEl) priceEl.textContent = currency.format(Number(variant.price.amount));
+      const outOfStock = !variant || !variant.availableForSale;
+      if (stockNote) stockNote.hidden = !outOfStock;
+      if (addButton) {
+        addButton.disabled = outOfStock;
+        addButton.textContent = outOfStock ? "Out of Stock" : "Add to Cart";
+      }
+    }
+
+    form.querySelectorAll<HTMLElement>(".option-values").forEach((group) => {
+      const optionName = group.dataset.optionName!;
+      group.querySelectorAll<HTMLButtonElement>(".option-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          selected[optionName] = btn.dataset.value!;
+          group.querySelectorAll<HTMLButtonElement>(".option-btn").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+          render();
+        });
+      });
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const variant = findVariant();
+      if (!variant || !addButton) return;
+      addButton.disabled = true;
+      const originalText = addButton.textContent;
+      try {
+        await addToCart(variant.id, 1);
+        addButton.textContent = "Added!";
+        window.dispatchEvent(new CustomEvent("cart:open"));
+      } catch (err) {
+        console.error(err);
+        addButton.textContent = "Couldn't add — try again";
+      } finally {
+        setTimeout(() => {
+          if (addButton) addButton.textContent = originalText;
+          render();
+        }, 1500);
+      }
+    });
+
+    render();
+  }
+</script>
+
+<style>
+  .section {
+    background: var(--stage-black);
+    color: var(--off-white);
+  }
+
+  .pdp {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  .pdp-gallery {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .pdp-gallery img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--off-white);
+    opacity: 0.65;
+    text-decoration: none;
+    margin-bottom: var(--space-2);
+  }
+
+  .back-link:hover {
+    opacity: 1;
+    color: var(--chai-gold);
+  }
+
+  .pdp-info h1 {
+    margin-bottom: var(--space-1);
+  }
+
+  .pdp-price {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--chai-gold);
+    margin-bottom: var(--space-3);
+  }
+
+  .pdp-description {
+    opacity: 0.85;
+    margin-bottom: var(--space-3);
+    line-height: 1.6;
+  }
+
+  .option-group {
+    margin-bottom: var(--space-2);
+  }
+
+  .option-label {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .option-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .option-btn {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.5em 1em;
+    background: transparent;
+    border: 1px solid rgba(239, 239, 239, 0.3);
+    color: var(--off-white);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .option-btn:hover {
+    border-color: var(--chai-gold);
+  }
+
+  .option-btn[aria-pressed="true"] {
+    border-color: var(--chai-gold);
+    color: var(--chai-gold);
+  }
+
+  .stock-note {
+    font-size: 0.85rem;
+    color: var(--ember);
+    margin-bottom: var(--space-2);
+  }
+
+  .add-to-cart {
+    margin-top: var(--space-2);
+    width: 100%;
+  }
+
+  .add-to-cart:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 860px) {
+    .pdp {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

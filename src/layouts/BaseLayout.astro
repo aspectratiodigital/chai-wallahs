@@ -1,6 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import CartDrawer from "../components/CartDrawer.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -36,5 +37,6 @@ const {
       <slot />
     </main>
     <Footer />
+    <CartDrawer />
   </body>
 </html>

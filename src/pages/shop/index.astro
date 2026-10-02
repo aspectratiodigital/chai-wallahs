@@ -1,16 +1,26 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Highlight from "../../components/Highlight.astro";
+import { getEntry } from "astro:content";
+import { getAllProducts, isShopifyConfigured, type ShopifyProduct } from "../../lib/shopify";
+
+import HeroImg from "../../assets/images/backgrounds/orange-3.png";
 import { Image } from "astro:assets";
-import Highlight from "../components/Highlight.astro";
-import { getCollection, getEntry } from "astro:content";
-
-import HeroImg from "../assets/images/backgrounds/orange-3.png";
-
-const STORE_URL = "https://www.chaiwallahs.co.uk/category/all-products";
 
 const siteContent = await getEntry("site", "shop");
-const products = await getCollection("products");
 const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+
+// Shopify isn't wired up yet in every environment (local dev without the
+// token, or before the Storefront API token has been generated) — fail soft
+// into an empty grid with a note, rather than breaking the whole build.
+let products: ShopifyProduct[] = [];
+if (isShopifyConfigured()) {
+  try {
+    products = await getAllProducts();
+  } catch (err) {
+    console.error("Failed to fetch products from Shopify:", err);
+  }
+}
 ---
 
 <BaseLayout title="Shop" description="Chai Wallahs merch — 50% of all profits reinvested into grassroots initiatives.">
@@ -26,25 +36,41 @@ const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "
 
   <section class="section">
     <div class="wrap">
-      <div class="product-grid">
-        {
-          products.map((p) => (
-            <a class="product-card" href={STORE_URL} target="_blank" rel="noopener noreferrer">
-              <div class="product-media">
-                <Image src={p.data.image} alt={p.data.name} width={640} height={640} class="product-img product-img--front" />
-                {p.data.imageHover && (
-                  <Image src={p.data.imageHover} alt="" width={640} height={640} class="product-img product-img--back" />
-                )}
-              </div>
-              <p class="eyebrow product-category">{p.data.category}</p>
-              <p class="product-name">{p.data.name}</p>
-              <p class="product-price">{currency.format(p.data.price)}</p>
-            </a>
-          ))
-        }
-      </div>
+      {
+        products.length === 0 ? (
+          <p class="shop-empty">{siteContent?.data.unavailableNote ?? "The shop's taking a breather — check back shortly."}</p>
+        ) : (
+          <div class="product-grid">
+            {products.map((p) => {
+              const hoverImage = p.images[1];
+              return (
+                <a class="product-card" href={`/shop/${p.handle}/`}>
+                  <div class="product-media">
+                    {p.featuredImage && (
+                      <img
+                        src={p.featuredImage.url}
+                        alt={p.featuredImage.altText ?? p.title}
+                        width={640}
+                        height={640}
+                        class="product-img product-img--front"
+                        loading="lazy"
+                      />
+                    )}
+                    {hoverImage && (
+                      <img src={hoverImage.url} alt="" width={640} height={640} class="product-img product-img--back" loading="lazy" />
+                    )}
+                  </div>
+                  <p class="product-name">{p.title}</p>
+                  <p class="product-price">
+                    {p.availableForSale ? currency.format(Number(p.priceRange.minVariantPrice.amount)) : "Sold out"}
+                  </p>
+                </a>
+              );
+            })}
+          </div>
+        )
+      }
       <p class="shop-note">{siteContent?.data.shopNote}</p>
-      <a href={STORE_URL} target="_blank" rel="noopener noreferrer" class="btn btn-solid">Visit the Full Store</a>
     </div>
   </section>
 </BaseLayout>
@@ -99,6 +125,12 @@ const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "
     color: var(--off-white);
   }
 
+  .shop-empty {
+    padding: var(--space-5) 0;
+    text-align: center;
+    opacity: 0.7;
+  }
+
   .product-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -117,43 +149,33 @@ const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "
     aspect-ratio: 1;
     overflow: hidden;
     margin-bottom: var(--space-2);
+    background: rgba(239, 239, 239, 0.06);
   }
 
-  .product-media :global(.product-img) {
+  .product-media .product-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: opacity 0.35s ease, transform 0.35s ease;
   }
 
-  .product-media :global(.product-img--front) {
+  .product-media .product-img--front {
     position: relative;
   }
 
-  .product-media :global(.product-img--back) {
+  .product-media .product-img--back {
     position: absolute;
     inset: 0;
     opacity: 0;
   }
 
-  .product-card:hover .product-media :global(.product-img--front) {
+  .product-card:hover .product-media .product-img--front {
     opacity: 0;
   }
 
-  .product-card:hover .product-media :global(.product-img--back) {
+  .product-card:hover .product-media .product-img--back {
     opacity: 1;
     transform: scale(1.04);
-  }
-
-  .product-placeholder {
-    width: 100%;
-    height: 100%;
-    background: var(--chai-gold);
-  }
-
-  .product-category {
-    color: var(--chai-gold);
-    margin-bottom: 0.3rem;
   }
 
   .product-name {
@@ -173,7 +195,6 @@ const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "
     color: var(--off-white);
     opacity: 0.6;
     max-width: 60ch;
-    margin-bottom: var(--space-3);
   }
 
   @media (max-width: 860px) {
@@ -202,7 +223,6 @@ const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "
   }
 
   @media (min-width: 500px) and (max-width: 850px) {
-    /* General tablet shrink — pages were running too tall */
     .shop-hero {
       min-height: 38vh;
       align-items: center;

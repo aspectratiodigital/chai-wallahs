@@ -1,0 +1,300 @@
+---
+// Mounted once in BaseLayout, so it stays in sync across every page — it
+// listens for cart:updated (broadcast by src/lib/cart.ts) and cart:open
+// (dispatched by Header's cart button and the PDP's add-to-cart handler).
+---
+
+<div class="cart-drawer" id="cart-drawer" aria-hidden="true">
+  <div class="cart-backdrop" id="cart-backdrop"></div>
+  <aside class="cart-panel" role="dialog" aria-label="Cart">
+    <div class="cart-header">
+      <p class="cart-title">Your Cart</p>
+      <button type="button" class="cart-close" id="cart-close" aria-label="Close cart">&times;</button>
+    </div>
+
+    <div class="cart-body" id="cart-body">
+      <p class="cart-empty" id="cart-empty">Your cart is empty.</p>
+      <ul class="cart-lines" id="cart-lines"></ul>
+    </div>
+
+    <div class="cart-footer" id="cart-footer" hidden>
+      <div class="cart-subtotal">
+        <span>Subtotal</span>
+        <span id="cart-subtotal-amount"></span>
+      </div>
+      <a href="#" id="cart-checkout" class="btn btn-solid cart-checkout-btn">Checkout</a>
+    </div>
+  </aside>
+</div>
+
+<script>
+  import { getCurrentCart, loadCart, removeLine, updateLineQuantity } from "../lib/cart";
+  import type { ShopifyCart } from "../lib/shopify";
+
+  const drawer = document.getElementById("cart-drawer")!;
+  const backdrop = document.getElementById("cart-backdrop")!;
+  const closeBtn = document.getElementById("cart-close")!;
+  const linesEl = document.getElementById("cart-lines")!;
+  const emptyEl = document.getElementById("cart-empty")!;
+  const footerEl = document.getElementById("cart-footer")!;
+  const subtotalEl = document.getElementById("cart-subtotal-amount")!;
+  const checkoutLink = document.getElementById("cart-checkout") as HTMLAnchorElement;
+  const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+
+  function open() {
+    drawer.classList.add("cart-open");
+    drawer.setAttribute("aria-hidden", "false");
+  }
+
+  function close() {
+    drawer.classList.remove("cart-open");
+    drawer.setAttribute("aria-hidden", "true");
+  }
+
+  function render(cart: ShopifyCart | null) {
+    linesEl.innerHTML = "";
+
+    if (!cart || cart.lines.length === 0) {
+      emptyEl.hidden = false;
+      footerEl.hidden = true;
+      updateBadge(0);
+      return;
+    }
+
+    emptyEl.hidden = true;
+    footerEl.hidden = false;
+    subtotalEl.textContent = currency.format(Number(cart.cost.subtotalAmount.amount));
+    checkoutLink.href = cart.checkoutUrl;
+    updateBadge(cart.totalQuantity);
+
+    for (const line of cart.lines) {
+      const li = document.createElement("li");
+      li.className = "cart-line";
+      const variantLabel = line.merchandise.title !== "Default Title" ? line.merchandise.title : "";
+      li.innerHTML = `
+        ${line.merchandise.image ? `<img src="${line.merchandise.image.url}" alt="" width="72" height="72" />` : ""}
+        <div class="cart-line-info">
+          <p class="cart-line-title">${line.merchandise.product.title}</p>
+          ${variantLabel ? `<p class="cart-line-variant">${variantLabel}</p>` : ""}
+          <div class="cart-line-qty">
+            <button type="button" data-action="decrease" aria-label="Decrease quantity">&minus;</button>
+            <span>${line.quantity}</span>
+            <button type="button" data-action="increase" aria-label="Increase quantity">&plus;</button>
+          </div>
+        </div>
+        <div class="cart-line-right">
+          <p class="cart-line-price">${currency.format(Number(line.merchandise.price.amount) * line.quantity)}</p>
+          <button type="button" class="cart-line-remove" data-action="remove" aria-label="Remove item">Remove</button>
+        </div>
+      `;
+
+      li.querySelector('[data-action="increase"]')?.addEventListener("click", () =>
+        updateLineQuantity(line.id, line.quantity + 1).catch(console.error),
+      );
+      li.querySelector('[data-action="decrease"]')?.addEventListener("click", () =>
+        updateLineQuantity(line.id, line.quantity - 1).catch(console.error),
+      );
+      li.querySelector('[data-action="remove"]')?.addEventListener("click", () => removeLine(line.id).catch(console.error));
+
+      linesEl.appendChild(li);
+    }
+  }
+
+  function updateBadge(count: number) {
+    window.dispatchEvent(new CustomEvent("cart:count", { detail: count }));
+  }
+
+  window.addEventListener("cart:updated", ((e: CustomEvent<ShopifyCart | null>) => render(e.detail)) as EventListener);
+  window.addEventListener("cart:open", open);
+  closeBtn.addEventListener("click", close);
+  backdrop.addEventListener("click", close);
+
+  render(getCurrentCart());
+  loadCart().catch(console.error);
+</script>
+
+<style>
+  .cart-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    visibility: hidden;
+  }
+
+  .cart-drawer.cart-open {
+    visibility: visible;
+  }
+
+  .cart-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(27, 21, 17, 0.6);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .cart-drawer.cart-open .cart-backdrop {
+    opacity: 1;
+  }
+
+  .cart-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(420px, 100%);
+    background: var(--stage-black);
+    color: var(--off-white);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    border-left: 1px solid rgba(239, 239, 239, 0.15);
+  }
+
+  .cart-drawer.cart-open .cart-panel {
+    transform: translateX(0);
+  }
+
+  .cart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3);
+    border-bottom: 1px solid rgba(239, 239, 239, 0.12);
+  }
+
+  .cart-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+  }
+
+  .cart-close {
+    background: none;
+    border: none;
+    color: var(--off-white);
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .cart-close:hover {
+    color: var(--chai-gold);
+  }
+
+  .cart-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-3);
+  }
+
+  .cart-empty {
+    opacity: 0.6;
+    text-align: center;
+    margin-top: var(--space-4);
+  }
+
+  .cart-lines {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .cart-line {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .cart-line img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .cart-line-info {
+    flex: 1;
+  }
+
+  .cart-line-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .cart-line-variant {
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+
+  .cart-line-qty {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+    font-family: var(--font-mono);
+  }
+
+  .cart-line-qty button {
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: 1px solid rgba(239, 239, 239, 0.3);
+    color: var(--off-white);
+    cursor: pointer;
+  }
+
+  .cart-line-qty button:hover {
+    border-color: var(--chai-gold);
+    color: var(--chai-gold);
+  }
+
+  .cart-line-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cart-line-price {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+  }
+
+  .cart-line-remove {
+    background: none;
+    border: none;
+    color: var(--off-white);
+    opacity: 0.5;
+    font-size: 0.75rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .cart-line-remove:hover {
+    opacity: 1;
+    color: var(--ember);
+  }
+
+  .cart-footer {
+    padding: var(--space-3);
+    border-top: 1px solid rgba(239, 239, 239, 0.12);
+  }
+
+  .cart-subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-2);
+  }
+
+  .cart-checkout-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+</style>

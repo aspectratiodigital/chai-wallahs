@@ -34,22 +34,6 @@ const festivals = defineCollection({
   schema: eventSchema,
 });
 
-const products = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/products" }),
-  schema: z.object({
-    name: z.string(),
-    price: z.number(),
-    image: z.string(),
-    imageHover: z.string().optional(),
-    category: z.string(),
-    featured: z.boolean().default(false),
-    // Unused today — reserved so a future Shopify Storefront API swap doesn't
-    // need a schema change, just a new data source mapped to the same shape.
-    shopifyHandle: z.string().optional(),
-    sku: z.string().optional(),
-  }),
-});
-
 const venues = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/venues" }),
   schema: z.object({
@@ -145,6 +129,7 @@ const site = defineCollection({
 
     heroSub: z.string().optional(),
     shopNote: z.string().optional(),
+    unavailableNote: z.string().optional(),
 
     tracks: z
       .array(
@@ -168,4 +153,4 @@ const site = defineCollection({
   }),
 });
 
-export const collections = { gigs, festivals, products, venues, partners, site, artists };
+export const collections = { gigs, festivals, venues, partners, site, artists };

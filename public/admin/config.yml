@@ -70,28 +70,10 @@ collections:
       - { label: Draft (hide from the site), name: draft, widget: boolean, default: false }
       - { label: Full description (shown on the event's own page), name: body, widget: markdown, required: false }
 
-  - name: products
-    label: Shop Products
-    label_singular: Product
-    folder: src/content/products
-    create: true
-    delete: true
-    slug: "{{slug}}"
-    summary: "{{name}} — £{{price}}"
-    media_folder: "/public/uploads/products"
-    public_folder: "/uploads/products"
-    fields:
-      - { label: Name, name: name, widget: string }
-      - { label: "Price (GBP, e.g. 25 or 17.50)", name: price, widget: number, value_type: float }
-      - { label: Image, name: image, widget: image }
-      - { label: Hover / back image, name: imageHover, widget: image, required: false }
-      - label: Category
-        name: category
-        widget: select
-        options: [Hoodies, T-Shirts, Hats]
-      - { label: "Featured on homepage (max 3 shown)", name: featured, widget: boolean, default: false }
-      - { label: "Shopify handle (reserved for later, leave blank)", name: shopifyHandle, widget: string, required: false }
-      - { label: "SKU (reserved for later, leave blank)", name: sku, widget: string, required: false }
+  # Shop products used to live here as a Decap-edited collection. They're now
+  # pulled straight from Shopify (src/lib/shopify.ts, src/pages/shop/) — the
+  # site owner manages products, prices, images and stock in Shopify admin
+  # instead of here.
 
   - name: venues
     label: "WIAB Venues"
@@ -185,6 +167,7 @@ collections:
         fields:
           - { label: Hero subtext, name: heroSub, widget: text, required: false }
           - { label: "Note below the product grid", name: shopNote, widget: text, required: false }
+          - { label: "Message shown if Shopify can't be reached", name: unavailableNote, widget: text, required: false }
 
       - name: contact
         label: Contact Page

@@ -38,8 +38,25 @@ const links = [
       </ul>
       <a href="/contact/#artists" class="btn btn-solid apply-btn">Join The Movement</a>
     </nav>
+
+    <button type="button" class="cart-toggle" id="cart-toggle" aria-label="Open cart">
+      Cart<span class="cart-count" id="cart-count" hidden>0</span>
+    </button>
   </div>
 </header>
+
+<script>
+  const cartToggle = document.getElementById("cart-toggle");
+  const cartCount = document.getElementById("cart-count");
+
+  cartToggle?.addEventListener("click", () => window.dispatchEvent(new CustomEvent("cart:open")));
+
+  window.addEventListener("cart:count", ((e: CustomEvent<number>) => {
+    if (!cartCount) return;
+    cartCount.textContent = String(e.detail);
+    cartCount.hidden = e.detail === 0;
+  }) as EventListener);
+</script>
 
 <script>
   const toggle = document.getElementById("nav-toggle");
@@ -161,6 +178,36 @@ const links = [
     background: transparent;
     border-color: var(--chai-gold);
     color: var(--chai-gold);
+  }
+
+  .cart-toggle {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid rgba(239, 239, 239, 0.3);
+    color: var(--off-white);
+    padding: 0.5em 0.9em;
+    cursor: pointer;
+    margin-left: 1rem;
+    position: relative;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .cart-toggle:hover {
+    border-color: var(--chai-gold);
+    color: var(--chai-gold);
+  }
+
+  .cart-count {
+    display: inline-block;
+    margin-left: 0.4em;
+    background: var(--chai-gold);
+    color: var(--stage-black);
+    border-radius: 999px;
+    font-size: 0.7rem;
+    padding: 0.05em 0.5em;
   }
 
   .nav-toggle {
