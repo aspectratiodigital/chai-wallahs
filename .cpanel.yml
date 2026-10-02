@@ -6,10 +6,18 @@
 # the static Astro site (using the Node 22 venv set up via Setup Node.js App)
 # and copies the output into public_html.
 #
+# GOMAXPROCS/RAYON_NUM_THREADS are capped because this shared hosting account
+# has a low OS thread limit (~11) and Astro's build tools (esbuild, a Go
+# binary, and Rolldown, a Rust/rayon binary) both default to spawning one
+# thread per detected CPU core, which exceeds that limit and crashes without
+# these caps.
+#
 deployment:
   tasks:
     - export DEPLOYPATH=/home/chaiwall/public_html
     - source /home/chaiwall/nodevenv/nodeapp/22/bin/activate
+    - export GOMAXPROCS=1
+    - export RAYON_NUM_THREADS=1
     - npm ci
     - npm run build
     - deactivate
