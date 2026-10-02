@@ -88,6 +88,33 @@ const stats = [
 ---
 
 <BaseLayout title="Home" description="Independent, artist-first festival venue and sound system. Grassroots since '99.">
+  <!-- MOBILE INTRO SPLASH — stamp fades in on stage-black, then the two
+       "curtain" panels it sits on part to reveal the homepage underneath,
+       echoing the site's own live-stage branding. Mobile only; shown once
+       per browser session so repeat page loads aren't interrupted by it. -->
+  <div class="splash" id="splash">
+    <div class="splash-panel splash-panel--left"></div>
+    <div class="splash-panel splash-panel--right"></div>
+    <div class="splash-logo-wrap">
+      <Image src={StampWhite} alt="Chai Wallahs" width={140} height={140} class="splash-logo" />
+    </div>
+  </div>
+
+  <!-- This runs inline (not a deferred module) so it executes before the
+       splash below ever paints - a repeat visit this session skips straight
+       past it with no flash of the intro. -->
+  <script is:inline>
+    (function () {
+      var splash = document.getElementById("splash");
+      if (!splash) return;
+      var isMobile = window.matchMedia("(max-width: 560px)").matches;
+      var alreadySeen = sessionStorage.getItem("chaiSplashSeen") === "1";
+      if (!isMobile || alreadySeen) {
+        splash.remove();
+      }
+    })();
+  </script>
+
   <!-- HERO -->
   <section class="hero">
     <Image src={HeroBg} alt="" class="hero-img" width={2200} height={1400} priority />
@@ -291,6 +318,36 @@ const stats = [
 </BaseLayout>
 
 <script>
+  // Runs the splash's reveal sequence - only does anything if the inline
+  // script above left the element in the page (mobile, first time this
+  // session). Body scroll is locked for the brief moment it's up so the
+  // homepage can't be scrolled underneath it.
+  const splash = document.getElementById("splash");
+  if (splash) {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    sessionStorage.setItem("chaiSplashSeen", "1");
+    document.body.style.overflow = "hidden";
+
+    function finishSplash() {
+      splash?.remove();
+      document.body.style.overflow = "";
+    }
+
+    if (prefersReducedMotion) {
+      finishSplash();
+    } else {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => splash.classList.add("is-active"));
+      });
+      const HOLD_MS = 1000;
+      const OPEN_MS = 900;
+      setTimeout(() => {
+        splash.classList.add("is-opening");
+        setTimeout(finishSplash, OPEN_MS + 100);
+      }, HOLD_MS);
+    }
+  }
+
   const nums = Array.from(document.querySelectorAll<HTMLElement>(".stat-num[data-target]"));
   const formatter = new Intl.NumberFormat("en-GB");
   const statsSection = document.querySelector(".stats");
@@ -404,6 +461,72 @@ const stats = [
 </script>
 
 <style>
+  /* MOBILE INTRO SPLASH */
+  .splash {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: none;
+  }
+
+  .splash-panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background: var(--stage-black);
+    transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .splash-panel--left {
+    left: 0;
+  }
+
+  .splash-panel--right {
+    right: 0;
+  }
+
+  .splash.is-opening .splash-panel--left {
+    transform: translateX(-100%);
+  }
+
+  .splash.is-opening .splash-panel--right {
+    transform: translateX(100%);
+  }
+
+  .splash-logo-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .splash-logo-wrap :global(.splash-logo) {
+    width: 128px;
+    height: 128px;
+    opacity: 0;
+    transform: scale(0.75);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .splash.is-active .splash-logo-wrap :global(.splash-logo) {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .splash.is-opening .splash-logo-wrap :global(.splash-logo) {
+    opacity: 0;
+    transform: scale(1.12);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  @media (max-width: 560px) {
+    .splash {
+      display: block;
+    }
+  }
+
   /* HERO */
   .hero {
     position: relative;
